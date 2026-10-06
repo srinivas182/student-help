@@ -40,6 +40,7 @@ class DemoDataSeeder extends Seeder
         $this->seedNotifications();
         $this->seedResources();
         $this->seedAnnouncements();
+        $this->seedClassrooms();
     }
 
     private function seedInstitutions(): void
@@ -470,6 +471,49 @@ class DemoDataSeeder extends Seeder
                 'priority' => $priority,
                 'targeting' => ['roles' => $roles, 'curriculum_item_ids' => $itemIds],
                 'publish_at' => now()->subDays($index * 3 + 1),
+            ]);
+        }
+    }
+
+    /** One own-group class and one school-linked class awaiting approval. */
+    private function seedClassrooms(): void
+    {
+        $service = app(\App\Domains\Classroom\Services\ClassroomService::class);
+        $students = User::where('role', User::ROLE_STUDENT)->get();
+        $school = \App\Domains\Curriculum\Models\Institution::where('type', 'school')->first();
+
+        foreach ($this->tutors->take(2) as $index => $teacher) {
+            $subject = $teacher->subjects()->first();
+
+            $classroom = $service->create($teacher, [
+                'name' => $subject ? $subject->name.' revision group' : 'Study group',
+                'description' => 'Weekly revision, worked examples and past paper practice.',
+                'type' => $index === 1 ? \App\Domains\Classroom\Models\Classroom::TYPE_SCHOOL
+                                       : \App\Domains\Classroom\Models\Classroom::TYPE_PERSONAL,
+                'institution_id' => $index === 1 ? $school?->id : null,
+                'curriculum_item_id' => $subject?->id,
+                'capacity' => 40,
+            ]);
+
+            foreach ($students->shuffle()->take(5) as $student) {
+                if ($student->canParticipate()) {
+                    $service->join($classroom, $student);
+                }
+            }
+
+            $classroom->posts()->create([
+                'author_id' => $teacher->id,
+                'type' => 'note',
+                'title' => 'Welcome to the group',
+                'body' => 'Post your questions here during the week and I will work through the hardest ones on Saturday.',
+            ]);
+
+            $classroom->posts()->create([
+                'author_id' => $teacher->id,
+                'type' => 'task',
+                'title' => 'Past paper: Section A',
+                'body' => 'Attempt Section A of the 2025 paper before our next session. Mark yourself done when finished.',
+                'due_at' => now()->addDays(5),
             ]);
         }
     }

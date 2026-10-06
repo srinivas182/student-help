@@ -50,6 +50,12 @@ export default function Authenticated({
                                             Study material
                                         </NavLink>
                                         <NavLink
+                                            href={route('classrooms.index')}
+                                            active={route().current('classrooms.*')}
+                                        >
+                                            My classes
+                                        </NavLink>
+                                        <NavLink
                                             href={route('announcements.index')}
                                             active={route().current('announcements.index')}
                                         >
@@ -71,6 +77,12 @@ export default function Authenticated({
                                             active={route().current('tutor.queue')}
                                         >
                                             Queue
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('classrooms.index')}
+                                            active={route().current('classrooms.*')}
+                                        >
+                                            Classes
                                         </NavLink>
                                         <NavLink
                                             href={route('resources.mine')}
@@ -124,6 +136,12 @@ export default function Authenticated({
                                             active={route().current('moderation.*')}
                                         >
                                             Moderation
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('admin.schoolLinks.index')}
+                                            active={route().current('admin.schoolLinks.*')}
+                                        >
+                                            Schools
                                         </NavLink>
                                         <NavLink
                                             href={route('admin.announcements.index')}

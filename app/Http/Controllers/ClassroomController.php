@@ -1,0 +1,238 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Domains\Classroom\Models\Classroom;
+use App\Domains\Classroom\Models\ClassroomMember;
+use App\Domains\Classroom\Models\ClassroomPost;
+use App\Domains\Classroom\Services\ClassroomService;
+use App\Domains\Curriculum\Models\CurriculumItem;
+use App\Domains\Curriculum\Models\Institution;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Inertia\Inertia;
+use Inertia\Response;
+
+class ClassroomController extends Controller
+{
+    public function __construct(private readonly ClassroomService $classrooms)
+    {
+    }
+
+    public function index(Request $request): Response
+    {
+        $user = $request->user();
+
+        if ($user->isStudent()) {
+            return Inertia::render('Classrooms/StudentIndex', [
+                'classrooms' => $user->classrooms()
+                    ->with(['teacher:id,first_name,last_name', 'institution:id,name', 'subject:id,name'])
+                    ->withCount('students')
+                    ->get()
+                    ->map(fn (Classroom $c) => $this->present($c)),
+            ]);
+        }
+
+        abort_unless($user->isTutor() || $user->isStaff(), 403);
+
+        return Inertia::render('Classrooms/TeacherIndex', [
+            'classrooms' => Classroom::where('teacher_id', $user->id)
+                ->with(['institution:id,name', 'subject:id,name'])
+                ->withCount('students')
+                ->latest()
+                ->get()
+                ->map(fn (Classroom $c) => $this->present($c) + [
+                    'joinCode' => $c->join_code,
+                    'joinCodeActive' => $c->join_code_active,
+                    'schoolLinkStatus' => $c->school_link_status,
+                    'schoolLinkNotes' => $c->school_link_notes,
+                    'isArchived' => $c->is_archived,
+                ]),
+            'institutions' => Institution::orderBy('name')->get(['id', 'name', 'type', 'city']),
+            'subjects' => $user->subjects()->get(['curriculum_items.id', 'name']),
+            'canCreate' => $user->isVerifiedTutor() || $user->isStaff(),
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        abort_unless($user->isVerifiedTutor() || $user->isStaff(), 403);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'description' => ['nullable', 'string', 'max:500'],
+            'type' => ['required', Rule::in([Classroom::TYPE_PERSONAL, Classroom::TYPE_SCHOOL])],
+            'institution_id' => ['nullable', 'required_if:type,school', 'integer', 'exists:institutions,id'],
+            'curriculum_item_id' => [
+                'nullable', 'integer',
+                Rule::exists('curriculum_items', 'id')->where('type', CurriculumItem::TYPE_SUBJECT),
+            ],
+            'capacity' => ['nullable', 'integer', 'between:2,500'],
+        ], [
+            'institution_id.required_if' => 'Choose the school, college or university this class belongs to.',
+        ]);
+
+        $classroom = $this->classrooms->create($user, $validated);
+
+        return back()->with('success', $classroom->type === Classroom::TYPE_SCHOOL
+            ? "Class created. Students can join with code {$classroom->join_code}. The school name appears once DX approves the link."
+            : "Class created. Students can join with code {$classroom->join_code}.");
+    }
+
+    public function show(Request $request, Classroom $classroom): Response
+    {
+        $user = $request->user();
+
+        abort_unless($this->canView($user, $classroom), 403);
+
+        $isTeacher = $classroom->teacher_id === $user->id;
+
+        $classroom->load(['teacher:id,first_name,last_name', 'institution:id,name', 'subject:id,name']);
+
+        return Inertia::render('Classrooms/Show', [
+            'classroom' => $this->present($classroom) + [
+                'description' => $classroom->description,
+                'joinCode' => $isTeacher ? $classroom->join_code : null,
+                'joinCodeActive' => $classroom->join_code_active,
+                'schoolLinkStatus' => $classroom->school_link_status,
+            ],
+            'isTeacher' => $isTeacher,
+            'posts' => $classroom->posts()->with(['author:id,first_name,last_name', 'resource:id,title'])
+                ->get()
+                ->map(fn (ClassroomPost $post) => [
+                    'id' => $post->id,
+                    'type' => $post->type,
+                    'title' => $post->title,
+                    'body' => $post->body,
+                    'author' => $post->author?->name,
+                    'resource' => $post->resource ? ['id' => $post->resource->id, 'title' => $post->resource->title] : null,
+                    'dueAt' => $post->due_at?->toFormattedDateString(),
+                    'isOverdue' => $post->isOverdue(),
+                    'completed' => $post->completedBy()->where('users.id', $user->id)->exists(),
+                    'completedCount' => $isTeacher ? $post->completedBy()->count() : null,
+                    'postedAt' => $post->created_at?->diffForHumans(),
+                ]),
+            'members' => $isTeacher
+                ? $classroom->students()->get(['users.id', 'first_name', 'last_name'])
+                    ->map(fn (User $student) => [
+                        'id' => $student->id,
+                        'name' => $student->name,
+                        'joinedAt' => $student->pivot->joined_at?->toFormattedDateString(),
+                    ])
+                : [],
+            'memberCount' => $classroom->students()->count(),
+        ]);
+    }
+
+    public function join(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'join_code' => ['required', 'string', 'max:12'],
+        ]);
+
+        $classroom = Classroom::active()
+            ->where('join_code', strtoupper($validated['join_code']))
+            ->first();
+
+        if (! $classroom) {
+            return back()->withErrors(['join_code' => 'We could not find a class with that code.']);
+        }
+
+        $this->classrooms->join($classroom, $request->user());
+
+        return redirect()->route('classrooms.show', $classroom)
+            ->with('success', 'You have joined '.$classroom->displayName().'.');
+    }
+
+    public function leave(Request $request, Classroom $classroom): RedirectResponse
+    {
+        $this->classrooms->leave($classroom, $request->user());
+
+        return redirect()->route('classrooms.index')->with('success', 'You have left the class.');
+    }
+
+    public function removeMember(Request $request, Classroom $classroom, User $user): RedirectResponse
+    {
+        abort_unless($classroom->teacher_id === $request->user()->id || $request->user()->isStaff(), 403);
+
+        $this->classrooms->remove($classroom, $user, $request->user());
+
+        return back()->with('success', 'Student removed from the class.');
+    }
+
+    public function rotateCode(Request $request, Classroom $classroom): RedirectResponse
+    {
+        abort_unless($classroom->teacher_id === $request->user()->id, 403);
+
+        $code = $this->classrooms->rotateCode($classroom);
+
+        return back()->with('success', "New join code: {$code}. The old one no longer works.");
+    }
+
+    public function post(Request $request, Classroom $classroom): RedirectResponse
+    {
+        abort_unless($classroom->teacher_id === $request->user()->id, 403);
+
+        $validated = $request->validate([
+            'type' => ['required', Rule::in([ClassroomPost::TYPE_NOTE, ClassroomPost::TYPE_TASK])],
+            'title' => ['required', 'string', 'max:150'],
+            'body' => ['required', 'string', 'max:3000'],
+            'resource_id' => ['nullable', 'integer', 'exists:resources,id'],
+            'due_at' => ['nullable', 'date', 'after:now'],
+        ]);
+
+        $classroom->posts()->create([...$validated, 'author_id' => $request->user()->id]);
+
+        return back()->with('success', 'Posted to the class.');
+    }
+
+    public function complete(Request $request, Classroom $classroom, ClassroomPost $post): RedirectResponse
+    {
+        abort_unless($post->classroom_id === $classroom->id, 404);
+        abort_unless($this->isMember($request->user(), $classroom), 403);
+
+        $post->completedBy()->syncWithoutDetaching([
+            $request->user()->id => ['completed_at' => now()],
+        ]);
+
+        return back();
+    }
+
+    private function canView(User $user, Classroom $classroom): bool
+    {
+        return $classroom->teacher_id === $user->id
+            || $user->isStaff()
+            || $this->isMember($user, $classroom);
+    }
+
+    private function isMember(User $user, Classroom $classroom): bool
+    {
+        return ClassroomMember::where('classroom_id', $classroom->id)
+            ->where('user_id', $user->id)
+            ->where('status', ClassroomMember::STATUS_ACTIVE)
+            ->exists();
+    }
+
+    private function present(Classroom $classroom): array
+    {
+        return [
+            'id' => $classroom->id,
+            'name' => $classroom->name,
+            'displayName' => $classroom->displayName(),
+            'type' => $classroom->type,
+            'school' => $classroom->showsSchoolName() ? $classroom->institution?->name : null,
+            'pendingSchool' => $classroom->type === Classroom::TYPE_SCHOOL
+                && $classroom->school_link_status === Classroom::LINK_PENDING
+                ? $classroom->institution?->name
+                : null,
+            'subject' => $classroom->subject?->name,
+            'teacher' => $classroom->teacher?->name,
+            'students' => $classroom->students_count ?? $classroom->students()->count(),
+            'capacity' => $classroom->capacity,
+        ];
+    }
+}

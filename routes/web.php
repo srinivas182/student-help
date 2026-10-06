@@ -8,11 +8,13 @@ use App\Http\Controllers\Admin\CoverageController;
 use App\Http\Controllers\Admin\CurriculumController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ResourceReviewController;
+use App\Http\Controllers\Admin\SchoolLinkController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\InvitationController;
 use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\NotificationController;
@@ -66,6 +68,19 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
 
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 
+    // Classes hosted by teachers (own group or linked to a school)
+    Route::prefix('classes')->name('classrooms.')->group(function () {
+        Route::get('/', [ClassroomController::class, 'index'])->name('index');
+        Route::post('/', [ClassroomController::class, 'store'])->name('store');
+        Route::post('/join', [ClassroomController::class, 'join'])->name('join');
+        Route::get('/{classroom}', [ClassroomController::class, 'show'])->name('show');
+        Route::post('/{classroom}/leave', [ClassroomController::class, 'leave'])->name('leave');
+        Route::post('/{classroom}/members/{user}/remove', [ClassroomController::class, 'removeMember'])->name('members.remove');
+        Route::post('/{classroom}/code', [ClassroomController::class, 'rotateCode'])->name('code');
+        Route::post('/{classroom}/posts', [ClassroomController::class, 'post'])->name('posts.store');
+        Route::post('/{classroom}/posts/{post}/complete', [ClassroomController::class, 'complete'])->name('posts.complete');
+    });
+
     // Study material: notes, past papers, solutions (SRS: RES-01 – RES-08)
     Route::prefix('resources')->name('resources.')->group(function () {
         Route::get('/', [ResourceController::class, 'index'])->name('index');
@@ -117,6 +132,10 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::get('/announcements', [AdminAnnouncementController::class, 'index'])->name('announcements.index');
         Route::post('/announcements', [AdminAnnouncementController::class, 'store'])->name('announcements.store');
         Route::delete('/announcements/{announcement}', [AdminAnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
+        Route::get('/school-links', [SchoolLinkController::class, 'index'])->name('schoolLinks.index');
+        Route::post('/school-links/{classroom}/approve', [SchoolLinkController::class, 'approve'])->name('schoolLinks.approve');
+        Route::post('/school-links/{classroom}/reject', [SchoolLinkController::class, 'reject'])->name('schoolLinks.reject');
 
         Route::get('/resources', [ResourceReviewController::class, 'index'])->name('resources.index');
         Route::post('/resources/{resource}/approve', [ResourceReviewController::class, 'approve'])->name('resources.approve');
