@@ -40,6 +40,11 @@ class TutorProfile extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function reviewedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
     public function subjects(): BelongsToMany
     {
         return $this->belongsToMany(CurriculumItem::class, 'tutor_subjects');

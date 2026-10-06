@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Onboarding\OnboardingController;
+use App\Http\Controllers\Admin\CoverageController;
+use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\NotificationController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\Moderation\ModerationController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\Student\HelpRequestController;
 use App\Http\Controllers\Tutor\RequestQueueController;
+use App\Http\Controllers\Tutor\TutorProfileController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -60,6 +63,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('/requests/{helpRequest}/rating', [RatingController::class, 'store'])->name('ratings.store');
 
+    // Admin: tutor verification and subject coverage (SRS: TUT-03, D-08)
+    Route::middleware('staff')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/verification', [VerificationController::class, 'index'])->name('verification.index');
+        Route::get('/verification/{tutorProfile}', [VerificationController::class, 'show'])->name('verification.show');
+        Route::get('/documents/{document}', [VerificationController::class, 'document'])->name('documents.show');
+        Route::post('/verification/{tutorProfile}/approve', [VerificationController::class, 'approve'])->name('verification.approve');
+        Route::post('/verification/{tutorProfile}/reject', [VerificationController::class, 'reject'])->name('verification.reject');
+        Route::post('/verification/{tutorProfile}/suspend', [VerificationController::class, 'suspend'])->name('verification.suspend');
+        Route::get('/coverage', CoverageController::class)->name('coverage');
+    });
+
     // Moderation (staff only)
     Route::middleware('staff')->prefix('moderation')->name('moderation.')->group(function () {
         Route::get('/', [ModerationController::class, 'index'])->name('index');
@@ -74,6 +88,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/requests/{helpRequest}/accept', [RequestQueueController::class, 'accept'])->name('requests.accept');
         Route::post('/requests/{helpRequest}/decline', [RequestQueueController::class, 'decline'])->name('requests.decline');
         Route::post('/requests/{helpRequest}/resolve', [RequestQueueController::class, 'resolve'])->name('requests.resolve');
+
+        // Tutor profile and verification (SRS: TUT-01 – TUT-04)
+        Route::get('/profile', [TutorProfileController::class, 'edit'])->name('profile');
+        Route::put('/profile', [TutorProfileController::class, 'update'])->name('profile.update');
+        Route::post('/documents', [TutorProfileController::class, 'uploadDocument'])->name('documents.upload');
+        Route::post('/submit', [TutorProfileController::class, 'submit'])->name('submit');
     });
 
     // Onboarding wizard (SRS: ONB-01 – ONB-10)

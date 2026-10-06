@@ -131,6 +131,22 @@ class DemoDataSeeder extends Seeder
 
             if ($status === TutorProfile::STATUS_APPROVED) {
                 $this->tutors->push($user);
+            } else {
+                // Pending tutors arrive with documents so the queue is reviewable.
+                foreach (['id', 'qualification', 'police_clearance'] as $type) {
+                    $path = "verification/{$profile->id}/{$type}-sample.pdf";
+                    \Illuminate\Support\Facades\Storage::disk('local')->put(
+                        $path,
+                        "Demo document placeholder: {$type} for {$first} {$last}.",
+                    );
+
+                    $profile->documents()->create([
+                        'document_type' => $type,
+                        'path' => $path,
+                        'original_name' => ucfirst(str_replace('_', ' ', $type)).'.pdf',
+                        'size' => 182000,
+                    ]);
+                }
             }
         }
     }

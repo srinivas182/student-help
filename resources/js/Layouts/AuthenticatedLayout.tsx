@@ -34,6 +34,55 @@ export default function Authenticated({
                                 >
                                     Dashboard
                                 </NavLink>
+
+                                {user.role === 'student' && (
+                                    <NavLink
+                                        href={route('requests.index')}
+                                        active={route().current('requests.*')}
+                                    >
+                                        My requests
+                                    </NavLink>
+                                )}
+
+                                {user.role === 'tutor' && (
+                                    <>
+                                        <NavLink
+                                            href={route('tutor.queue')}
+                                            active={route().current('tutor.queue')}
+                                        >
+                                            Queue
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('tutor.profile')}
+                                            active={route().current('tutor.profile')}
+                                        >
+                                            My profile
+                                        </NavLink>
+                                    </>
+                                )}
+
+                                {['admin', 'super_admin', 'moderator'].includes(user.role) && (
+                                    <>
+                                        <NavLink
+                                            href={route('admin.verification.index')}
+                                            active={route().current('admin.verification.*')}
+                                        >
+                                            Verification
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('admin.coverage')}
+                                            active={route().current('admin.coverage')}
+                                        >
+                                            Coverage
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('moderation.index')}
+                                            active={route().current('moderation.*')}
+                                        >
+                                            Moderation
+                                        </NavLink>
+                                    </>
+                                )}
                             </div>
                         </div>
 
