@@ -64,10 +64,28 @@ export default function Authenticated({
                                 {['admin', 'super_admin', 'moderator'].includes(user.role) && (
                                     <>
                                         <NavLink
+                                            href={route('admin.dashboard')}
+                                            active={route().current('admin.dashboard')}
+                                        >
+                                            Overview
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('admin.users.index')}
+                                            active={route().current('admin.users.*')}
+                                        >
+                                            Users
+                                        </NavLink>
+                                        <NavLink
                                             href={route('admin.verification.index')}
                                             active={route().current('admin.verification.*')}
                                         >
                                             Verification
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('admin.curriculum.index')}
+                                            active={route().current('admin.curriculum.*')}
+                                        >
+                                            Curriculum
                                         </NavLink>
                                         <NavLink
                                             href={route('admin.coverage')}
@@ -80,6 +98,12 @@ export default function Authenticated({
                                             active={route().current('moderation.*')}
                                         >
                                             Moderation
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('admin.settings')}
+                                            active={route().current('admin.settings')}
+                                        >
+                                            Settings
                                         </NavLink>
                                     </>
                                 )}

@@ -2,7 +2,13 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Onboarding\OnboardingController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CoverageController;
+use App\Http\Controllers\Admin\CurriculumController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\InvitationController;
 use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\ConversationController;
@@ -23,6 +29,10 @@ Route::get('/', fn () => Inertia::render('Welcome', [
     'laravelVersion' => Application::VERSION,
     'phpVersion' => PHP_VERSION,
 ]))->name('home');
+
+// Staff invitations — public, token-authenticated (SRS: AUTH-08)
+Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
+Route::post('/invitations/{token}', [InvitationController::class, 'accept'])->name('invitations.accept');
 
 // Guardian consent — public, token-authenticated (SRS: CON-02)
 Route::get('/consent/{token}', [ConsentController::class, 'show'])->name('consent.show');
@@ -72,6 +82,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/verification/{tutorProfile}/reject', [VerificationController::class, 'reject'])->name('verification.reject');
         Route::post('/verification/{tutorProfile}/suspend', [VerificationController::class, 'suspend'])->name('verification.suspend');
         Route::get('/coverage', CoverageController::class)->name('coverage');
+
+        // Operational dashboard, users, curriculum, settings, audit (ADM-01 – ADM-06)
+        Route::get('/', AdminDashboardController::class)->name('dashboard');
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::post('/users/{user}/suspend', [UserController::class, 'suspend'])->name('users.suspend');
+        Route::post('/users/{user}/reinstate', [UserController::class, 'reinstate'])->name('users.reinstate');
+        Route::post('/invitations', [UserController::class, 'invite'])->name('invitations.send');
+        Route::delete('/invitations/{invitation}', [UserController::class, 'revokeInvitation'])->name('invitations.revoke');
+
+        Route::get('/curriculum', [CurriculumController::class, 'index'])->name('curriculum.index');
+        Route::post('/curriculum', [CurriculumController::class, 'store'])->name('curriculum.store');
+        Route::put('/curriculum/{curriculumItem}', [CurriculumController::class, 'update'])->name('curriculum.update');
+        Route::post('/curriculum/{curriculumItem}/toggle', [CurriculumController::class, 'toggle'])->name('curriculum.toggle');
+        Route::post('/curriculum/reorder', [CurriculumController::class, 'reorder'])->name('curriculum.reorder');
+        Route::post('/curriculum/import', [CurriculumController::class, 'import'])->name('curriculum.import');
+
+        Route::get('/settings', [SettingsController::class, 'edit'])->name('settings');
+        Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
+        Route::get('/audit', AuditLogController::class)->name('audit');
     });
 
     // Moderation (staff only)
