@@ -56,6 +56,12 @@ export default function Authenticated({
                                             My classes
                                         </NavLink>
                                         <NavLink
+                                            href={route('studyGroups.index')}
+                                            active={route().current('studyGroups.*')}
+                                        >
+                                            Study groups
+                                        </NavLink>
+                                        <NavLink
                                             href={route('announcements.index')}
                                             active={route().current('announcements.index')}
                                         >
@@ -136,6 +142,12 @@ export default function Authenticated({
                                             active={route().current('moderation.index')}
                                         >
                                             Moderation
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('moderation.groups')}
+                                            active={route().current('moderation.groups*')}
+                                        >
+                                            Groups
                                         </NavLink>
                                         <NavLink
                                             href={route('moderation.voice')}

@@ -22,7 +22,9 @@ use App\Http\Controllers\Moderation\ModerationController;
 use App\Http\Controllers\PortalLandingController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\StudyGroupController;
 use App\Http\Controllers\VoiceNoteController;
+use App\Http\Controllers\Moderation\StudyGroupReviewController;
 use App\Http\Controllers\Moderation\VoiceReviewController;
 use App\Http\Controllers\Student\HelpRequestController;
 use App\Http\Controllers\Tutor\RequestQueueController;
@@ -92,6 +94,20 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::get('/{resource}/download', [ResourceController::class, 'download'])->name('download');
     });
 
+    // Student-created study groups
+    Route::prefix('study-groups')->name('studyGroups.')->group(function () {
+        Route::get('/', [StudyGroupController::class, 'index'])->name('index');
+        Route::post('/', [StudyGroupController::class, 'store'])->name('store');
+        Route::post('/join', [StudyGroupController::class, 'join'])->name('join');
+        Route::get('/{group}', [StudyGroupController::class, 'show'])->name('show');
+        Route::get('/{group}/poll', [StudyGroupController::class, 'poll'])->name('poll');
+        Route::post('/{group}/join', [StudyGroupController::class, 'joinById'])->name('joinById');
+        Route::post('/{group}/messages', [StudyGroupController::class, 'post'])->name('post');
+        Route::post('/{group}/messages/{message}/report', [StudyGroupController::class, 'report'])->name('report');
+        Route::post('/{group}/leave', [StudyGroupController::class, 'leave'])->name('leave');
+        Route::post('/{group}/members/{user}/remove', [StudyGroupController::class, 'removeMember'])->name('members.remove');
+    });
+
     // Voice note lessons
     Route::prefix('voice-notes')->name('voiceNotes.')->group(function () {
         Route::post('/', [VoiceNoteController::class, 'store'])->name('store');
@@ -157,6 +173,12 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::get('/', [ModerationController::class, 'index'])->name('index');
         Route::get('/conversations/{helpRequest}', [ModerationController::class, 'conversation'])->name('conversation');
         Route::post('/reports/{report}/resolve', [ModerationController::class, 'resolve'])->name('resolve');
+        Route::get('/study-groups', [StudyGroupReviewController::class, 'index'])->name('groups');
+        Route::get('/study-groups/{group}', [StudyGroupReviewController::class, 'show'])->name('groups.show');
+        Route::post('/study-groups/{group}/lock', [StudyGroupReviewController::class, 'lock'])->name('groups.lock');
+        Route::post('/study-groups/{group}/unlock', [StudyGroupReviewController::class, 'unlock'])->name('groups.unlock');
+        Route::post('/group-messages/{message}/remove', [StudyGroupReviewController::class, 'removeMessage'])->name('groups.message.remove');
+
         Route::get('/voice-notes', [VoiceReviewController::class, 'index'])->name('voice');
         Route::post('/voice-notes/{voiceNote}/clear', [VoiceReviewController::class, 'clear'])->name('voice.clear');
         Route::delete('/voice-notes/{voiceNote}', [VoiceReviewController::class, 'remove'])->name('voice.remove');

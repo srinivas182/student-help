@@ -42,6 +42,7 @@ class DemoDataSeeder extends Seeder
         $this->seedAnnouncements();
         $this->seedClassrooms();
         $this->seedVoiceNotes();
+        $this->seedStudyGroups();
     }
 
     private function seedInstitutions(): void
@@ -556,6 +557,61 @@ class DemoDataSeeder extends Seeder
 
             // Shows the safeguarding pipeline working: the third one is flagged.
             $service->applyTranscript($note, $transcript);
+        }
+    }
+
+    /** Student-run study groups, including one that has tripped the auto-flag. */
+    private function seedStudyGroups(): void
+    {
+        $service = app(\App\Domains\StudyGroup\Services\StudyGroupService::class);
+
+        $students = User::where('role', User::ROLE_STUDENT)->get()
+            ->filter(fn (User $s) => $s->canParticipate())
+            ->values();
+
+        if ($students->count() < 3) {
+            return;
+        }
+
+        $groups = [
+            ['Grade 12 Maths exam crew', 'Working through past papers together every Saturday morning.', false],
+            ['Physical Sciences study circle', 'Swapping notes and quizzing each other before tests.', true],
+        ];
+
+        foreach ($groups as $index => [$name, $description, $problematic]) {
+            $owner = $students[$index];
+            $subject = $owner->subjects()->first();
+
+            $group = $service->create($owner, [
+                'name' => $name,
+                'description' => $description,
+                'curriculum_item_id' => $subject?->id,
+            ]);
+
+            foreach ($students->skip($index + 1)->take(4) as $member) {
+                $service->join($group, $member);
+            }
+
+            $chat = [
+                [$owner, 'Hi everyone. Shall we start with question 3 from the 2025 paper?'],
+                [$students[$index + 1], 'Yes please. I got stuck on the second part.'],
+                [$owner, 'Same here. I will post my working tonight and we can compare.'],
+            ];
+
+            foreach ($chat as [$author, $body]) {
+                $service->post($group, $author, $body);
+            }
+
+            // One group demonstrates the safeguarding pipeline and auto-flagging.
+            if ($problematic) {
+                foreach ([
+                    'Easier if you just WhatsApp me on 082 555 1234',
+                    'Or email me at studygroup@example.co.za',
+                    'My other number is 073 999 8888 if that does not work',
+                ] as $body) {
+                    $service->post($group, $students[$index + 1], $body);
+                }
+            }
         }
     }
 

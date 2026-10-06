@@ -87,6 +87,14 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withTimestamps();
     }
 
+    public function studyGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Domains\StudyGroup\Models\StudyGroup::class, 'study_group_members')
+            ->wherePivot('status', 'active')
+            ->withPivot(['role', 'status', 'joined_at'])
+            ->withTimestamps();
+    }
+
     /** Pathway, institution type, grade, faculty — the student's academic context. */
     public function academicContext(): BelongsToMany
     {
