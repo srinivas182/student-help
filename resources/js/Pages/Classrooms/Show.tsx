@@ -1,3 +1,5 @@
+import VoiceNotePlayer from '@/Components/VoiceNotePlayer';
+import VoiceRecorder from '@/Components/VoiceRecorder';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
@@ -22,6 +24,7 @@ export default function Show({
     posts,
     members,
     memberCount,
+    voiceNotes,
 }: {
     classroom: {
         id: number;
@@ -37,6 +40,15 @@ export default function Show({
     posts: Post[];
     members: { id: number; name: string; joinedAt: string | null }[];
     memberCount: number;
+    voiceNotes: {
+        id: number;
+        title: string | null;
+        author: string | null;
+        duration: string;
+        transcript: string | null;
+        status: string;
+        createdAt: string | null;
+    }[];
 }) {
     const [posting, setPosting] = useState(false);
 
@@ -165,6 +177,28 @@ export default function Show({
                             </form>
                         )}
                     </div>
+                )}
+
+                {isTeacher && <VoiceRecorder context="classroom" contextId={classroom.id} />}
+
+                {voiceNotes.length > 0 && (
+                    <section className="space-y-3">
+                        <h2 className="font-semibold text-slate-900">Voice note lessons</h2>
+                        {voiceNotes.map((note) => (
+                            <VoiceNotePlayer
+                                key={note.id}
+                                note={note}
+                                onDelete={
+                                    isTeacher
+                                        ? () =>
+                                              router.delete(route('voiceNotes.destroy', note.id), {
+                                                  preserveScroll: true,
+                                              })
+                                        : undefined
+                                }
+                            />
+                        ))}
+                    </section>
                 )}
 
                 <section className="space-y-3">

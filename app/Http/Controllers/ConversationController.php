@@ -6,6 +6,7 @@ use App\Domains\Tutoring\Models\HelpRequest;
 use App\Domains\Tutoring\Models\Message;
 use App\Domains\Tutoring\Services\MessageService;
 use App\Domains\Tutoring\Services\ModerationService;
+use App\Domains\Voice\Models\VoiceNote;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -47,6 +48,20 @@ class ConversationController extends Controller
             'messages' => $this->serialise($helpRequest, $user->id),
             'isTutor' => $user->id === $helpRequest->tutor_id,
             'canPost' => $user->canParticipate() && $helpRequest->isConversationOpen(),
+            'voiceNotes' => VoiceNote::where('attachable_type', $helpRequest->getMorphClass())
+                ->where('attachable_id', $helpRequest->id)
+                ->with('user:id,first_name,last_name')
+                ->oldest()
+                ->get()
+                ->map(fn (VoiceNote $note) => [
+                    'id' => $note->id,
+                    'title' => $note->title,
+                    'author' => $note->user?->name,
+                    'duration' => $note->durationLabel(),
+                    'transcript' => $note->transcript,
+                    'status' => $note->transcription_status,
+                    'createdAt' => $note->created_at?->diffForHumans(),
+                ]),
             'rating' => $helpRequest->rating ? [
                 'stars' => $helpRequest->rating->stars,
                 'comment' => $helpRequest->rating->comment,

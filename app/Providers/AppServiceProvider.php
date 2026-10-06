@@ -12,7 +12,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Swap this binding when DX chooses a transcription provider.
+        $this->app->bind(
+            \App\Domains\Voice\Services\Transcriber::class,
+            \App\Domains\Voice\Services\NullTranscriber::class,
+        );
     }
 
     /**

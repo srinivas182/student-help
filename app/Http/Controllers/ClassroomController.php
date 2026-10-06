@@ -8,6 +8,7 @@ use App\Domains\Classroom\Models\ClassroomPost;
 use App\Domains\Classroom\Services\ClassroomService;
 use App\Domains\Curriculum\Models\CurriculumItem;
 use App\Domains\Curriculum\Models\Institution;
+use App\Domains\Voice\Models\VoiceNote;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -125,6 +126,20 @@ class ClassroomController extends Controller
                     ])
                 : [],
             'memberCount' => $classroom->students()->count(),
+            'voiceNotes' => VoiceNote::where('attachable_type', $classroom->getMorphClass())
+                ->where('attachable_id', $classroom->id)
+                ->with('user:id,first_name,last_name')
+                ->latest()
+                ->get()
+                ->map(fn (VoiceNote $note) => [
+                    'id' => $note->id,
+                    'title' => $note->title,
+                    'author' => $note->user?->name,
+                    'duration' => $note->durationLabel(),
+                    'transcript' => $note->transcript,
+                    'status' => $note->transcription_status,
+                    'createdAt' => $note->created_at?->diffForHumans(),
+                ]),
         ]);
     }
 

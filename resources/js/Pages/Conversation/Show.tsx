@@ -1,4 +1,6 @@
 import StatusBadge from '@/Components/StatusBadge';
+import VoiceNotePlayer from '@/Components/VoiceNotePlayer';
+import VoiceRecorder from '@/Components/VoiceRecorder';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { FormEventHandler, useEffect, useRef, useState } from 'react';
@@ -27,6 +29,15 @@ interface Props {
     isTutor: boolean;
     canPost: boolean;
     rating: { stars: number; comment: string | null } | null;
+    voiceNotes: {
+        id: number;
+        title: string | null;
+        author: string | null;
+        duration: string;
+        transcript: string | null;
+        status: string;
+        createdAt: string | null;
+    }[];
 }
 
 const REPORT_REASONS = [
@@ -38,7 +49,7 @@ const REPORT_REASONS = [
     { value: 'other', label: 'Something else' },
 ];
 
-export default function Show({ request, counterpart, messages, isTutor, canPost, rating }: Props) {
+export default function Show({ request, counterpart, messages, isTutor, canPost, rating, voiceNotes }: Props) {
     const [thread, setThread] = useState<ChatMessage[]>(messages);
     const [reportingId, setReportingId] = useState<number | null>(null);
     const bottom = useRef<HTMLDivElement>(null);
@@ -208,6 +219,21 @@ export default function Show({ request, counterpart, messages, isTutor, canPost,
                         and moderators can review any conversation to keep learners safe.
                     </p>
                 </div>
+
+                {voiceNotes.length > 0 && (
+                    <section className="mt-5 space-y-3">
+                        <h2 className="text-sm font-semibold text-slate-900">Voice notes</h2>
+                        {voiceNotes.map((note) => (
+                            <VoiceNotePlayer key={note.id} note={note} />
+                        ))}
+                    </section>
+                )}
+
+                {canPost && (
+                    <div className="mt-5">
+                        <VoiceRecorder context="request" contextId={request.id} maxSeconds={300} />
+                    </div>
+                )}
 
                 {!isTutor && !rating && ['resolved', 'closed'].includes(request.status) && (
                     <RatingForm requestId={request.id} />

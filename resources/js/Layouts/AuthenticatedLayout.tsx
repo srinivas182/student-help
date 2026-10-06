@@ -133,9 +133,15 @@ export default function Authenticated({
                                         </NavLink>
                                         <NavLink
                                             href={route('moderation.index')}
-                                            active={route().current('moderation.*')}
+                                            active={route().current('moderation.index')}
                                         >
                                             Moderation
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('moderation.voice')}
+                                            active={route().current('moderation.voice*')}
+                                        >
+                                            Voice
                                         </NavLink>
                                         <NavLink
                                             href={route('admin.schoolLinks.index')}

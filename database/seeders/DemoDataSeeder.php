@@ -41,6 +41,7 @@ class DemoDataSeeder extends Seeder
         $this->seedResources();
         $this->seedAnnouncements();
         $this->seedClassrooms();
+        $this->seedVoiceNotes();
     }
 
     private function seedInstitutions(): void
@@ -515,6 +516,46 @@ class DemoDataSeeder extends Seeder
                 'body' => 'Attempt Section A of the 2025 paper before our next session. Mark yourself done when finished.',
                 'due_at' => now()->addDays(5),
             ]);
+        }
+    }
+
+    /** Voice note lessons, including one flagged for contact details spoken aloud. */
+    private function seedVoiceNotes(): void
+    {
+        $service = app(\App\Domains\Voice\Services\VoiceNoteService::class);
+        $classrooms = \App\Domains\Classroom\Models\Classroom::with('teacher')->get();
+
+        $samples = [
+            ['The chain rule in two minutes', 118, 'Start by differentiating the outer function, then multiply by the derivative of the inner one. Let us work through two examples together.'],
+            ['Balancing redox equations', 164, 'Split the reaction into half equations first. Balance the atoms, then the charges, and only then combine them again.'],
+            ['Bank reconciliation walkthrough', 203, 'Begin with the cash book balance. Add deposits in transit, subtract outstanding cheques, and you should land on the bank statement balance. If you get stuck, call me on 082 123 4567 and we can go through it.'],
+        ];
+
+        foreach ($samples as $index => [$title, $seconds, $transcript]) {
+            $classroom = $classrooms[$index % max($classrooms->count(), 1)] ?? null;
+
+            if (! $classroom) {
+                continue;
+            }
+
+            $path = 'voice-notes/'.$classroom->teacher_id.'/'.Str::slug($title).'.webm';
+            \Illuminate\Support\Facades\Storage::disk('local')->put($path, 'Demo audio placeholder for '.$title);
+
+            $note = \App\Domains\Voice\Models\VoiceNote::create([
+                'user_id' => $classroom->teacher_id,
+                'attachable_type' => \App\Domains\Classroom\Models\Classroom::class,
+                'attachable_id' => $classroom->id,
+                'path' => $path,
+                'mime_type' => 'audio/webm',
+                'size' => $seconds * 12000,
+                'duration_seconds' => $seconds,
+                'title' => $title,
+                'transcription_status' => \App\Domains\Voice\Models\VoiceNote::STATUS_PENDING,
+                'plays' => rand(3, 40),
+            ]);
+
+            // Shows the safeguarding pipeline working: the third one is flagged.
+            $service->applyTranscript($note, $transcript);
         }
     }
 

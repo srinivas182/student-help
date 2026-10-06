@@ -22,6 +22,8 @@ use App\Http\Controllers\Moderation\ModerationController;
 use App\Http\Controllers\PortalLandingController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\VoiceNoteController;
+use App\Http\Controllers\Moderation\VoiceReviewController;
 use App\Http\Controllers\Student\HelpRequestController;
 use App\Http\Controllers\Tutor\RequestQueueController;
 use App\Http\Controllers\Tutor\TeacherDashboardController;
@@ -90,6 +92,13 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::get('/{resource}/download', [ResourceController::class, 'download'])->name('download');
     });
 
+    // Voice note lessons
+    Route::prefix('voice-notes')->name('voiceNotes.')->group(function () {
+        Route::post('/', [VoiceNoteController::class, 'store'])->name('store');
+        Route::get('/{voiceNote}/play', [VoiceNoteController::class, 'play'])->name('play');
+        Route::delete('/{voiceNote}', [VoiceNoteController::class, 'destroy'])->name('destroy');
+    });
+
     // Conversations, ratings and reporting (SRS: MSG-*, RAT-*)
     Route::prefix('conversations')->name('conversations.')->group(function () {
         Route::get('/{helpRequest}', [ConversationController::class, 'show'])->name('show');
@@ -148,6 +157,9 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::get('/', [ModerationController::class, 'index'])->name('index');
         Route::get('/conversations/{helpRequest}', [ModerationController::class, 'conversation'])->name('conversation');
         Route::post('/reports/{report}/resolve', [ModerationController::class, 'resolve'])->name('resolve');
+        Route::get('/voice-notes', [VoiceReviewController::class, 'index'])->name('voice');
+        Route::post('/voice-notes/{voiceNote}/clear', [VoiceReviewController::class, 'clear'])->name('voice.clear');
+        Route::delete('/voice-notes/{voiceNote}', [VoiceReviewController::class, 'remove'])->name('voice.remove');
     });
 
     // Tutor queue
