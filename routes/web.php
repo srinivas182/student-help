@@ -2,6 +2,9 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Onboarding\OnboardingController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\Moderation\ModerationController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\Student\HelpRequestController;
 use App\Http\Controllers\Tutor\RequestQueueController;
 use App\Http\Controllers\ProfileController;
@@ -28,6 +31,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{helpRequest}/cancel', [HelpRequestController::class, 'cancel'])->name('cancel');
         Route::post('/{helpRequest}/confirm', [HelpRequestController::class, 'confirm'])->name('confirm');
         Route::post('/{helpRequest}/reopen', [HelpRequestController::class, 'reopen'])->name('reopen');
+    });
+
+    // Conversations, ratings and reporting (SRS: MSG-*, RAT-*)
+    Route::prefix('conversations')->name('conversations.')->group(function () {
+        Route::get('/{helpRequest}', [ConversationController::class, 'show'])->name('show');
+        Route::get('/{helpRequest}/poll', [ConversationController::class, 'poll'])->name('poll');
+        Route::post('/{helpRequest}/messages', [ConversationController::class, 'store'])->name('store');
+        Route::post('/{helpRequest}/messages/{message}/report', [ConversationController::class, 'report'])->name('report');
+    });
+
+    Route::post('/requests/{helpRequest}/rating', [RatingController::class, 'store'])->name('ratings.store');
+
+    // Moderation (staff only)
+    Route::middleware('staff')->prefix('moderation')->name('moderation.')->group(function () {
+        Route::get('/', [ModerationController::class, 'index'])->name('index');
+        Route::get('/conversations/{helpRequest}', [ModerationController::class, 'conversation'])->name('conversation');
+        Route::post('/reports/{report}/resolve', [ModerationController::class, 'resolve'])->name('resolve');
     });
 
     // Tutor queue

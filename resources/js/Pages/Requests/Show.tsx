@@ -87,9 +87,16 @@ export default function Show({ request }: { request: RequestDetail }) {
                             </div>
                         </div>
 
-                        <p className="mt-4 rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
-                            Messaging opens in the next release. All conversations stay inside DX Student Help
-                            and are visible to moderators to keep learners safe.
+                        <Link
+                            href={route('conversations.show', request.id)}
+                            className="mt-4 inline-block rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+                        >
+                            Open conversation
+                        </Link>
+
+                        <p className="mt-3 text-xs text-slate-500">
+                            Conversations stay inside DX Student Help. Contact details are removed
+                            automatically and moderators can review any conversation to keep learners safe.
                         </p>
                     </section>
                 )}

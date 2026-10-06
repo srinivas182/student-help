@@ -36,6 +36,7 @@ class DemoDataSeeder extends Seeder
         $this->seedTutors($admin);
         $students = $this->seedStudents();
         $this->seedActivity($students);
+        $this->seedReports();
     }
 
     private function seedInstitutions(): void
@@ -308,6 +309,41 @@ class DemoDataSeeder extends Seeder
                         null,
                     ])->random(),
                 ]);
+            }
+        }
+    }
+
+    /** A couple of open reports so the moderation queue has something to show. */
+    private function seedReports(): void
+    {
+        $moderation = app(\App\Domains\Tutoring\Services\ModerationService::class);
+
+        $messages = Message::with('helpRequest.student')->inRandomOrder()->limit(3)->get();
+
+        $reasons = ['contact_details', 'academic_dishonesty', 'inappropriate'];
+
+        foreach ($messages as $index => $message) {
+            $reporter = $message->helpRequest?->student;
+
+            if (! $reporter) {
+                continue;
+            }
+
+            $report = $moderation->report(
+                $reporter,
+                $message,
+                $reasons[$index % count($reasons)],
+                'Reported from the conversation screen during demo data generation.',
+            );
+
+            // Leave the newest open; close the oldest so both views have content.
+            if ($index === 2) {
+                $moderation->resolve(
+                    $report,
+                    User::where('role', User::ROLE_MODERATOR)->first(),
+                    'dismiss',
+                    'Reviewed: no action needed, the tutor was explaining method only.',
+                );
             }
         }
     }

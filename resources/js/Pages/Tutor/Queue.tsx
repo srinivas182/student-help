@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import StatusBadge from '@/Components/StatusBadge';
-import { Head, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 
 interface Offer {
     id: number;
@@ -145,6 +145,12 @@ export default function Queue({
                                         </p>
                                     </div>
                                     <StatusBadge status={item.status} />
+                                    <Link
+                                        href={route('conversations.show', item.id)}
+                                        className="rounded-lg border border-slate-300 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                                    >
+                                        Open chat
+                                    </Link>
                                     {item.status === 'assigned' && (
                                         <button
                                             onClick={() => router.post(route('tutor.requests.resolve', item.id))}
