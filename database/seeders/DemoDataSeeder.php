@@ -37,6 +37,7 @@ class DemoDataSeeder extends Seeder
         $students = $this->seedStudents();
         $this->seedActivity($students);
         $this->seedReports();
+        $this->seedNotifications();
     }
 
     private function seedInstitutions(): void
@@ -345,6 +346,31 @@ class DemoDataSeeder extends Seeder
                     'Reviewed: no action needed, the tutor was explaining method only.',
                 );
             }
+        }
+    }
+
+    /** A few in-app notifications so the bell is not empty in the demo. */
+    private function seedNotifications(): void
+    {
+        $requests = HelpRequest::with(['student', 'tutor', 'subject'])
+            ->whereNotNull('tutor_id')
+            ->limit(6)
+            ->get();
+
+        foreach ($requests as $index => $request) {
+            $request->student->notifications()->create([
+                'id' => (string) Str::uuid(),
+                'type' => \App\Notifications\RequestAccepted::class,
+                'data' => [
+                    'event' => 'request_accepted',
+                    'title' => 'A tutor has accepted your request',
+                    'body' => ($request->tutor->first_name ?? 'A tutor').' picked up your question on "'.$request->topic.'".',
+                    'url' => route('conversations.show', $request),
+                ],
+                'read_at' => $index > 2 ? now()->subDays(1) : null,
+                'created_at' => now()->subHours($index * 5 + 1),
+                'updated_at' => now()->subHours($index * 5 + 1),
+            ]);
         }
     }
 

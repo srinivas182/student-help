@@ -5,6 +5,11 @@ namespace App\Domains\Tutoring\Services;
 use App\Domains\Tutoring\Models\HelpRequest;
 use App\Domains\Tutoring\Models\HelpRequestOffer;
 use App\Models\User;
+use App\Notifications\RequestAccepted;
+use App\Notifications\RequestEscalated;
+use App\Notifications\RequestOffered;
+use App\Notifications\RequestResolved;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -37,6 +42,11 @@ class HelpRequestService
             ]);
 
             $notified = $this->matching->offer($request);
+
+            Notification::send(
+                User::whereIn('id', $request->offers()->pluck('tutor_id'))->get(),
+                new RequestOffered($request),
+            );
 
             audit('help_request.created', $request, [
                 'subject_id' => $request->subject_id,
@@ -111,6 +121,8 @@ class HelpRequestService
             $fresh->offers()->where('tutor_id', $tutor->id)
                 ->update(['status' => HelpRequestOffer::STATUS_ACCEPTED]);
 
+            $fresh->student->notify(new RequestAccepted($fresh));
+
             audit('help_request.accepted', $fresh, ['tutor_id' => $tutor->id]);
 
             return $fresh;
@@ -139,6 +151,11 @@ class HelpRequestService
             'status' => HelpRequest::STATUS_ESCALATED,
             'escalated_at' => now(),
         ]);
+
+        Notification::send(
+            User::whereIn('role', [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN])->get(),
+            new RequestEscalated($request),
+        );
 
         audit('help_request.escalated', $request);
     }
@@ -182,6 +199,8 @@ class HelpRequestService
             'resolved_at' => now(),
             'last_activity_at' => now(),
         ]);
+
+        $request->student->notify(new RequestResolved($request));
 
         audit('help_request.resolved', $request, ['tutor_id' => $tutor->id]);
     }

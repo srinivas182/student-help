@@ -2,14 +2,17 @@
 
 namespace App\Domains\Identity\Services;
 
-use App\Domains\Identity\Models\GuardianConsent;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+
 
 class RegistrationService
 {
+    public function __construct(private readonly ConsentService $consent)
+    {
+    }
+
     /**
      * Create the account and, for a learner under 18, raise the guardian
      * consent record that gates participation (SRS: CON-01 – CON-04).
@@ -32,16 +35,8 @@ class RegistrationService
             ]);
 
             if ($user->isMinor()) {
-                GuardianConsent::create([
-                    'user_id' => $user->id,
-                    'guardian_name' => $data['guardian_name'],
-                    'guardian_email' => $data['guardian_email'],
-                    'guardian_mobile' => $data['guardian_mobile'] ?? null,
-                    'token' => Str::random(64),
-                    'status' => GuardianConsent::STATUS_PENDING,
-                    'requested_at' => now(),
-                    'policy_version' => (string) setting('policy_version', '1.0'),
-                ]);
+                // Creates the consent record and emails the guardian (CON-02).
+                $this->consent->request($user, $data);
             }
 
             audit('user.registered', $user, ['role' => $user->role, 'is_minor' => $user->isMinor()]);

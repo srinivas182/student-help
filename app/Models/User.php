@@ -33,6 +33,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'first_name', 'last_name', 'name', 'email', 'password', 'date_of_birth',
         'role', 'status', 'mobile', 'institution_id', 'onboarding_completed_at',
         'plan', 'plan_expires_at', 'free_for_life', 'monthly_request_quota',
+        'notification_preferences',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -46,6 +47,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'plan_expires_at' => 'datetime',
             'date_of_birth' => 'date',
             'free_for_life' => 'boolean',
+            'notification_preferences' => 'array',
             'password' => 'hashed',
         ];
     }

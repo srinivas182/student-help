@@ -5,6 +5,7 @@ namespace App\Domains\Tutoring\Services;
 use App\Domains\Tutoring\Models\HelpRequest;
 use App\Domains\Tutoring\Models\Message;
 use App\Models\User;
+use App\Notifications\NewMessage;
 use Illuminate\Validation\ValidationException;
 
 class MessageService
@@ -28,6 +29,13 @@ class MessageService
         ]);
 
         $request->update(['last_activity_at' => now()]);
+
+        // Notify the other party only — never the sender.
+        $recipientId = $sender->id === $request->student_id ? $request->tutor_id : $request->student_id;
+
+        if ($recipientId) {
+            User::find($recipientId)?->notify(new NewMessage($message));
+        }
 
         if ($message->is_flagged) {
             audit('message.flagged', $message, ['help_request_id' => $request->id]);

@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Onboarding\OnboardingController;
+use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Moderation\ModerationController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\Student\HelpRequestController;
@@ -19,7 +21,22 @@ Route::get('/', fn () => Inertia::render('Welcome', [
     'phpVersion' => PHP_VERSION,
 ]))->name('home');
 
+// Guardian consent — public, token-authenticated (SRS: CON-02)
+Route::get('/consent/{token}', [ConsentController::class, 'show'])->name('consent.show');
+Route::post('/consent/{token}', [ConsentController::class, 'decide'])->name('consent.decide');
+
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Notifications (SRS: NOT-01 – NOT-04)
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/unread', [NotificationController::class, 'unread'])->name('unread');
+        Route::post('/{id}/read', [NotificationController::class, 'markRead'])->name('read');
+        Route::post('/read-all', [NotificationController::class, 'markAllRead'])->name('readAll');
+        Route::put('/preferences', [NotificationController::class, 'updatePreferences'])->name('preferences');
+    });
+
+    Route::post('/consent/resend', [ConsentController::class, 'resend'])->name('consent.resend');
+
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     // Help requests — students (SRS: REQ-01 – REQ-11)

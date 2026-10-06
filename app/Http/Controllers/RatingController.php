@@ -6,6 +6,7 @@ use App\Domains\Tutoring\Models\HelpRequest;
 use App\Domains\Tutoring\Models\Rating;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Notifications\RatingReceived;
 use Illuminate\Support\Facades\DB;
 
 class RatingController extends Controller
@@ -26,8 +27,8 @@ class RatingController extends Controller
             'comment' => ['nullable', 'string', 'max:500'],
         ]);
 
-        DB::transaction(function () use ($helpRequest, $validated) {
-            Rating::create([
+        $rating = DB::transaction(function () use ($helpRequest, $validated) {
+            $rating = Rating::create([
                 'help_request_id' => $helpRequest->id,
                 'student_id' => $helpRequest->student_id,
                 'tutor_id' => $helpRequest->tutor_id,
@@ -36,7 +37,11 @@ class RatingController extends Controller
             ]);
 
             $this->recalculate($helpRequest);
+
+            return $rating;
         });
+
+        $helpRequest->tutor?->notify(new RatingReceived($rating));
 
         audit('rating.created', $helpRequest, ['stars' => $validated['stars']]);
 
