@@ -87,6 +87,52 @@ class User extends Authenticatable implements MustVerifyEmail
             ->withTimestamps();
     }
 
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Domains\Access\Models\Role::class)
+            ->withPivot('assigned_by')
+            ->withTimestamps();
+    }
+
+    public function reviewerScopes(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Access\Models\ReviewerScope::class);
+    }
+
+    /**
+     * Super administrators hold every permission implicitly; everyone else holds
+     * exactly what their assigned roles grant.
+     */
+    public function hasPermission(string $permission): bool
+    {
+        if ($this->role === self::ROLE_SUPER_ADMIN) {
+            return true;
+        }
+
+        return $this->roles->contains(fn ($role) => $role->grants($permission));
+    }
+
+    /** A reviewer with no scope rows may review anything; scopes narrow them. */
+    public function mayReview(?int $subjectId, ?int $languageId): bool
+    {
+        if (! $this->hasPermission('topics.review') && ! $this->hasPermission('topics.publish')) {
+            return false;
+        }
+
+        $scopes = $this->reviewerScopes;
+
+        if ($scopes->isEmpty()) {
+            return true;
+        }
+
+        return $scopes->contains(function ($scope) use ($subjectId, $languageId) {
+            $subjectOk = $scope->curriculum_item_id === null || $scope->curriculum_item_id === $subjectId;
+            $languageOk = $scope->language_id === null || $scope->language_id === $languageId;
+
+            return $subjectOk && $languageOk;
+        });
+    }
+
     public function preferredLanguage(): BelongsTo
     {
         return $this->belongsTo(\App\Domains\Tutor\Models\Language::class, 'preferred_language_id');

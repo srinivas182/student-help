@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CoverageController;
 use App\Http\Controllers\Admin\CurriculumController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ResourceReviewController;
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SchoolLinkController;
 use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\SettingsController;
@@ -177,6 +178,17 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/curriculum/{curriculumItem}/toggle', [CurriculumController::class, 'toggle'])->name('curriculum.toggle');
         Route::post('/curriculum/reorder', [CurriculumController::class, 'reorder'])->name('curriculum.reorder');
         Route::post('/curriculum/import', [CurriculumController::class, 'import'])->name('curriculum.import');
+
+        // Roles, permissions and reviewer scopes
+        Route::get('/roles', [RoleController::class, 'index'])->name('roles.index');
+        Route::post('/roles', [RoleController::class, 'store'])->name('roles.store');
+        Route::put('/roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+        Route::delete('/roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+        Route::post('/roles/assign', [RoleController::class, 'assign'])->name('roles.assign');
+        Route::delete('/roles/{role}/users/{user}', [RoleController::class, 'revoke'])->name('roles.revoke')->scopeBindings();
+        Route::post('/reviewer-scopes', [RoleController::class, 'addScope'])->name('roles.scopes.add');
+        Route::delete('/reviewer-scopes/{scope}', [RoleController::class, 'removeScope'])->name('roles.scopes.remove');
+        Route::get('/access-activity', [RoleController::class, 'activity'])->name('roles.activity');
 
         // AI Tutor: curriculum lessons generated once, used by every student
         Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');

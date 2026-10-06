@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'staff' => \App\Http\Middleware\EnsureIsStaff::class,
             'portal' => \App\Http\Middleware\EnsureCorrectPortal::class,
+            'can.do' => \App\Http\Middleware\EnsurePermission::class,
         ]);
 
         $middleware->web(append: [
