@@ -36,12 +36,20 @@ export default function Authenticated({
                                 </NavLink>
 
                                 {user.role === 'student' && (
-                                    <NavLink
-                                        href={route('requests.index')}
-                                        active={route().current('requests.*')}
-                                    >
-                                        My requests
-                                    </NavLink>
+                                    <>
+                                        <NavLink
+                                            href={route('requests.index')}
+                                            active={route().current('requests.*')}
+                                        >
+                                            My requests
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('resources.index')}
+                                            active={route().current('resources.index')}
+                                        >
+                                            Study material
+                                        </NavLink>
+                                    </>
                                 )}
 
                                 {user.role === 'tutor' && (
@@ -51,6 +59,12 @@ export default function Authenticated({
                                             active={route().current('tutor.queue')}
                                         >
                                             Queue
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('resources.mine')}
+                                            active={route().current('resources.*')}
+                                        >
+                                            Material
                                         </NavLink>
                                         <NavLink
                                             href={route('tutor.profile')}
@@ -98,6 +112,12 @@ export default function Authenticated({
                                             active={route().current('moderation.*')}
                                         >
                                             Moderation
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('admin.resources.index')}
+                                            active={route().current('admin.resources.*')}
+                                        >
+                                            Material
                                         </NavLink>
                                         <NavLink
                                             href={route('admin.settings')}

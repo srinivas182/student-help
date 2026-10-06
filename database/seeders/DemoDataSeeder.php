@@ -38,6 +38,7 @@ class DemoDataSeeder extends Seeder
         $this->seedActivity($students);
         $this->seedReports();
         $this->seedNotifications();
+        $this->seedResources();
     }
 
     private function seedInstitutions(): void
@@ -387,6 +388,63 @@ class DemoDataSeeder extends Seeder
                 'created_at' => now()->subHours($index * 5 + 1),
                 'updated_at' => now()->subHours($index * 5 + 1),
             ]);
+        }
+    }
+
+    /** Study notes, past papers and solutions so the library is not empty. */
+    private function seedResources(): void
+    {
+        $catalogue = [
+            ['Grade 11 Trigonometry — worked examples', 'notes', 'Fifteen worked examples covering identities, proofs and the sine and cosine rules.'],
+            ['Grade 12 Mathematics Paper 1 (2025)', 'past_paper', 'Full question paper from the November 2025 NSC examination.'],
+            ['Grade 12 Mathematics Paper 1 — memo', 'solution', 'Step-by-step solutions with mark allocations.'],
+            ['Physical Sciences: Newton\'s laws summary', 'notes', 'One-page summary with free-body diagram practice.'],
+            ['Chemical equations: balancing drill', 'course_material', 'Twenty practice equations, answers at the end.'],
+            ['Accounting: bank reconciliation explained', 'notes', 'Worked example from cash book to reconciled balance.'],
+            ['Voice note: the chain rule in two minutes', 'other', 'A short spoken explanation you can listen to on the way to school.'],
+            ['Life Sciences: photosynthesis diagrams', 'notes', 'Labelled diagrams for the light and dark reactions.'],
+            ['English HL: structuring a discursive essay', 'notes', 'Paragraph-by-paragraph structure with a model answer.'],
+            ['Grade 11 Accounting June paper', 'past_paper', 'Mid-year examination paper with answer sheet.'],
+            ['Economics: elasticity made simple', 'notes', 'Graphs explained in plain language with real South African examples.'],
+            ['Geography: reading contour maps', 'course_material', 'How to work out gradient and cross-sections.'],
+        ];
+
+        $uploaders = $this->tutors->take(6);
+        $admin = User::where('role', User::ROLE_ADMIN)->first();
+
+        foreach ($catalogue as $index => [$title, $type, $description]) {
+            $uploader = $index % 4 === 0 ? $admin : $uploaders[$index % $uploaders->count()];
+            $subject = $uploader->subjects()->inRandomOrder()->first();
+
+            if (! $subject) {
+                continue;
+            }
+
+            // Two are left pending so the review queue has content.
+            $pending = in_array($index, [10, 11], true) && ! $uploader->isStaff();
+
+            $path = 'resources/'.$uploader->id.'/'.Str::slug($title).'.pdf';
+            \Illuminate\Support\Facades\Storage::disk('local')->put($path, "Demo material placeholder: {$title}.");
+
+            $resource = \App\Domains\Content\Models\Resource::create([
+                'uploaded_by' => $uploader->id,
+                'title' => $title,
+                'description' => $description,
+                'resource_type' => $type,
+                'path' => $path,
+                'mime_type' => $type === 'other' ? 'audio/mpeg' : 'application/pdf',
+                'size' => rand(120000, 2400000),
+                'rights_declared' => true,
+                'status' => $pending
+                    ? \App\Domains\Content\Models\Resource::STATUS_PENDING
+                    : \App\Domains\Content\Models\Resource::STATUS_PUBLISHED,
+                'approved_by' => $pending ? null : $admin?->id,
+                'approved_at' => $pending ? null : now()->subDays(rand(1, 20)),
+                'views' => $pending ? 0 : rand(5, 180),
+                'downloads' => $pending ? 0 : rand(2, 90),
+            ]);
+
+            $resource->curriculumItems()->sync([$subject->id]);
         }
     }
 

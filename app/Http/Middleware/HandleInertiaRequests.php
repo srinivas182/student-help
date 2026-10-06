@@ -43,6 +43,12 @@ class HandleInertiaRequests extends Middleware
                     'is_minor' => $request->user()->isMinor(),
                 ] : null,
             ],
+            'portal' => [
+                'current' => app(\App\Domains\Identity\Portal::class)->current($request),
+                'name' => config('portals.'.app(\App\Domains\Identity\Portal::class)->current($request).'.name'),
+                'studentUrl' => app(\App\Domains\Identity\Portal::class)->urlFor('student'),
+                'teacherUrl' => app(\App\Domains\Identity\Portal::class)->urlFor('teacher'),
+            ],
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'warning' => fn () => $request->session()->get('warning'),

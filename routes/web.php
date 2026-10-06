@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CoverageController;
 use App\Http\Controllers\Admin\CurriculumController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ResourceReviewController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\InvitationController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Moderation\ModerationController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\Student\HelpRequestController;
 use App\Http\Controllers\Tutor\RequestQueueController;
 use App\Http\Controllers\Tutor\TutorProfileController;
@@ -38,7 +40,7 @@ Route::post('/invitations/{token}', [InvitationController::class, 'accept'])->na
 Route::get('/consent/{token}', [ConsentController::class, 'show'])->name('consent.show');
 Route::post('/consent/{token}', [ConsentController::class, 'decide'])->name('consent.decide');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'portal'])->group(function () {
     // Notifications (SRS: NOT-01 – NOT-04)
     Route::prefix('notifications')->name('notifications.')->group(function () {
         Route::get('/', [NotificationController::class, 'index'])->name('index');
@@ -61,6 +63,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/{helpRequest}/cancel', [HelpRequestController::class, 'cancel'])->name('cancel');
         Route::post('/{helpRequest}/confirm', [HelpRequestController::class, 'confirm'])->name('confirm');
         Route::post('/{helpRequest}/reopen', [HelpRequestController::class, 'reopen'])->name('reopen');
+    });
+
+    // Study material: notes, past papers, solutions (SRS: RES-01 – RES-08)
+    Route::prefix('resources')->name('resources.')->group(function () {
+        Route::get('/', [ResourceController::class, 'index'])->name('index');
+        Route::get('/mine', [ResourceController::class, 'mine'])->name('mine');
+        Route::post('/', [ResourceController::class, 'store'])->name('store');
+        Route::get('/{resource}', [ResourceController::class, 'show'])->name('show');
+        Route::get('/{resource}/download', [ResourceController::class, 'download'])->name('download');
     });
 
     // Conversations, ratings and reporting (SRS: MSG-*, RAT-*)
@@ -101,6 +112,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/settings', [SettingsController::class, 'edit'])->name('settings');
         Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
         Route::get('/audit', AuditLogController::class)->name('audit');
+
+        Route::get('/resources', [ResourceReviewController::class, 'index'])->name('resources.index');
+        Route::post('/resources/{resource}/approve', [ResourceReviewController::class, 'approve'])->name('resources.approve');
+        Route::post('/resources/{resource}/reject', [ResourceReviewController::class, 'reject'])->name('resources.reject');
+        Route::post('/resources/{resource}/unpublish', [ResourceReviewController::class, 'unpublish'])->name('resources.unpublish');
     });
 
     // Moderation (staff only)

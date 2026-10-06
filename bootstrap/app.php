@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'staff' => \App\Http\Middleware\EnsureIsStaff::class,
+            'portal' => \App\Http\Middleware\EnsureCorrectPortal::class,
         ]);
 
         $middleware->web(append: [
