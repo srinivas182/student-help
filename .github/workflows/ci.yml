@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  quality:
+    name: Tests & static analysis
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: testing
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping" --health-interval=10s
+          --health-timeout=5s --health-retries=5
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=10s
+          --health-timeout=5s --health-retries=5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Skip until the application lands in Sprint 3
+        id: guard
+        run: |
+          if [ ! -f composer.json ]; then
+            echo "No application yet — repository is in Sprint 1 (documentation only)."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up PHP
+        if: steps.guard.outputs.skip != 'true'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: bcmath, mbstring, intl, gd, zip, redis, pdo_mysql, exif
+          coverage: none
+
+      - name: Install PHP dependencies
+        if: steps.guard.outputs.skip != 'true'
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan migrate --force
+
+      - name: Static analysis (PHPStan level 8)
+        if: steps.guard.outputs.skip != 'true'
+        run: vendor/bin/phpstan analyse --no-progress
+
+      - name: Tests (Pest)
+        if: steps.guard.outputs.skip != 'true'
+        run: php artisan test
+
+      - name: Set up Node
+        if: steps.guard.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Build front end
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          npm ci
+          npm run build

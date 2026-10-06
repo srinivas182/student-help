@@ -1,0 +1,50 @@
+# Laravel
+/vendor
+/storage/*.key
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+/bootstrap/cache/*
+.env
+.env.*
+!.env.example
+.phpunit.result.cache
+auth.json
+Homestead.json
+Homestead.yaml
+
+# Node / Vite
+/node_modules
+/public/build
+/public/hot
+/public/storage
+npm-debug.log
+yarn-error.log
+.vite
+
+# Capacitor / mobile
+/mobile/android/app/build
+/mobile/android/.gradle
+/mobile/android/local.properties
+/mobile/ios/App/Pods
+/mobile/ios/App/build
+/mobile/*/app/src/main/assets/public
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+*.cer
+GoogleService-Info.plist
+google-services.json
+
+# Editors / OS
+/.idea
+/.vscode
+*.swp
+.DS_Store
+Thumbs.db
+
+# Testing / coverage
+/coverage
+.phpunit.cache
