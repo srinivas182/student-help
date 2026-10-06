@@ -12,6 +12,7 @@ interface RequestDetail {
     tutorBio: string | null;
     tutorRating: string | null;
     offersSent: number;
+    aiOffered: boolean;
     createdAt: string | null;
     updatedAt: string | null;
 }
@@ -62,6 +63,22 @@ export default function Show({ request }: { request: RequestDetail }) {
                         <p className="mt-1 text-rose-800">
                             No tutor picked this up in time, so the DX team has been alerted.
                         </p>
+                    </div>
+                )}
+
+                {request.aiOffered && !request.tutor && (
+                    <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-5">
+                        <p className="font-medium text-indigo-900">Want an instant answer while you wait?</p>
+                        <p className="mt-1 text-sm text-indigo-800">
+                            Our AI study assistant can explain the method now. A tutor can still pick this up
+                            and go through it with you properly.
+                        </p>
+                        <Link
+                            href={route('assistant.index')}
+                            className="mt-3 inline-block rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+                        >
+                            Ask the study assistant
+                        </Link>
                     </div>
                 )}
 

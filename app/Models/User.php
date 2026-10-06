@@ -32,7 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'first_name', 'last_name', 'name', 'email', 'password', 'date_of_birth',
         'role', 'status', 'mobile', 'institution_id', 'onboarding_completed_at',
-        'plan', 'plan_expires_at', 'free_for_life', 'monthly_request_quota',
+        'plan', 'plan_expires_at', 'free_for_life', 'monthly_request_quota', 'monthly_ai_quota',
         'notification_preferences',
     ];
 

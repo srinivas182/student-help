@@ -56,6 +56,12 @@ export default function Authenticated({
                                             My classes
                                         </NavLink>
                                         <NavLink
+                                            href={route('assistant.index')}
+                                            active={route().current('assistant.*')}
+                                        >
+                                            Assistant
+                                        </NavLink>
+                                        <NavLink
                                             href={route('community.index')}
                                             active={route().current('community.*')}
                                         >
@@ -190,6 +196,12 @@ export default function Authenticated({
                                             active={route().current('admin.resources.*')}
                                         >
                                             Material
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('admin.assistant')}
+                                            active={route().current('admin.assistant*')}
+                                        >
+                                            AI
                                         </NavLink>
                                         <NavLink
                                             href={route('admin.settings')}

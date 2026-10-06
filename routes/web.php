@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Onboarding\OnboardingController;
 use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
+use App\Http\Controllers\Admin\AssistantSettingsController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CoverageController;
 use App\Http\Controllers\Admin\CurriculumController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\Auth\InvitationController;
 use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\ProgressController;
@@ -96,6 +98,14 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::get('/{resource}/download', [ResourceController::class, 'download'])->name('download');
     });
 
+    // AI study assistant
+    Route::prefix('assistant')->name('assistant.')->group(function () {
+        Route::get('/', [AssistantController::class, 'index'])->name('index');
+        Route::post('/ask', [AssistantController::class, 'ask'])->name('ask');
+        Route::post('/{answer}/escalate', [AssistantController::class, 'escalate'])->name('escalate');
+        Route::post('/{answer}/feedback', [AssistantController::class, 'feedback'])->name('feedback');
+    });
+
     // Subject discussion boards (SRS: COM-01 – COM-06)
     Route::prefix('community')->name('community.')->group(function () {
         Route::get('/', [CommunityController::class, 'index'])->name('index');
@@ -166,6 +176,9 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/curriculum/{curriculumItem}/toggle', [CurriculumController::class, 'toggle'])->name('curriculum.toggle');
         Route::post('/curriculum/reorder', [CurriculumController::class, 'reorder'])->name('curriculum.reorder');
         Route::post('/curriculum/import', [CurriculumController::class, 'import'])->name('curriculum.import');
+
+        Route::get('/assistant', [AssistantSettingsController::class, 'edit'])->name('assistant');
+        Route::put('/assistant', [AssistantSettingsController::class, 'update'])->name('assistant.update');
 
         Route::get('/settings', [SettingsController::class, 'edit'])->name('settings');
         Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');

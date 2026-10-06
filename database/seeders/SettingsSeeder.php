@@ -26,6 +26,15 @@ class SettingsSeeder extends Seeder
             'max_attachments_per_request' => 5,
             'prohibited_words' => [],
             'policy_version' => '1.0',
+
+            // AI study assistant — off until DX configures a provider
+            'ai_mode' => 'off',
+            'ai_provider' => 'anthropic',
+            'ai_model' => '',
+            'ai_fallback_after_hours' => 2,
+            'ai_monthly_quota_per_student' => 10,
+            'ai_daily_quota_per_student' => 5,
+            'ai_monthly_budget_usd' => 50,
         ];
 
         foreach ($settings as $key => $value) {

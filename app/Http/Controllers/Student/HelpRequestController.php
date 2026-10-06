@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use App\Domains\Tutoring\Models\HelpRequest;
 use App\Domains\Tutoring\Services\HelpRequestService;
+use App\Domains\Assistant\Services\AssistantService;
 use App\Domains\Tutoring\Services\MatchingService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
@@ -17,6 +18,7 @@ class HelpRequestController extends Controller
     public function __construct(
         private readonly HelpRequestService $requests,
         private readonly MatchingService $matching,
+        private readonly AssistantService $assistant,
     ) {
     }
 
@@ -99,6 +101,7 @@ class HelpRequestController extends Controller
                 'tutorBio' => $helpRequest->tutor?->tutorProfile?->bio,
                 'tutorRating' => $helpRequest->tutor?->tutorProfile?->average_rating,
                 'offersSent' => $helpRequest->offers()->count(),
+                'aiOffered' => $this->assistant->isOfferedFor($helpRequest),
             ],
         ]);
     }

@@ -17,6 +17,12 @@ class AppServiceProvider extends ServiceProvider
             \App\Domains\Voice\Services\Transcriber::class,
             \App\Domains\Voice\Services\NullTranscriber::class,
         );
+
+        // Replaced by a real provider once DX configures one in admin settings.
+        $this->app->bind(
+            \App\Domains\Assistant\Services\AssistantProvider::class,
+            \App\Domains\Assistant\Services\NullAssistantProvider::class,
+        );
     }
 
     /**
