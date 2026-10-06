@@ -43,6 +43,7 @@ class DemoDataSeeder extends Seeder
         $this->seedClassrooms();
         $this->seedVoiceNotes();
         $this->seedStudyGroups();
+        $this->seedCommunity();
     }
 
     private function seedInstitutions(): void
@@ -612,6 +613,54 @@ class DemoDataSeeder extends Seeder
                     $service->post($group, $students[$index + 1], $body);
                 }
             }
+        }
+    }
+
+    /** Community questions with answers, including one marked as accepted. */
+    private function seedCommunity(): void
+    {
+        $service = app(\App\Domains\Community\Services\CommunityService::class);
+
+        $students = User::where('role', User::ROLE_STUDENT)->get()
+            ->filter(fn (User $s) => $s->canParticipate())->values();
+
+        if ($students->isEmpty()) {
+            return;
+        }
+
+        $threads = [
+            ['Why does the sign change when I divide by a negative?', 'When solving inequalities my teacher says to flip the sign but I do not understand why it happens.',
+                ['Think of it on a number line: multiplying by a negative mirrors everything, so the order reverses.', 'Try it with numbers: 2 < 4, but -2 > -4. The mirror is the reason.']],
+            ['How much working must I show in Paper 1?', 'I lost marks last time even though my final answer was right.',
+                ['Markers award method marks. Show each substitution and each simplification step.', 'Write the formula before you substitute. That alone usually earns a mark.']],
+            ['Best way to memorise the reactivity series?', 'I keep mixing up the order of the metals.',
+                ['Use a mnemonic and then test yourself by writing it from memory every morning.']],
+        ];
+
+        foreach ($threads as $index => [$title, $body, $answers]) {
+            $asker = $students[$index % $students->count()];
+            $subject = $asker->subjects()->first();
+
+            if (! $subject) {
+                continue;
+            }
+
+            $question = $service->ask($asker, $subject, $title, $body);
+
+            foreach ($answers as $answerIndex => $answer) {
+                $responder = $answerIndex === 0 && $this->tutors->isNotEmpty()
+                    ? $this->tutors->first()
+                    : $students[($index + $answerIndex + 1) % $students->count()];
+
+                $reply = $service->reply($responder, $question, $answer);
+
+                if ($answerIndex === 0) {
+                    $service->accept($reply, $asker);
+                    $reply->update(['votes' => rand(2, 9)]);
+                }
+            }
+
+            $question->update(['views' => rand(10, 120)]);
         }
     }
 

@@ -15,7 +15,9 @@ use App\Http\Controllers\Auth\InvitationController;
 use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\ConsentController;
+use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Moderation\ModerationController;
@@ -93,6 +95,21 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::get('/{resource}', [ResourceController::class, 'show'])->name('show');
         Route::get('/{resource}/download', [ResourceController::class, 'download'])->name('download');
     });
+
+    // Subject discussion boards (SRS: COM-01 – COM-06)
+    Route::prefix('community')->name('community.')->group(function () {
+        Route::get('/', [CommunityController::class, 'index'])->name('index');
+        Route::post('/', [CommunityController::class, 'store'])->name('store');
+        Route::get('/{post}', [CommunityController::class, 'show'])->name('show');
+        Route::post('/{post}/replies', [CommunityController::class, 'reply'])->name('reply');
+        Route::post('/{post}/accept', [CommunityController::class, 'accept'])->name('accept');
+        Route::post('/{post}/vote', [CommunityController::class, 'vote'])->name('vote');
+        Route::post('/{post}/report', [CommunityController::class, 'report'])->name('report');
+    });
+
+    // Progress and recognition (SRS: PRG-01 – PRG-03)
+    Route::get('/progress', ProgressController::class)->name('progress');
+    Route::get('/progress/certificate', [ProgressController::class, 'certificate'])->name('progress.certificate');
 
     // Student-created study groups
     Route::prefix('study-groups')->name('studyGroups.')->group(function () {

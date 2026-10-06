@@ -48,6 +48,8 @@ class HelpRequestService
                 new RequestOffered($request),
             );
 
+            app(\App\Domains\Progress\Services\ProgressService::class)->record($student);
+
             audit('help_request.created', $request, [
                 'subject_id' => $request->subject_id,
                 'tutors_notified' => $notified,

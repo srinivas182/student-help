@@ -30,6 +30,8 @@ class MessageService
 
         $request->update(['last_activity_at' => now()]);
 
+        app(\App\Domains\Progress\Services\ProgressService::class)->record($sender);
+
         // Notify the other party only — never the sender.
         $recipientId = $sender->id === $request->student_id ? $request->tutor_id : $request->student_id;
 

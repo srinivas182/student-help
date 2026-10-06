@@ -56,10 +56,22 @@ export default function Authenticated({
                                             My classes
                                         </NavLink>
                                         <NavLink
+                                            href={route('community.index')}
+                                            active={route().current('community.*')}
+                                        >
+                                            Community
+                                        </NavLink>
+                                        <NavLink
                                             href={route('studyGroups.index')}
                                             active={route().current('studyGroups.*')}
                                         >
                                             Study groups
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('progress')}
+                                            active={route().current('progress')}
+                                        >
+                                            Progress
                                         </NavLink>
                                         <NavLink
                                             href={route('announcements.index')}
@@ -95,6 +107,12 @@ export default function Authenticated({
                                             active={route().current('resources.*')}
                                         >
                                             Material
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('progress')}
+                                            active={route().current('progress*')}
+                                        >
+                                            My impact
                                         </NavLink>
                                         <NavLink
                                             href={route('tutor.profile')}
