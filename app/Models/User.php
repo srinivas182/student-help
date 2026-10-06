@@ -33,7 +33,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'first_name', 'last_name', 'name', 'email', 'password', 'date_of_birth',
         'role', 'status', 'mobile', 'institution_id', 'onboarding_completed_at',
         'plan', 'plan_expires_at', 'free_for_life', 'monthly_request_quota', 'monthly_ai_quota',
-        'notification_preferences',
+        'notification_preferences', 'preferred_language_id',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -85,6 +85,11 @@ class User extends Authenticatable implements MustVerifyEmail
             ->wherePivot('status', 'active')
             ->withPivot(['status', 'joined_at'])
             ->withTimestamps();
+    }
+
+    public function preferredLanguage(): BelongsTo
+    {
+        return $this->belongsTo(\App\Domains\Tutor\Models\Language::class, 'preferred_language_id');
     }
 
     public function studyGroups(): BelongsToMany

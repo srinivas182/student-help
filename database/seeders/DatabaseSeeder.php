@@ -10,6 +10,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             CurriculumSeeder::class,
+            LanguageSeeder::class,
             SettingsSeeder::class,
             DemoDataSeeder::class,
         ]);

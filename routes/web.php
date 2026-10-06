@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\CurriculumController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ResourceReviewController;
 use App\Http\Controllers\Admin\SchoolLinkController;
+use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\InvitationController;
@@ -176,6 +177,14 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/curriculum/{curriculumItem}/toggle', [CurriculumController::class, 'toggle'])->name('curriculum.toggle');
         Route::post('/curriculum/reorder', [CurriculumController::class, 'reorder'])->name('curriculum.reorder');
         Route::post('/curriculum/import', [CurriculumController::class, 'import'])->name('curriculum.import');
+
+        // AI Tutor: curriculum lessons generated once, used by every student
+        Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
+        Route::post('/topics', [TopicController::class, 'store'])->name('topics.store');
+        Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
+        Route::post('/topics/{topic}/sources', [TopicController::class, 'addSource'])->name('topics.sources');
+        Route::post('/topics/{topic}/generate', [TopicController::class, 'generate'])->name('topics.generate');
+        Route::delete('/sources/{source}', [TopicController::class, 'destroySource'])->name('topics.sources.destroy');
 
         Route::get('/assistant', [AssistantSettingsController::class, 'edit'])->name('assistant');
         Route::put('/assistant', [AssistantSettingsController::class, 'update'])->name('assistant.update');

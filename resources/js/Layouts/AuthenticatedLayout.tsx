@@ -198,6 +198,12 @@ export default function Authenticated({
                                             Material
                                         </NavLink>
                                         <NavLink
+                                            href={route('admin.topics.index')}
+                                            active={route().current('admin.topics.*')}
+                                        >
+                                            AI Tutor
+                                        </NavLink>
+                                        <NavLink
                                             href={route('admin.assistant')}
                                             active={route().current('admin.assistant*')}
                                         >
