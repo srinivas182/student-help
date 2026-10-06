@@ -22,7 +22,7 @@ return [
         'name' => env('TEACHER_PORTAL_NAME', 'The X Teacher Help'),
         'host' => env('TEACHER_PORTAL_HOST', 'teacher-help.rightally.io'),
         'roles' => ['tutor', 'moderator', 'admin', 'super_admin'],
-        'home' => 'tutor.queue',
+        'home' => 'tutor.home',
         'tagline' => 'Support your students, share material, host classes.',
     ],
 

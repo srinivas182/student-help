@@ -56,6 +56,14 @@ class DashboardController extends Controller
                     ->where('severity', Report::SEVERITY_HIGH)->count(),
                 'flaggedMessages' => DB::table('messages')->where('is_flagged', true)->count(),
             ],
+            'portals' => [
+                'studentsAtTeacherDoor' => DB::table('portal_redirects')
+                    ->where('from_portal', 'teacher')->where('to_portal', 'student')
+                    ->where('created_at', '>=', $since)->count(),
+                'teachersAtStudentDoor' => DB::table('portal_redirects')
+                    ->where('from_portal', 'student')->where('to_portal', 'teacher')
+                    ->where('created_at', '>=', $since)->count(),
+            ],
             'topSubjects' => HelpRequest::select('subject_id', DB::raw('count(*) as total'))
                 ->with('subject:id,name')
                 ->where('created_at', '>=', $since)

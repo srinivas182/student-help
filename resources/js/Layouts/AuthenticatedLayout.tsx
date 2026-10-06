@@ -49,11 +49,23 @@ export default function Authenticated({
                                         >
                                             Study material
                                         </NavLink>
+                                        <NavLink
+                                            href={route('announcements.index')}
+                                            active={route().current('announcements.index')}
+                                        >
+                                            Announcements
+                                        </NavLink>
                                     </>
                                 )}
 
                                 {user.role === 'tutor' && (
                                     <>
+                                        <NavLink
+                                            href={route('tutor.home')}
+                                            active={route().current('tutor.home')}
+                                        >
+                                            Home
+                                        </NavLink>
                                         <NavLink
                                             href={route('tutor.queue')}
                                             active={route().current('tutor.queue')}
@@ -112,6 +124,12 @@ export default function Authenticated({
                                             active={route().current('moderation.*')}
                                         >
                                             Moderation
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('admin.announcements.index')}
+                                            active={route().current('admin.announcements.*')}
+                                        >
+                                            Announce
                                         </NavLink>
                                         <NavLink
                                             href={route('admin.resources.index')}

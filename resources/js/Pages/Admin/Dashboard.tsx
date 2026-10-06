@@ -16,6 +16,7 @@ interface Props {
         resolutionRate: number | null; averageRating: number; lowRatings: number;
     };
     safety: { openReports: number; highPriority: number; flaggedMessages: number };
+    portals: { studentsAtTeacherDoor: number; teachersAtStudentDoor: number };
     topSubjects: { subject: string; total: number }[];
     busiestTutors: { name: string | null; resolved: number; rating: string | null }[];
 }
@@ -30,7 +31,7 @@ function Card({ label, value, tone = 'text-slate-900', sub }: { label: string; v
     );
 }
 
-export default function Dashboard({ days, people, requests, service, safety, topSubjects, busiestTutors }: Props) {
+export default function Dashboard({ days, people, requests, service, safety, portals, topSubjects, busiestTutors }: Props) {
     const needsAttention = [
         people.pendingTutors > 0 && {
             label: `${people.pendingTutors} tutor${people.pendingTutors === 1 ? '' : 's'} awaiting verification`,
@@ -141,6 +142,17 @@ export default function Dashboard({ days, people, requests, service, safety, top
                                 <dt className="text-slate-600">Suspended accounts</dt>
                                 <dd className="font-semibold text-slate-900">{people.suspended}</dd>
                             </div>
+                            <div className="flex justify-between border-t border-slate-100 pt-3">
+                                <dt className="text-slate-600">Wrong front door</dt>
+                                <dd className="font-semibold text-slate-900">
+                                    {portals.studentsAtTeacherDoor + portals.teachersAtStudentDoor}
+                                </dd>
+                            </div>
+                            <p className="text-xs text-slate-400">
+                                {portals.studentsAtTeacherDoor} students sent back from the teacher site,{' '}
+                                {portals.teachersAtStudentDoor} teachers from the student site. High numbers
+                                mean a link somewhere points at the wrong domain.
+                            </p>
                         </dl>
                         <Link href={route('moderation.index')} className="mt-4 inline-block text-xs font-medium text-indigo-600 hover:text-indigo-500">
                             Open moderation queue →

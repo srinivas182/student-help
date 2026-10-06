@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Onboarding\OnboardingController;
+use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\CoverageController;
 use App\Http\Controllers\Admin\CurriculumController;
@@ -11,26 +12,24 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\InvitationController;
 use App\Http\Controllers\Admin\VerificationController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\ConversationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Moderation\ModerationController;
+use App\Http\Controllers\PortalLandingController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\Student\HelpRequestController;
 use App\Http\Controllers\Tutor\RequestQueueController;
+use App\Http\Controllers\Tutor\TeacherDashboardController;
 use App\Http\Controllers\Tutor\TutorProfileController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', fn () => Inertia::render('Welcome', [
-    'canLogin' => Route::has('login'),
-    'canRegister' => Route::has('register'),
-    'laravelVersion' => Application::VERSION,
-    'phpVersion' => PHP_VERSION,
-]))->name('home');
+Route::get('/', PortalLandingController::class)->name('home');
 
 // Staff invitations — public, token-authenticated (SRS: AUTH-08)
 Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
@@ -64,6 +63,8 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/{helpRequest}/confirm', [HelpRequestController::class, 'confirm'])->name('confirm');
         Route::post('/{helpRequest}/reopen', [HelpRequestController::class, 'reopen'])->name('reopen');
     });
+
+    Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 
     // Study material: notes, past papers, solutions (SRS: RES-01 – RES-08)
     Route::prefix('resources')->name('resources.')->group(function () {
@@ -113,6 +114,10 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');
         Route::get('/audit', AuditLogController::class)->name('audit');
 
+        Route::get('/announcements', [AdminAnnouncementController::class, 'index'])->name('announcements.index');
+        Route::post('/announcements', [AdminAnnouncementController::class, 'store'])->name('announcements.store');
+        Route::delete('/announcements/{announcement}', [AdminAnnouncementController::class, 'destroy'])->name('announcements.destroy');
+
         Route::get('/resources', [ResourceReviewController::class, 'index'])->name('resources.index');
         Route::post('/resources/{resource}/approve', [ResourceReviewController::class, 'approve'])->name('resources.approve');
         Route::post('/resources/{resource}/reject', [ResourceReviewController::class, 'reject'])->name('resources.reject');
@@ -128,6 +133,7 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
 
     // Tutor queue
     Route::prefix('tutor')->name('tutor.')->group(function () {
+        Route::get('/', TeacherDashboardController::class)->name('home');
         Route::get('/queue', [RequestQueueController::class, 'index'])->name('queue');
         Route::post('/availability', [RequestQueueController::class, 'toggleAvailability'])->name('availability');
         Route::post('/requests/{helpRequest}/accept', [RequestQueueController::class, 'accept'])->name('requests.accept');

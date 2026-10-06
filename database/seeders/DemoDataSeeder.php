@@ -39,6 +39,7 @@ class DemoDataSeeder extends Seeder
         $this->seedReports();
         $this->seedNotifications();
         $this->seedResources();
+        $this->seedAnnouncements();
     }
 
     private function seedInstitutions(): void
@@ -445,6 +446,31 @@ class DemoDataSeeder extends Seeder
             ]);
 
             $resource->curriculumItems()->sync([$subject->id]);
+        }
+    }
+
+    private function seedAnnouncements(): void
+    {
+        $admin = User::where('role', User::ROLE_ADMIN)->first();
+        $grade12 = \App\Domains\Curriculum\Models\CurriculumItem::where('type', 'level')
+            ->where('name', 'Grade 12')->first();
+
+        $items = [
+            ['Welcome to DX Student Help', 'Ask a question in any of your subjects and a verified tutor will help you. All conversations stay on the platform and are monitored to keep you safe.', 'normal', [], []],
+            ['November exam timetable is out', 'The final NSC timetable has been released. Check with your school for your exam centre details.', 'important', ['student'], $grade12 ? [$grade12->id] : []],
+            ['New past papers added', 'Mathematics and Physical Sciences papers with full memos are now in the study material section.', 'normal', ['student'], []],
+            ['Tutors: please keep your availability up to date', 'If you are unavailable for a while, switch availability off so requests go to someone who can answer quickly.', 'normal', ['tutor'], []],
+        ];
+
+        foreach ($items as $index => [$title, $body, $priority, $roles, $itemIds]) {
+            \App\Domains\Content\Models\Announcement::create([
+                'author_id' => $admin?->id,
+                'title' => $title,
+                'body' => $body,
+                'priority' => $priority,
+                'targeting' => ['roles' => $roles, 'curriculum_item_ids' => $itemIds],
+                'publish_at' => now()->subDays($index * 3 + 1),
+            ]);
         }
     }
 

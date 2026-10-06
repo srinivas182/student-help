@@ -4,7 +4,7 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 export default function Login({
@@ -27,6 +27,15 @@ export default function Login({
             onFinish: () => reset('password'),
         });
     };
+
+    const portal = usePage().props.portal as {
+        current: string;
+        name: string;
+        studentUrl: string;
+        teacherUrl: string;
+    };
+
+    const isStudentPortal = portal?.current === 'student';
 
     return (
         <GuestLayout>
@@ -105,6 +114,17 @@ export default function Login({
                     </PrimaryButton>
                 </div>
             </form>
+            <div className="mt-6 border-t border-slate-200 pt-5 text-center text-sm">
+                <p className="text-slate-600">
+                    {isStudentPortal ? 'Are you a teacher or tutor?' : 'Are you a student?'}
+                </p>
+                <a
+                    href={isStudentPortal ? portal?.teacherUrl : portal?.studentUrl}
+                    className="mt-1 inline-block font-semibold text-indigo-600 hover:text-indigo-500"
+                >
+                    Sign in at {isStudentPortal ? 'The X Teacher Help' : 'DX Student Help'} →
+                </a>
+            </div>
         </GuestLayout>
     );
 }
