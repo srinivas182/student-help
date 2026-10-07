@@ -36,7 +36,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'notification_preferences', 'preferred_language_id',
     ];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'];
 
     protected function casts(): array
     {
@@ -48,6 +48,8 @@ class User extends Authenticatable implements MustVerifyEmail
             'date_of_birth' => 'date',
             'free_for_life' => 'boolean',
             'notification_preferences' => 'array',
+            'two_factor_confirmed_at' => 'datetime',
+            'two_factor_bypass_until' => 'datetime',
             'password' => 'hashed',
         ];
     }

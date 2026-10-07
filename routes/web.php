@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ResourceReviewController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SchoolLinkController;
+use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\StudyGroupController;
 use App\Http\Controllers\VoiceNoteController;
 use App\Http\Controllers\Moderation\StudyGroupReviewController;
@@ -152,6 +154,16 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/{post}/report', [CommunityController::class, 'report'])->name('report');
     });
 
+    // Two-factor authentication
+    Route::prefix('two-factor')->name('twoFactor.')->group(function () {
+        Route::get('/', [TwoFactorController::class, 'show'])->name('show');
+        Route::get('/setup', [TwoFactorController::class, 'enrol'])->name('enrol');
+        Route::post('/confirm', [TwoFactorController::class, 'confirm'])->name('confirm');
+        Route::post('/recovery-codes', [TwoFactorController::class, 'regenerateRecovery'])->name('recovery');
+        Route::delete('/', [TwoFactorController::class, 'disable'])->name('disable');
+        Route::delete('/devices', [TwoFactorController::class, 'forgetDevices'])->name('devices');
+    });
+
     // Progress and recognition (SRS: PRG-01 – PRG-03)
     Route::get('/progress', ProgressController::class)->name('progress');
     Route::get('/progress/certificate', [ProgressController::class, 'certificate'])->name('progress.certificate');
@@ -228,11 +240,18 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/topics', [TopicController::class, 'store'])->name('topics.store');
         Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
         Route::post('/topics/{topic}/sources', [TopicController::class, 'addSource'])->name('topics.sources');
+        Route::post('/topics/{topic}/estimate', [TopicController::class, 'estimate'])->name('topics.estimate');
+        Route::post('/topics/{topic}/code', [TopicController::class, 'requestCode'])->name('topics.code');
         Route::post('/topics/{topic}/generate', [TopicController::class, 'generate'])->name('topics.generate');
         Route::delete('/sources/{source}', [TopicController::class, 'destroySource'])->name('topics.sources.destroy');
 
         Route::get('/assistant', [AssistantSettingsController::class, 'edit'])->name('assistant');
         Route::put('/assistant', [AssistantSettingsController::class, 'update'])->name('assistant.update');
+
+        Route::get('/security', [SecurityController::class, 'edit'])->name('security');
+        Route::put('/security', [SecurityController::class, 'update'])->name('security.update');
+        Route::post('/security/{user}/bypass', [SecurityController::class, 'grantBypass'])->name('security.bypass');
+        Route::post('/security/test-email', [SecurityController::class, 'testEmail'])->name('security.testEmail');
 
         Route::get('/settings', [SettingsController::class, 'edit'])->name('settings');
         Route::put('/settings', [SettingsController::class, 'update'])->name('settings.update');

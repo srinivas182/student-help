@@ -72,7 +72,28 @@ export default function Show({
         file: null,
     });
 
-    const generate = useForm<{ language_ids: number[] }>({ language_ids: [] });
+    const generate = useForm<{ language_ids: number[]; code: string }>({ language_ids: [], code: '' });
+
+    const [estimate, setEstimate] = useState<{
+        sourceWords: number;
+        languages: { language: string; inputTokens: number; outputTokens: number; costUsd: number }[];
+        totalUsd: number;
+        totalZar: number;
+        requiresOtp: boolean;
+    } | null>(null);
+    const [codeSent, setCodeSent] = useState(false);
+
+    const preview = async () => {
+        try {
+            const response = await window.axios.post(route('admin.topics.estimate', topic.id), {
+                language_ids: generate.data.language_ids,
+            });
+            setEstimate(response.data);
+            setCodeSent(false);
+        } catch {
+            setEstimate(null);
+        }
+    };
 
     const submitSource: FormEventHandler = (e) => {
         e.preventDefault();
@@ -284,16 +305,123 @@ export default function Show({
                     </p>
 
                     <button
-                        onClick={() => generate.post(route('admin.topics.generate', topic.id))}
-                        disabled={!canGenerate || generate.processing || generate.data.language_ids.length === 0}
+                        onClick={preview}
+                        disabled={!canGenerate || generate.data.language_ids.length === 0}
                         className="mt-4 rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 disabled:bg-slate-300"
                     >
-                        {generate.processing ? 'Generating…' : 'Generate lesson'}
+                        See what this will cost
                     </button>
                     {!canGenerate && (
                         <p className="mt-2 text-xs text-amber-700">
                             Add at least one readable source first.
                         </p>
+                    )}
+
+                    {/* Nobody spends money without seeing the number first */}
+                    {estimate && (
+                        <div className="mt-5 rounded-xl border border-slate-300 bg-slate-50 p-5">
+                            <h3 className="font-semibold text-slate-900">Before you generate</h3>
+                            <p className="mt-1 text-xs text-slate-500">
+                                Estimated from {estimate.sourceWords.toLocaleString()} words of source material.
+                            </p>
+
+                            <table className="mt-3 w-full text-sm">
+                                <thead className="text-left text-xs uppercase tracking-wide text-slate-500">
+                                    <tr>
+                                        <th className="pb-1">Language</th>
+                                        <th className="pb-1 text-right">Tokens in</th>
+                                        <th className="pb-1 text-right">Tokens out</th>
+                                        <th className="pb-1 text-right">Cost</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-200">
+                                    {estimate.languages.map((row) => (
+                                        <tr key={row.language}>
+                                            <td className="py-1.5 text-slate-700">{row.language}</td>
+                                            <td className="py-1.5 text-right text-slate-600">
+                                                {row.inputTokens.toLocaleString()}
+                                            </td>
+                                            <td className="py-1.5 text-right text-slate-600">
+                                                {row.outputTokens.toLocaleString()}
+                                            </td>
+                                            <td className="py-1.5 text-right text-slate-900">
+                                                ${row.costUsd.toFixed(4)}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+
+                            <p className="mt-3 text-base font-semibold text-slate-900">
+                                Total: ${estimate.totalUsd.toFixed(3)}{' '}
+                                <span className="text-sm font-normal text-slate-500">
+                                    (about R{estimate.totalZar.toFixed(2)})
+                                </span>
+                            </p>
+
+                            {estimate.requiresOtp ? (
+                                <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+                                    <p className="text-sm text-amber-900">
+                                        This one needs email confirmation before it runs.
+                                    </p>
+
+                                    {!codeSent ? (
+                                        <button
+                                            onClick={() =>
+                                                router.post(
+                                                    route('admin.topics.code', topic.id),
+                                                    { language_ids: generate.data.language_ids },
+                                                    { preserveScroll: true, onSuccess: () => setCodeSent(true) },
+                                                )
+                                            }
+                                            className="mt-2 rounded-lg bg-amber-600 px-5 py-2 text-sm font-semibold text-white"
+                                        >
+                                            Email me a code
+                                        </button>
+                                    ) : (
+                                        <div className="mt-2 flex gap-2">
+                                            <input
+                                                value={generate.data.code}
+                                                onChange={(e) =>
+                                                    generate.setData('code', e.target.value.replace(/\D/g, ''))
+                                                }
+                                                placeholder="000000"
+                                                maxLength={6}
+                                                className="w-32 rounded-lg border-slate-300 text-center font-mono tracking-widest"
+                                            />
+                                            <button
+                                                onClick={() =>
+                                                    generate.post(route('admin.topics.generate', topic.id))
+                                                }
+                                                disabled={generate.processing || generate.data.code.length !== 6}
+                                                className="rounded-lg bg-emerald-600 px-5 py-2 text-sm font-semibold text-white disabled:bg-slate-300"
+                                            >
+                                                Confirm and generate
+                                            </button>
+                                        </div>
+                                    )}
+                                    {generate.errors.code && (
+                                        <p className="mt-2 text-xs text-rose-600">{generate.errors.code}</p>
+                                    )}
+                                </div>
+                            ) : (
+                                <div className="mt-4 flex gap-3">
+                                    <button
+                                        onClick={() => generate.post(route('admin.topics.generate', topic.id))}
+                                        disabled={generate.processing}
+                                        className="rounded-lg bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-500"
+                                    >
+                                        {generate.processing ? 'Generating…' : 'Confirm and generate'}
+                                    </button>
+                                    <button
+                                        onClick={() => setEstimate(null)}
+                                        className="rounded-lg border border-slate-300 px-5 py-2 text-sm text-slate-600"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     )}
                 </section>
 

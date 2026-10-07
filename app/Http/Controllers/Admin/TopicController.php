@@ -8,8 +8,11 @@ use App\Domains\Tutor\Models\Topic;
 use App\Domains\Tutor\Models\TopicSource;
 use App\Domains\Tutor\Models\TopicVersion;
 use App\Domains\Tutor\Services\LessonGenerator;
+use App\Domains\Tutor\Services\GenerationEstimator;
 use App\Domains\Tutor\Services\SourceExtractor;
+use App\Domains\Security\Services\OneTimeCodeService;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -22,6 +25,8 @@ class TopicController extends Controller
     public function __construct(
         private readonly LessonGenerator $generator,
         private readonly SourceExtractor $extractor,
+        private readonly GenerationEstimator $estimator,
+        private readonly OneTimeCodeService $codes,
     ) {
     }
 
@@ -155,19 +160,78 @@ class TopicController extends Controller
         return back()->with('success', 'Source added.');
     }
 
-    public function generate(Request $request, Topic $topic): RedirectResponse
+    /** What this will cost, before anybody commits to spending it. */
+    public function estimate(Request $request, Topic $topic): JsonResponse
     {
         $validated = $request->validate([
             'language_ids' => ['required', 'array', 'min:1'],
             'language_ids.*' => ['integer', 'exists:languages,id'],
         ]);
 
+        return response()->json($this->estimator->estimate($topic, $validated['language_ids']));
+    }
+
+    /** Sends the confirmation code for an expensive generation. */
+    public function requestCode(Request $request, Topic $topic): RedirectResponse
+    {
+        $validated = $request->validate([
+            'language_ids' => ['required', 'array', 'min:1'],
+            'language_ids.*' => ['integer', 'exists:languages,id'],
+        ]);
+
+        $estimate = $this->estimator->estimate($topic, $validated['language_ids']);
+
+        $this->codes->issue(
+            $request->user(),
+            OneTimeCodeService::PURPOSE_GENERATION,
+            'email',
+            ['topic_id' => $topic->id, 'language_ids' => $validated['language_ids'], 'cost' => $estimate['totalUsd']],
+        );
+
+        return back()->with('success', 'We have emailed you a confirmation code.');
+    }
+
+    public function generate(Request $request, Topic $topic): RedirectResponse
+    {
+        $validated = $request->validate([
+            'language_ids' => ['required', 'array', 'min:1'],
+            'language_ids.*' => ['integer', 'exists:languages,id'],
+            'code' => ['nullable', 'string', 'size:6'],
+        ]);
+
         abort_unless($topic->sources()->where('extraction_status', 'done')->exists(), 422,
             'Add at least one readable source before generating.');
+
+        $estimate = $this->estimator->estimate($topic, $validated['language_ids']);
+
+        // Routine generations go straight through; expensive ones need the code.
+        if ($estimate['requiresOtp']) {
+            if (blank($validated['code'] ?? null)) {
+                return back()->withErrors([
+                    'code' => 'This generation needs email confirmation. Request a code first.',
+                ]);
+            }
+
+            $payload = $this->codes->verify(
+                $request->user(),
+                OneTimeCodeService::PURPOSE_GENERATION,
+                $validated['code'],
+            );
+
+            // The code authorises this topic only, not whatever was submitted after it.
+            abort_unless(($payload['topic_id'] ?? null) === $topic->id, 422,
+                'That code was issued for a different topic.');
+        }
 
         foreach ($validated['language_ids'] as $languageId) {
             $this->generator->generate($topic, Language::findOrFail($languageId));
         }
+
+        audit('topic.generation_confirmed', $topic, [
+            'languages' => count($validated['language_ids']),
+            'estimated_usd' => $estimate['totalUsd'],
+            'otp_used' => $estimate['requiresOtp'],
+        ]);
 
         return back()->with('success', 'Lesson generated. It now needs a subject teacher to review it before students see it.');
     }

@@ -35,6 +35,31 @@ class SettingsSeeder extends Seeder
             'ai_monthly_quota_per_student' => 10,
             'ai_daily_quota_per_student' => 5,
             'ai_monthly_budget_usd' => 50,
+
+            // Two-factor: app first, students never required
+            '2fa_primary_method' => 'app',
+            '2fa_backup_methods' => ['email'],
+            '2fa_required_roles' => ['super_admin', 'admin', 'moderator'],
+            '2fa_trusted_device_days' => 30,
+            '2fa_bypass_hours' => 24,
+
+            // Gateways are off until DX configures them
+            'email_gateway_enabled' => false,
+            'email_gateway_provider' => 'smtp',
+            'email_from_address' => 'noreply@dxstudenthelp.co.za',
+            'email_from_name' => 'DX Student Help',
+            'sms_gateway_enabled' => false,
+            'sms_gateway_provider' => 'clickatell',
+            'sms_sender_id' => 'DXHelp',
+
+            // AI Tutor generation costs and confirmation thresholds
+            'ai_tutor_inherit_assistant' => true,
+            'ai_tutor_otp_enabled' => true,
+            'ai_tutor_otp_cost_threshold' => 2.0,
+            'ai_tutor_otp_language_threshold' => 5,
+            'ai_tutor_input_cost_per_million' => 3.0,
+            'ai_tutor_output_cost_per_million' => 15.0,
+            'usd_to_zar' => 18.0,
         ];
 
         foreach ($settings as $key => $value) {
