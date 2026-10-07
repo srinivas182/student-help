@@ -30,6 +30,36 @@ it('sends the security headers on every page', function () {
         ->and($response->headers->get('Content-Security-Policy'))->toContain("object-src 'none'");
 });
 
+it('gives inline scripts a nonce that matches the policy', function () {
+    // Force the production policy: local relaxes it for the Vite dev server,
+    // so testing the local one would prove nothing about the live site.
+    app()['env'] = 'production';
+    config(['app.env' => 'production']);
+
+    $response = $this->actingAs($this->student)->get(route('dashboard'));
+
+    $csp = (string) $response->headers->get('Content-Security-Policy');
+    $html = (string) $response->getContent();
+
+    expect($csp)->toContain("script-src 'self' 'nonce-");
+
+    // Ziggy's route list is inline. Without a matching nonce the browser
+    // refuses it, route() is undefined, and every page renders blank.
+    preg_match("/'nonce-([^']+)'/", $csp, $fromPolicy);
+    preg_match('/nonce="([^"]+)"/', $html, $fromPage);
+
+    expect($fromPolicy[1] ?? 'policy')->toBe($fromPage[1] ?? 'page');
+});
+
+it('allows the font CDN the layout actually uses', function () {
+    $csp = $this->actingAs($this->student)
+        ->get(route('dashboard'))
+        ->headers->get('Content-Security-Policy');
+
+    // The layout loads Figtree from Bunny; blocking it leaves the page unstyled
+    expect($csp)->toContain('https://fonts.bunny.net');
+});
+
 it('allows PayFast as a form target but nothing else', function () {
     $csp = $this->actingAs($this->student)
         ->get(route('dashboard'))

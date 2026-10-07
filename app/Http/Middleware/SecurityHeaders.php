@@ -17,6 +17,14 @@ class SecurityHeaders
 {
     public function handle(Request $request, Closure $next): Response
     {
+        // A per-request nonce lets the few inline scripts we genuinely need
+        // (Ziggy's route list, Vite's preloader) run, while still refusing any
+        // script an attacker manages to inject.
+        // One nonce per request, shared with Vite so its injected tags match
+        $nonce = \Illuminate\Support\Facades\Vite::useCspNonce(base64_encode(random_bytes(16)));
+        $request->attributes->set('csp_nonce', $nonce);
+        view()->share('cspNonce', $nonce);
+
         $response = $next($request);
 
         $headers = [
@@ -34,7 +42,7 @@ class SecurityHeaders
         }
 
         if (! $response->headers->has('Content-Security-Policy')) {
-            $headers['Content-Security-Policy'] = $this->contentSecurityPolicy();
+            $headers['Content-Security-Policy'] = $this->contentSecurityPolicy($nonce);
         }
 
         foreach ($headers as $name => $value) {
@@ -44,12 +52,12 @@ class SecurityHeaders
         return $response;
     }
 
-    private function contentSecurityPolicy(): string
+    private function contentSecurityPolicy(string $nonce): string
     {
         // Vite serves modules from the dev server while developing
         $scriptSrc = app()->environment('local')
             ? "'self' 'unsafe-inline' 'unsafe-eval' http://localhost:* http://127.0.0.1:*"
-            : "'self'";
+            : "'self' 'nonce-{$nonce}'";
 
         $connectSrc = app()->environment('local')
             ? "'self' ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:*"
@@ -59,11 +67,12 @@ class SecurityHeaders
             "default-src 'self'",
             "script-src {$scriptSrc}",
             // Tailwind and Inertia inject styles at runtime
-            "style-src 'self' 'unsafe-inline'",
+            // Fonts are loaded from Bunny, a privacy-respecting CDN
+            "style-src 'self' 'unsafe-inline' https://fonts.bunny.net",
+            "font-src 'self' data: https://fonts.bunny.net",
             "img-src 'self' data: blob: https:",
             // Voice notes play from blob URLs created in the browser
             "media-src 'self' blob:",
-            "font-src 'self' data:",
             "connect-src {$connectSrc}",
             // PayFast checkout posts to their domain
             'form-action '."'self' https://www.payfast.co.za https://sandbox.payfast.co.za",

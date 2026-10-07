@@ -30,6 +30,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
         // Mail provider comes from admin settings rather than .env
         if (! $this->app->runningInConsole() || $this->app->runningUnitTests() === false) {
             try {
