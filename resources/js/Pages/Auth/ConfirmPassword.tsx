@@ -20,7 +20,10 @@ export default function ConfirmPassword() {
     };
 
     return (
-        <GuestLayout>
+        <GuestLayout
+            title="Confirm your password"
+            subtitle="This is a secure area, so please confirm it is you."
+        >
             <Head title="Confirm Password" />
 
             <div className="mb-4 text-sm text-gray-600">

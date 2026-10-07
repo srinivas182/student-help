@@ -13,7 +13,10 @@ export default function VerifyEmail({ status }: { status?: string }) {
     };
 
     return (
-        <GuestLayout>
+        <GuestLayout
+            title="Check your email"
+            subtitle="We sent you a link to confirm your address."
+        >
             <Head title="Email Verification" />
 
             <div className="mb-4 text-sm text-gray-600">

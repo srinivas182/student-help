@@ -29,7 +29,10 @@ export default function ResetPassword({
     };
 
     return (
-        <GuestLayout>
+        <GuestLayout
+            title="Choose a new password"
+            subtitle="Make it something you have not used elsewhere."
+        >
             <Head title="Reset Password" />
 
             <form onSubmit={submit}>

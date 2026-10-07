@@ -1,9 +1,8 @@
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useMemo } from 'react';
 
 interface Role {
@@ -37,6 +36,9 @@ export default function Register({ minimumAge, roles }: { minimumAge: number; ro
         return eighteenth > new Date();
     }, [data.date_of_birth]);
 
+    const portal = usePage().props.portal as { current: string } | undefined;
+    const isStudent = portal?.current !== 'teacher';
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         post(route('register'), {
@@ -44,14 +46,22 @@ export default function Register({ minimumAge, roles }: { minimumAge: number; ro
         });
     };
 
-    return (
-        <GuestLayout>
-            <Head title="Create your account" />
+    const button = isStudent
+        ? 'bg-indigo-600 hover:bg-indigo-500 focus:ring-indigo-500'
+        : 'bg-teal-600 hover:bg-teal-500 focus:ring-teal-500';
 
-            <h1 className="mb-1 text-xl font-semibold text-slate-900">DX Student Help</h1>
-            <p className="mb-6 text-sm text-slate-500">
-                Create your account to get help from verified tutors.
-            </p>
+    const link = isStudent ? 'text-indigo-600 hover:text-indigo-500' : 'text-teal-700 hover:text-teal-600';
+
+    return (
+        <GuestLayout
+            title={isStudent ? 'Create your free account' : 'Apply to tutor'}
+            subtitle={
+                isStudent
+                    ? 'Two minutes, and you can ask a tutor tonight.'
+                    : 'Tell us what you teach. We usually review applications within 48 hours.'
+            }
+        >
+            <Head title={isStudent ? 'Create your account' : 'Apply to tutor'} />
 
             <form onSubmit={submit} className="space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -237,17 +247,25 @@ export default function Register({ minimumAge, roles }: { minimumAge: number; ro
                 </label>
                 <InputError message={errors.terms} />
 
-                <div className="flex items-center justify-between pt-2">
-                    <Link
-                        href={route('login')}
-                        className="text-sm text-slate-600 underline hover:text-slate-900"
-                    >
-                        Already registered?
-                    </Link>
-
-                    <PrimaryButton disabled={processing}>Create account</PrimaryButton>
-                </div>
+                <button
+                    type="submit"
+                    disabled={processing}
+                    className={`w-full rounded-lg px-6 py-3 text-sm font-semibold text-white transition focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:bg-slate-300 ${button}`}
+                >
+                    {processing
+                        ? 'Creating your account…'
+                        : isStudent
+                          ? 'Create my free account'
+                          : 'Submit my application'}
+                </button>
             </form>
+
+            <p className="mt-6 text-center text-sm text-slate-600">
+                Already have an account?{' '}
+                <Link href={route('login')} className={`font-semibold ${link}`}>
+                    Sign in
+                </Link>
+            </p>
         </GuestLayout>
     );
 }

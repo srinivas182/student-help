@@ -35,7 +35,10 @@ export default function AcceptInvitation({
 
     if (!valid) {
         return (
-            <GuestLayout>
+            <GuestLayout
+            title="Set up your account"
+            subtitle="You have been invited to join the DX team."
+        >
                 <Head title="Invitation not valid" />
                 <h1 className="text-lg font-semibold text-slate-900">This invitation is no longer valid</h1>
                 <p className="mt-2 text-sm text-slate-600">
