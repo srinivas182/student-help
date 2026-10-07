@@ -145,16 +145,25 @@ class DemoDataSeeder extends Seeder
                 // Pending tutors arrive with documents so the queue is reviewable.
                 foreach (['id', 'qualification', 'police_clearance'] as $type) {
                     $path = "verification/{$profile->id}/{$type}-sample.pdf";
-                    \Illuminate\Support\Facades\Storage::disk('local')->put(
-                        $path,
-                        "Demo document placeholder: {$type} for {$first} {$last}.",
+
+                    // Real PDFs, so an administrator reviewing the queue sees a
+                    // document rather than a broken viewer.
+                    $contents = \Database\Seeders\Support\DemoPdf::make(
+                        ucfirst(str_replace('_', ' ', $type)),
+                        [
+                            "Submitted by {$first} {$last}",
+                            '',
+                            'Demo document. Not a real identity or qualification record.',
+                        ],
                     );
+
+                    \Illuminate\Support\Facades\Storage::disk('local')->put($path, $contents);
 
                     $profile->documents()->create([
                         'document_type' => $type,
                         'path' => $path,
                         'original_name' => ucfirst(str_replace('_', ' ', $type)).'.pdf',
-                        'size' => 182000,
+                        'size' => strlen($contents),
                     ]);
                 }
             }
@@ -432,8 +441,21 @@ class DemoDataSeeder extends Seeder
             // Two are left pending so the review queue has content.
             $pending = in_array($index, [10, 11], true) && ! $uploader->isStaff();
 
-            $path = 'resources/'.$uploader->id.'/'.Str::slug($title).'.pdf';
-            \Illuminate\Support\Facades\Storage::disk('local')->put($path, "Demo material placeholder: {$title}.");
+            // A real PDF, not text labelled as one: the browser's viewer
+            // refuses a fake and the preview reads as a broken platform.
+            $isAudio = $type === 'other';
+            $extension = $isAudio ? 'mp3' : 'pdf';
+            $path = 'resources/'.$uploader->id.'/'.Str::slug($title).'.'.$extension;
+
+            $contents = $isAudio
+                ? $this->silentMp3()
+                : \Database\Seeders\Support\DemoPdf::make($title, [
+                    $description,
+                    '',
+                    $subject->name,
+                ]);
+
+            \Illuminate\Support\Facades\Storage::disk('local')->put($path, $contents);
 
             $resource = \App\Domains\Content\Models\Resource::create([
                 'uploaded_by' => $uploader->id,
@@ -441,8 +463,8 @@ class DemoDataSeeder extends Seeder
                 'description' => $description,
                 'resource_type' => $type,
                 'path' => $path,
-                'mime_type' => $type === 'other' ? 'audio/mpeg' : 'application/pdf',
-                'size' => rand(120000, 2400000),
+                'mime_type' => $isAudio ? 'audio/mpeg' : 'application/pdf',
+                'size' => strlen($contents),
                 'rights_declared' => true,
                 'status' => $pending
                     ? \App\Domains\Content\Models\Resource::STATUS_PENDING
@@ -738,5 +760,16 @@ class DemoDataSeeder extends Seeder
 
         $user->subjects()->sync($subjects->pluck('id')->mapWithKeys(fn ($id) => [$id => ['role' => 'subject']]));
         $user->update(['onboarding_completed_at' => now()->subDays(rand(5, 30))]);
+    }
+
+    /**
+     * A one-frame silent MP3. Enough for the audio player to load and show
+     * controls rather than erroring, without shipping a binary into the repo.
+     */
+    private function silentMp3(): string
+    {
+        $frame = "\xFF\xFB\x90\x44".str_repeat("\x00", 500);
+
+        return str_repeat($frame, 20);
     }
 }
