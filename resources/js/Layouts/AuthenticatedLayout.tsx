@@ -56,6 +56,12 @@ export default function Authenticated({
                                             My classes
                                         </NavLink>
                                         <NavLink
+                                            href={route('learn.index')}
+                                            active={route().current('learn.*')}
+                                        >
+                                            Learn
+                                        </NavLink>
+                                        <NavLink
                                             href={route('assistant.index')}
                                             active={route().current('assistant.*')}
                                         >

@@ -28,6 +28,7 @@ use App\Http\Controllers\Moderation\ModerationController;
 use App\Http\Controllers\PortalLandingController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StudyGroupController;
 use App\Http\Controllers\VoiceNoteController;
@@ -99,6 +100,14 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/', [ResourceController::class, 'store'])->name('store');
         Route::get('/{resource}', [ResourceController::class, 'show'])->name('show');
         Route::get('/{resource}/download', [ResourceController::class, 'download'])->name('download');
+    });
+
+    // AI Tutor: what students use
+    Route::prefix('learn')->name('learn.')->group(function () {
+        Route::get('/', [LearnController::class, 'index'])->name('index');
+        Route::post('/language', [LearnController::class, 'setLanguage'])->name('language');
+        Route::get('/{topic}', [LearnController::class, 'show'])->name('topic');
+        Route::post('/{topic}/progress', [LearnController::class, 'saveProgress'])->name('progress');
     });
 
     // AI Tutor review workspace — for content reviewers, not administrators
