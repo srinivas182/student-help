@@ -28,6 +28,7 @@ use App\Http\Controllers\Moderation\ModerationController;
 use App\Http\Controllers\PortalLandingController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StudyGroupController;
@@ -106,8 +107,17 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
     Route::prefix('learn')->name('learn.')->group(function () {
         Route::get('/', [LearnController::class, 'index'])->name('index');
         Route::post('/language', [LearnController::class, 'setLanguage'])->name('language');
+        Route::get('/reviews', [AssessmentController::class, 'reviews'])->name('reviews');
         Route::get('/{topic}', [LearnController::class, 'show'])->name('topic');
         Route::post('/{topic}/progress', [LearnController::class, 'saveProgress'])->name('progress');
+    });
+
+    // Assessments, mastery and spaced review
+    Route::prefix('assessment')->name('assessment.')->group(function () {
+        Route::get('/{topic}', [AssessmentController::class, 'index'])->name('index');
+        Route::get('/{topic}/result/{attempt}', [AssessmentController::class, 'result'])->name('result');
+        Route::get('/{topic}/{level}', [AssessmentController::class, 'start'])->name('start');
+        Route::post('/{topic}/{level}', [AssessmentController::class, 'submit'])->name('submit');
     });
 
     // AI Tutor review workspace — for content reviewers, not administrators

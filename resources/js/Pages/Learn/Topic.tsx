@@ -253,10 +253,13 @@ export default function Topic({
                                     </button>
                                 ) : (
                                     <button
-                                        onClick={() => markDone(current)}
+                                        onClick={() => {
+                                            markDone(current);
+                                            router.visit(route('assessment.index', topic.id));
+                                        }}
                                         className="rounded-lg bg-emerald-600 px-6 py-2 text-sm font-semibold text-white hover:bg-emerald-500"
                                     >
-                                        Finish lesson
+                                        Finish and test yourself
                                     </button>
                                 )}
                             </div>
