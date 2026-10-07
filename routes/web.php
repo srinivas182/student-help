@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\CurriculumController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ResourceReviewController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\GatewayController;
 use App\Http\Controllers\Admin\SchoolLinkController;
 use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\TopicController;
@@ -247,6 +248,12 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
 
         Route::get('/assistant', [AssistantSettingsController::class, 'edit'])->name('assistant');
         Route::put('/assistant', [AssistantSettingsController::class, 'update'])->name('assistant.update');
+
+        Route::get('/gateways', [GatewayController::class, 'index'])->name('gateways');
+        Route::post('/gateways', [GatewayController::class, 'save'])->name('gateways.save');
+        Route::post('/gateways/test', [GatewayController::class, 'test'])->name('gateways.test');
+        Route::post('/gateways/whatsapp-preference', [GatewayController::class, 'preferWhatsApp'])->name('gateways.whatsapp');
+        Route::delete('/gateways/{credential}', [GatewayController::class, 'deactivate'])->name('gateways.deactivate');
 
         Route::get('/security', [SecurityController::class, 'edit'])->name('security');
         Route::put('/security', [SecurityController::class, 'update'])->name('security.update');

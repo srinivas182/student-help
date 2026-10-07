@@ -237,6 +237,12 @@ export default function Authenticated({
                                             AI
                                         </NavLink>
                                         <NavLink
+                                            href={route('admin.gateways')}
+                                            active={route().current('admin.gateways*')}
+                                        >
+                                            Gateways
+                                        </NavLink>
+                                        <NavLink
                                             href={route('admin.security')}
                                             active={route().current('admin.security*')}
                                         >

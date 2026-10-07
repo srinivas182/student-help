@@ -24,7 +24,7 @@ class GatewaySettings
 
     public function emailEnabled(): bool
     {
-        return (bool) setting('email_gateway_enabled', false) && filled($this->emailProvider());
+        return app(\App\Domains\Messaging\Services\MessageDispatcher::class)->isChannelReady('email');
     }
 
     public function emailProvider(): ?string
@@ -44,7 +44,9 @@ class GatewaySettings
 
     public function smsEnabled(): bool
     {
-        return (bool) setting('sms_gateway_enabled', false) && filled($this->smsProvider());
+        $dispatcher = app(\App\Domains\Messaging\Services\MessageDispatcher::class);
+
+        return $dispatcher->isChannelReady('sms') || $dispatcher->isChannelReady('whatsapp');
     }
 
     public function smsProvider(): ?string

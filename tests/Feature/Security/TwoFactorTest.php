@@ -24,6 +24,8 @@ function setSettings(array $values): void
     Cache::forget('platform.settings');
 }
 
+
+
 beforeEach(function () {
     Notification::fake();
     $this->seed(SettingsSeeder::class);
@@ -158,7 +160,7 @@ it('will not issue a code on a channel that is not configured', function () {
 });
 
 it('verifies a one-time code once, then refuses it', function () {
-    setSettings(['email_gateway_enabled' => true, 'email_gateway_provider' => 'smtp']);
+    configureEmailGateway();
 
     $service = app(OneTimeCodeService::class);
     $code = $service->issue($this->admin, 'generation', 'email', ['topic_id' => 7]);
@@ -172,7 +174,7 @@ it('verifies a one-time code once, then refuses it', function () {
 });
 
 it('locks a code after too many wrong attempts', function () {
-    setSettings(['email_gateway_enabled' => true, 'email_gateway_provider' => 'smtp']);
+    configureEmailGateway();
 
     $service = app(OneTimeCodeService::class);
     $code = $service->issue($this->admin, 'login', 'email');

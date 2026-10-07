@@ -53,6 +53,8 @@ function stubGenerator(): void
     });
 }
 
+
+
 function tune(array $values): void
 {
     foreach ($values as $key => $value) {
@@ -148,9 +150,9 @@ it('demands a code when many languages are generated at once', function () {
 it('generates once the emailed code is given', function () {
     tune([
         'ai_tutor_otp_cost_threshold' => 0.0001,
-        'email_gateway_enabled' => true,
-        'email_gateway_provider' => 'smtp',
     ]);
+
+    configureEmailGateway();
 
     $code = app(OneTimeCodeService::class)->issue(
         $this->admin,
@@ -171,9 +173,9 @@ it('generates once the emailed code is given', function () {
 it('refuses a code that was issued for a different topic', function () {
     tune([
         'ai_tutor_otp_cost_threshold' => 0.0001,
-        'email_gateway_enabled' => true,
-        'email_gateway_provider' => 'smtp',
     ]);
+
+    configureEmailGateway();
 
     $other = Topic::create([
         'curriculum_item_id' => $this->topic->curriculum_item_id,

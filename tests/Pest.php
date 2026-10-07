@@ -48,3 +48,24 @@ function something()
 {
     // ..
 }
+
+
+/** Email readiness depends on a stored credential, not a settings flag. */
+function configureEmailGateway(): void
+{
+    $credential = new \App\Domains\Messaging\Models\GatewayCredential([
+        'channel' => 'email',
+        'provider' => 'smtp',
+        'is_active' => true,
+    ]);
+
+    $credential->setSecrets([
+        'host' => 'smtp.example.com',
+        'port' => '587',
+        'username' => 'dx',
+        'password' => 'secret',
+        'encryption' => 'tls',
+    ]);
+
+    $credential->save();
+}
