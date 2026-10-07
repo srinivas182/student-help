@@ -231,7 +231,9 @@ class DemoLessonSeeder extends Seeder
                 'email_verified_at' => now(),
                 'date_of_birth' => now()->subYears(34),
                 'onboarding_completed_at' => now(),
-                'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(32)),
+                // Same demo password as every other seeded account, so the
+                // reviewer workspace can actually be demonstrated.
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
             ]);
         }
 

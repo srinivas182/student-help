@@ -73,6 +73,10 @@ class DemoDataSeeder extends Seeder
 
     private function seedStaff(): User
     {
+        // A super admin exists so every permission level is demonstrable, and
+        // because platform:security-check requires one with two-factor.
+        $this->user('Nomvula', 'Dlamini', 'superadmin@dxstudenthelp.co.za', User::ROLE_SUPER_ADMIN, '1980-02-20');
+
         $admin = $this->user('Thabo', 'Mkhize', 'admin@dxstudenthelp.co.za', User::ROLE_ADMIN, '1985-04-12');
         $this->user('Nomsa', 'Dlamini', 'moderator@dxstudenthelp.co.za', User::ROLE_MODERATOR, '1990-08-03');
 
