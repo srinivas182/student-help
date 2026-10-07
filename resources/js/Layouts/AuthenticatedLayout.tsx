@@ -14,47 +14,54 @@ interface StaffSection {
     items: { label: string; href: string; pattern: string; description?: string }[];
 }
 
-/** Staff navigation, shared by the desktop dropdowns and the mobile menu. */
-function staffSections(): StaffSection[] {
-    return [
+/**
+ * Staff navigation, shared by the desktop dropdowns and the mobile menu.
+ * Filtered by permission, so a moderator never sees a link to a page the
+ * server would refuse them.
+ */
+function staffSections(can: Record<string, boolean>): StaffSection[] {
+    const sections: StaffSection[] = [
         {
             label: 'People',
             items: [
-                { label: 'Users', href: route('admin.users.index'), pattern: 'admin.users.*', description: 'Accounts, suspensions, invitations' },
-                { label: 'Tutor verification', href: route('admin.verification.index'), pattern: 'admin.verification.*', description: 'Documents awaiting review' },
-                { label: 'Subject coverage', href: route('admin.coverage'), pattern: 'admin.coverage', description: 'Where tutors are thin' },
-                { label: 'Roles and permissions', href: route('admin.roles.index'), pattern: 'admin.roles.*', description: 'Who can do what' },
-            ],
+                can['users.manage'] && { label: 'Users', href: route('admin.users.index'), pattern: 'admin.users.*', description: 'Accounts, suspensions, invitations' },
+                can['tutors.verify'] && { label: 'Tutor verification', href: route('admin.verification.index'), pattern: 'admin.verification.*', description: 'Documents awaiting review' },
+                can['tutors.verify'] && { label: 'Subject coverage', href: route('admin.coverage'), pattern: 'admin.coverage', description: 'Where tutors are thin' },
+                can['roles.manage'] && { label: 'Roles and permissions', href: route('admin.roles.index'), pattern: 'admin.roles.*', description: 'Who can do what' },
+            ].filter(Boolean) as StaffSection['items'],
         },
         {
             label: 'Content',
             items: [
-                { label: 'AI Tutor topics', href: route('admin.topics.index'), pattern: 'admin.topics.*', description: 'Generate and publish lessons' },
-                { label: 'Study material', href: route('admin.resources.index'), pattern: 'admin.resources.*', description: 'Uploads awaiting approval' },
-                { label: 'Curriculum', href: route('admin.curriculum.index'), pattern: 'admin.curriculum.*', description: 'Grades, subjects and topics' },
-                { label: 'Announcements', href: route('admin.announcements.index'), pattern: 'admin.announcements.*', description: 'Messages to students and tutors' },
-                { label: 'School links', href: route('admin.schoolLinks.index'), pattern: 'admin.schoolLinks.*', description: 'Classes claiming a school name' },
-            ],
+                can['topics.manage'] && { label: 'AI Tutor topics', href: route('admin.topics.index'), pattern: 'admin.topics.*', description: 'Generate and publish lessons' },
+                can['resources.review'] && { label: 'Study material', href: route('admin.resources.index'), pattern: 'admin.resources.*', description: 'Uploads awaiting approval' },
+                can['curriculum.manage'] && { label: 'Curriculum', href: route('admin.curriculum.index'), pattern: 'admin.curriculum.*', description: 'Grades, subjects and topics' },
+                can['announcements.manage'] && { label: 'Announcements', href: route('admin.announcements.index'), pattern: 'admin.announcements.*', description: 'Messages to students and tutors' },
+                can['tutors.verify'] && { label: 'School links', href: route('admin.schoolLinks.index'), pattern: 'admin.schoolLinks.*', description: 'Classes claiming a school name' },
+            ].filter(Boolean) as StaffSection['items'],
         },
         {
             label: 'Safeguarding',
             items: [
-                { label: 'Reports queue', href: route('moderation.index'), pattern: 'moderation.index', description: 'Reported messages and posts' },
-                { label: 'Study groups', href: route('moderation.groups'), pattern: 'moderation.groups*', description: 'Flagged group conversations' },
-                { label: 'Voice notes', href: route('moderation.voice'), pattern: 'moderation.voice*', description: 'Flagged or untranscribed audio' },
-                { label: 'Audit log', href: route('admin.audit'), pattern: 'admin.audit', description: 'Who did what, and when' },
-            ],
+                can['moderation.queue'] && { label: 'Reports queue', href: route('moderation.index'), pattern: 'moderation.index', description: 'Reported messages and posts' },
+                can['moderation.groups'] && { label: 'Study groups', href: route('moderation.groups'), pattern: 'moderation.groups*', description: 'Flagged group conversations' },
+                can['moderation.voice'] && { label: 'Voice notes', href: route('moderation.voice'), pattern: 'moderation.voice*', description: 'Flagged or untranscribed audio' },
+                can['audit.view'] && { label: 'Audit log', href: route('admin.audit'), pattern: 'admin.audit', description: 'Who did what, and when' },
+            ].filter(Boolean) as StaffSection['items'],
         },
         {
             label: 'Settings',
             items: [
-                { label: 'Platform settings', href: route('admin.settings'), pattern: 'admin.settings', description: 'Limits, consent, policy version' },
-                { label: 'Study assistant', href: route('admin.assistant'), pattern: 'admin.assistant*', description: 'AI mode, quotas and spend' },
-                { label: 'Gateways', href: route('admin.gateways'), pattern: 'admin.gateways*', description: 'Email, SMS and WhatsApp' },
-                { label: 'Security', href: route('admin.security'), pattern: 'admin.security*', description: 'Two-factor and staff accounts' },
-            ],
+                can['settings.manage'] && { label: 'Platform settings', href: route('admin.settings'), pattern: 'admin.settings', description: 'Limits, consent, policy version' },
+                can['assistant.configure'] && { label: 'Study assistant', href: route('admin.assistant'), pattern: 'admin.assistant*', description: 'AI mode, quotas and spend' },
+                can['settings.manage'] && { label: 'Gateways', href: route('admin.gateways'), pattern: 'admin.gateways*', description: 'Email, SMS and WhatsApp' },
+                can['settings.manage'] && { label: 'Security', href: route('admin.security'), pattern: 'admin.security*', description: 'Two-factor and staff accounts' },
+            ].filter(Boolean) as StaffSection['items'],
         },
     ];
+
+    // A group with nothing in it should not appear at all
+    return sections.filter((section) => section.items.length > 0);
 }
 
 export default function Authenticated({
@@ -68,7 +75,8 @@ export default function Authenticated({
 
     // Staff work on desktop and need the full menu; the tab bar is for learners
     const isStaff = ['admin', 'super_admin', 'moderator'].includes(user.role);
-    const STAFF_SECTIONS = isStaff ? staffSections() : [];
+    const can = ((user as unknown as { can?: Record<string, boolean> }).can ?? {}) as Record<string, boolean>;
+    const STAFF_SECTIONS = isStaff ? staffSections(can) : [];
 
     return (
         <div className="min-h-screen bg-gray-100">

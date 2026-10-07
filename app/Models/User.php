@@ -105,9 +105,34 @@ class User extends Authenticatable implements MustVerifyEmail
      * Super administrators hold every permission implicitly; everyone else holds
      * exactly what their assigned roles grant.
      */
+    /**
+     * Permissions that come with the account type itself, before any assigned
+     * role. Without these an administrator with no role attached would have no
+     * access at all, and a moderator would silently have everything.
+     */
+    public const BASE_PERMISSIONS = [
+        self::ROLE_MODERATOR => [
+            'moderation.queue', 'moderation.conversations',
+            'moderation.groups', 'moderation.voice',
+            'resources.review',
+        ],
+        self::ROLE_ADMIN => [
+            'users.manage', 'users.suspend', 'staff.invite', 'tutors.verify',
+            'curriculum.manage', 'announcements.manage', 'resources.review',
+            'topics.manage', 'topics.generate', 'topics.publish', 'topics.review',
+            'moderation.queue', 'moderation.conversations',
+            'moderation.groups', 'moderation.voice',
+            'assistant.configure', 'audit.view',
+        ],
+    ];
+
     public function hasPermission(string $permission): bool
     {
         if ($this->role === self::ROLE_SUPER_ADMIN) {
+            return true;
+        }
+
+        if (in_array($permission, self::BASE_PERMISSIONS[$this->role] ?? [], true)) {
             return true;
         }
 

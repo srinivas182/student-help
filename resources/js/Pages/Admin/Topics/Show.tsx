@@ -459,6 +459,14 @@ export default function Show({
                                     >
                                         {version.status === 'review' ? 'awaiting review' : version.status}
                                     </span>
+
+                                    {/* Counts say nothing about quality; this shows the lesson itself */}
+                                    <Link
+                                        href={route('admin.topics.preview', version.id)}
+                                        className="rounded-lg border border-slate-300 px-4 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                                    >
+                                        View content
+                                    </Link>
                                 </li>
                             ))}
                         </ul>

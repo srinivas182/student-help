@@ -11,7 +11,11 @@ use Illuminate\Support\Facades\Http;
 beforeEach(function () {
     $this->seed(SettingsSeeder::class);
 
-    $this->admin = User::factory()->create(['role' => User::ROLE_ADMIN, 'onboarding_completed_at' => now()]);
+    // Gateways are configuration, so only a super admin may touch them
+    $this->admin = User::factory()->create([
+        'role' => User::ROLE_SUPER_ADMIN,
+        'onboarding_completed_at' => now(),
+    ]);
 });
 
 it('offers South African SMS providers alongside the international one', function () {

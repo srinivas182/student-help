@@ -43,6 +43,15 @@ class HandleInertiaRequests extends Middleware
                     'can_self_study' => $request->user()->canSelfStudy(),
                     'is_minor' => $request->user()->isMinor(),
                     'can_review' => $request->user()->hasPermission('topics.review'),
+                    // The menu must show only what this person can actually open
+                    'can' => collect([
+                        'users.manage', 'tutors.verify', 'curriculum.manage', 'roles.manage',
+                        'topics.manage', 'resources.review', 'announcements.manage',
+                        'moderation.queue', 'moderation.groups', 'moderation.voice',
+                        'audit.view', 'settings.manage', 'assistant.configure',
+                    ])->mapWithKeys(fn (string $permission) => [
+                        $permission => $request->user()->hasPermission($permission),
+                    ]),
                 ] : null,
             ],
             'portal' => [

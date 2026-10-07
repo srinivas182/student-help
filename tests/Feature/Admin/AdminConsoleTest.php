@@ -19,6 +19,12 @@ beforeEach(function () {
     $this->seed(SettingsSeeder::class);
 
     $this->admin = User::factory()->create(['role' => User::ROLE_ADMIN, 'onboarding_completed_at' => now()]);
+
+    // Platform settings belong to the super admin, not every administrator
+    $this->superAdmin = User::factory()->create([
+        'role' => User::ROLE_SUPER_ADMIN,
+        'onboarding_completed_at' => now(),
+    ]);
     $this->student = User::factory()->create(['role' => User::ROLE_STUDENT, 'onboarding_completed_at' => now()]);
 });
 
@@ -172,7 +178,7 @@ it('bulk imports subjects and skips duplicates', function () {
 });
 
 it('saves platform settings and applies them immediately', function () {
-    $this->actingAs($this->admin)->put(route('admin.settings.update'), [
+    $this->actingAs($this->superAdmin)->put(route('admin.settings.update'), [
         'settings' => [
             'minimum_registration_age' => 14,
             'request_escalation_hours' => 12,
@@ -193,7 +199,7 @@ it('saves platform settings and applies them immediately', function () {
 });
 
 it('rejects settings outside sensible bounds', function () {
-    $this->actingAs($this->admin)->put(route('admin.settings.update'), [
+    $this->actingAs($this->superAdmin)->put(route('admin.settings.update'), [
         'settings' => [
             'minimum_registration_age' => 2,
             'request_escalation_hours' => 12,

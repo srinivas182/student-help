@@ -124,6 +124,55 @@ class TopicController extends Controller
         ]);
     }
 
+    /**
+     * The finished lesson, exactly as a student reads it.
+     *
+     * Listing "8 segments, 20 questions, published" tells an administrator
+     * nothing about whether the content is any good. This shows it.
+     */
+    public function preview(TopicVersion $version): Response
+    {
+        $version->load(['topic.subject:id,name', 'language', 'reviewer:id,first_name,last_name', 'questions']);
+
+        return Inertia::render('Admin/Topics/Preview', [
+            'version' => [
+                'id' => $version->id,
+                'status' => $version->status,
+                'language' => $version->language?->native_name,
+                'languageCode' => $version->language?->code,
+                'reviewer' => $version->reviewer?->name,
+                'reviewedAt' => $version->reviewed_at?->toFormattedDateString(),
+                'reviewNotes' => $version->review_notes,
+                'generatedAt' => $version->generated_at?->toFormattedDateString(),
+                'provider' => $version->provider,
+                'model' => $version->model,
+                'costUsd' => (float) $version->cost_usd,
+            ],
+            'topic' => [
+                'id' => $version->topic->id,
+                'title' => $version->topic->title,
+                'subject' => $version->topic->subject?->name,
+                'summary' => $version->topic->summary,
+                'objectives' => $version->topic->objectives ?? [],
+                'minutes' => $version->topic->estimated_minutes,
+            ],
+            'segments' => $version->segments(),
+            'notes' => $version->notes,
+            'flashcards' => $version->flashcards ?? [],
+            'questions' => $version->questions
+                ->sortBy(fn ($q) => array_search($q->level, ['basic', 'easy', 'intermediate', 'difficult', 'extreme']))
+                ->values()
+                ->map(fn ($q) => [
+                    'id' => $q->id,
+                    'level' => $q->level,
+                    'question' => $q->question,
+                    'options' => $q->options,
+                    'correctIndex' => $q->correct_index,
+                    'explanation' => $q->explanation,
+                ]),
+        ]);
+    }
+
     public function addSource(Request $request, Topic $topic): RedirectResponse
     {
         $validated = $request->validate([
