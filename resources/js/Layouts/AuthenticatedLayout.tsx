@@ -129,6 +129,15 @@ export default function Authenticated({
                                     </>
                                 )}
 
+                                {user.can_review && (
+                                    <NavLink
+                                        href={route('review.index')}
+                                        active={route().current('review.*')}
+                                    >
+                                        Review
+                                    </NavLink>
+                                )}
+
                                 {['admin', 'super_admin', 'moderator'].includes(user.role) && (
                                     <>
                                         <NavLink

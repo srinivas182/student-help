@@ -28,6 +28,7 @@ use App\Http\Controllers\Moderation\ModerationController;
 use App\Http\Controllers\PortalLandingController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StudyGroupController;
 use App\Http\Controllers\VoiceNoteController;
 use App\Http\Controllers\Moderation\StudyGroupReviewController;
@@ -98,6 +99,19 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/', [ResourceController::class, 'store'])->name('store');
         Route::get('/{resource}', [ResourceController::class, 'show'])->name('show');
         Route::get('/{resource}/download', [ResourceController::class, 'download'])->name('download');
+    });
+
+    // AI Tutor review workspace — for content reviewers, not administrators
+    Route::middleware('can.do:topics.review')->prefix('review')->name('review.')->group(function () {
+        Route::get('/', [ReviewController::class, 'index'])->name('index');
+        Route::get('/{version}', [ReviewController::class, 'show'])->name('show');
+        Route::put('/{version}/segments/{index}', [ReviewController::class, 'updateSegment'])->name('segments.update');
+        Route::delete('/{version}/segments/{index}', [ReviewController::class, 'removeSegment'])->name('segments.remove');
+        Route::put('/questions/{question}', [ReviewController::class, 'updateQuestion'])->name('questions.update');
+        Route::delete('/questions/{question}', [ReviewController::class, 'destroyQuestion'])->name('questions.destroy');
+        Route::post('/{version}/publish', [ReviewController::class, 'publish'])->name('publish');
+        Route::post('/{version}/reject', [ReviewController::class, 'reject'])->name('reject');
+        Route::post('/{version}/unpublish', [ReviewController::class, 'unpublish'])->name('unpublish');
     });
 
     // AI study assistant

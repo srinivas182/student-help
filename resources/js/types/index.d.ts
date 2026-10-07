@@ -8,6 +8,7 @@ export interface User {
     role: 'student' | 'tutor' | 'moderator' | 'admin' | 'super_admin';
     can_participate?: boolean;
     is_minor?: boolean;
+    can_review?: boolean;
 }
 
 export type PageProps<

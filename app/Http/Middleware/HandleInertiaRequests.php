@@ -41,6 +41,7 @@ class HandleInertiaRequests extends Middleware
                     'role' => $request->user()->role,
                     'can_participate' => $request->user()->canParticipate(),
                     'is_minor' => $request->user()->isMinor(),
+                    'can_review' => $request->user()->hasPermission('topics.review'),
                 ] : null,
             ],
             'portal' => [
