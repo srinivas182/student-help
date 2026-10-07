@@ -56,7 +56,19 @@ As `moderator@dxstudenthelp.co.za`:
 
 ## 5. AI Tutor (6 minutes)
 
-Sign in as `student@dxstudenthelp.co.za` and open **Learn**.
+Sign in as `student@dxstudenthelp.co.za` and open **Learn**. Seven published
+lessons across seven subjects are waiting:
+
+| Lesson | Subject | Languages |
+|---|---|---|
+| Factorising trinomials when a is not 1 | Grade 11 Mathematics | English, isiZulu |
+| Newton's second law: F = ma in practice | Grade 12 Physical Sciences | English, Afrikaans |
+| Compound and double angle identities | Grade 12 Mathematics | English |
+| Photosynthesis: the light and dark reactions | Grade 11 Life Sciences | English |
+| Bank reconciliation, step by step | Grade 11 Accounting | English |
+| Structuring a discursive essay | Grade 12 English Home Language | English |
+| Price elasticity of demand | Grade 11 Economics | English |
+
 
 1. **Pick a language.** English and isiZulu are both published for the Grade 11
    Mathematics topic. Choose isiZulu and open the lesson.

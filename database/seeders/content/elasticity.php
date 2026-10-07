@@ -1,0 +1,130 @@
+<?php
+
+return [
+    'slug' => 'price-elasticity-demand',
+    'subject' => 'Economics',
+    'grade' => 'Grade 11',
+    'title' => 'Price elasticity of demand',
+    'summary' => 'Calculating elasticity, interpreting the result, and explaining why it matters for pricing and tax policy.',
+    'objectives' => [
+        'Calculate price elasticity of demand',
+        'Classify demand as elastic, inelastic or unitary',
+        'Explain what determines elasticity and why it affects revenue',
+    ],
+    'minutes' => 20,
+    'segments' => [
+        [
+            'title' => 'What elasticity actually measures',
+            'narration' => "Elasticity answers one question: if the price changes, how much does the quantity people buy change?\n\nPetrol goes up 10% and most people still drive to work. Demand barely moves. That is inelastic.\n\nA particular brand of chips goes up 10% and shoppers reach for the one next to it. Demand moves a lot. That is elastic.\n\nThe formula is percentage change in quantity demanded divided by percentage change in price. Note the order: quantity on top. Getting it upside down is the most common error in this topic.",
+            'visual' => 'Two demand curves, one steep and one shallow, with the same price change producing very different quantity changes.',
+            'check' => ['question' => 'Which goes on top of the fraction?', 'answer' => 'Percentage change in quantity demanded.'],
+        ],
+        [
+            'title' => 'Calculating it',
+            'narration' => "Price rises from R20 to R24. Quantity demanded falls from 100 to 80.\n\nPercentage change in quantity: (80 − 100) ÷ 100 = −20%.\nPercentage change in price: (24 − 20) ÷ 20 = +20%.\n\nElasticity = −20 ÷ 20 = −1.\n\nThe answer is negative because price and quantity move in opposite directions. That is always true for normal goods, so economists usually drop the sign and talk about the size: here, 1.\n\nWork with percentages, not the raw numbers. A R4 rise means something different on a R20 item than on a R400 one.",
+            'visual' => 'The calculation set out line by line with both percentage changes shown.',
+            'check' => ['question' => 'Why is elasticity negative for normal goods?', 'answer' => 'Because price and quantity demanded move in opposite directions.'],
+        ],
+        [
+            'title' => 'Reading the number',
+            'narration' => "Ignore the sign and look at the size compared with 1.\n\nGreater than 1: elastic. Quantity responds more than price changed. Luxuries, items with close substitutes.\n\nLess than 1: inelastic. Quantity responds less. Necessities, items with no substitute, addictive goods.\n\nExactly 1: unitary elastic. They change in proportion.\n\nTwo extremes worth knowing: zero is perfectly inelastic, a vertical demand curve, where quantity does not change at all. Infinite is perfectly elastic, a horizontal curve. Both are theoretical rather than real.",
+            'visual' => 'A number line from 0 through 1 to infinity with the categories marked.',
+            'check' => ['question' => 'Elasticity is 0.4. Elastic or inelastic?', 'answer' => 'Inelastic, since 0.4 is less than 1.'],
+        ],
+        [
+            'title' => 'What makes demand elastic',
+            'narration' => "Four things decide it.\n\nSubstitutes. The more alternatives, the more elastic. One brand of bread is elastic; bread in general is not.\n\nNecessity. Insulin is inelastic. A weekend away is elastic.\n\nShare of income. A R2 rise on a loaf barely registers. A 10% rise on a car does.\n\nTime. Demand is more elastic over the long run, because people find alternatives. When petrol rises, you still drive this month, but over two years you may move closer to work or buy a smaller car.",
+            'visual' => 'Four factors as cards, each with a South African example.',
+            'check' => ['question' => 'Why is demand more elastic in the long run?', 'answer' => 'Because people have time to find substitutes or change their habits.'],
+        ],
+        [
+            'title' => 'Why it matters: revenue',
+            'narration' => "This is the part examiners like.\n\nIf demand is inelastic and you raise the price, total revenue goes up. You lose few customers and earn more from each.\n\nIf demand is elastic and you raise the price, total revenue goes down. You lose more in customers than you gain per sale.\n\nThat is why government places excise taxes on cigarettes, alcohol and fuel. Demand is inelastic, so the tax raises revenue reliably without collapsing the market.\n\nIt is also why a struggling restaurant often cuts prices rather than raising them. Their demand is elastic.",
+            'visual' => 'Two revenue rectangles before and after a price rise, one growing and one shrinking.',
+            'check' => ['question' => 'A shop raises prices and revenue falls. What does that tell you?', 'answer' => 'Demand for its goods is elastic.'],
+        ],
+        [
+            'title' => 'Your turn',
+            'narration' => "A taxi fare rises from R15 to R18. Daily passengers fall from 400 to 380.\n\nCalculate the elasticity. Then say whether demand is elastic or inelastic, and what happened to total revenue.\n\nWork out both revenues to check your reasoning: 400 × 15 against 380 × 18.\n\nThen explain in one sentence why this result makes sense for minibus taxi commuters.",
+            'visual' => 'A blank calculation frame with the four figures given.',
+            'check' => ['question' => 'What is the answer?', 'answer' => 'Quantity −5%, price +20%, so elasticity = 0.25: inelastic. Revenue rose from R6 000 to R6 840. Commuters have few alternatives for getting to work.'],
+        ],
+    ],
+    'notes' => "# Price elasticity of demand\n\n**PED = % change in quantity demanded ÷ % change in price**\n\nQuantity on top. Always.\n\n## Interpreting the result\n\n| Value (ignoring sign) | Type | Meaning |\n|---|---|---|\n| 0 | perfectly inelastic | quantity does not change |\n| between 0 and 1 | inelastic | quantity responds less than price |\n| 1 | unitary | proportional |\n| above 1 | elastic | quantity responds more |\n| infinite | perfectly elastic | theoretical |\n\n## What determines it\n\n- **Substitutes** — more alternatives, more elastic\n- **Necessity** — necessities are inelastic\n- **Share of income** — expensive items are more elastic\n- **Time** — more elastic over the long run\n\n## Revenue\n\n| Demand | Price rises | Price falls |\n|---|---|---|\n| Inelastic | revenue **up** | revenue down |\n| Elastic | revenue **down** | revenue up |\n\nThis is why excise taxes target cigarettes, alcohol and fuel.\n\n## Common mistakes\n\n- Inverting the formula\n- Using raw changes instead of percentages\n- Forgetting the answer is negative for normal goods",
+    'flashcards' => [
+        ['front' => 'The formula for PED?', 'back' => '% change in quantity demanded ÷ % change in price.'],
+        ['front' => 'PED = 0.3. Elastic or inelastic?', 'back' => 'Inelastic. Below 1.'],
+        ['front' => 'Inelastic demand, price rises. What happens to revenue?', 'back' => 'Revenue rises.'],
+        ['front' => 'Elastic demand, price rises. What happens to revenue?', 'back' => 'Revenue falls.'],
+        ['front' => 'Why are excise taxes placed on cigarettes and fuel?', 'back' => 'Demand is inelastic, so the tax raises revenue reliably.'],
+        ['front' => 'Why is demand more elastic over time?', 'back' => 'People find substitutes and change habits.'],
+    ],
+    'questions' => [
+        ['basic', 'What does price elasticity of demand measure?', [
+            ['How much quantity demanded responds to a price change', ''],
+            ['How much price responds to a quantity change', 'That is the inverse and not what PED measures.'],
+            ['Total revenue', 'Revenue is affected by elasticity but is not the same thing.'],
+            ['How quickly prices rise', 'That is inflation.'],
+        ], 0, 'It compares the percentage change in quantity with the percentage change in price.'],
+        ['basic', 'Which goes on top of the elasticity fraction?', [
+            ['Percentage change in quantity demanded', ''],
+            ['Percentage change in price', 'That is the denominator. Inverting is the most common error in this topic.'],
+            ['Total revenue', 'Revenue does not appear in the formula.'],
+            ['The price itself', 'The formula uses percentage changes, not levels.'],
+        ], 0, 'Quantity on top, price on the bottom.'],
+        ['basic', 'A PED of 2.5 means demand is:', [
+            ['Elastic', ''],
+            ['Inelastic', 'Inelastic is below 1.'],
+            ['Unitary', 'Unitary is exactly 1.'],
+            ['Perfectly inelastic', 'That is 0.'],
+        ], 0, 'Above 1 means quantity responds more than price changed.'],
+        ['easy', 'Price rises 10% and quantity demanded falls 5%. The PED is:', [
+            ['0.5', ''],
+            ['2', 'The formula has been inverted.'],
+            ['5', 'Raw numbers have been used instead of the ratio.'],
+            ['15', 'The changes have been added rather than divided.'],
+        ], 0, '5 ÷ 10 = 0.5, so demand is inelastic.'],
+        ['easy', 'Which good is most likely to have inelastic demand?', [
+            ['Chronic medication', ''],
+            ['One brand of cooldrink', 'Many close substitutes make it elastic.'],
+            ['Overseas holidays', 'A luxury with many alternatives, so elastic.'],
+            ['Designer clothing', 'Highly substitutable and discretionary.'],
+        ], 0, 'Necessities with no substitutes are inelastic.'],
+        ['intermediate', 'A taxi fare rises from R15 to R18 and passengers fall from 400 to 380. The PED is:', [
+            ['0.25', ''],
+            ['4', 'The formula has been inverted.'],
+            ['0.05', 'Only the quantity change has been used.'],
+            ['1.25', 'Check the percentages: quantity fell 5%, price rose 20%.'],
+        ], 0, '5% ÷ 20% = 0.25. Inelastic, as expected for commuters with few alternatives.'],
+        ['intermediate', 'A shop raises prices and total revenue falls. This means demand is:', [
+            ['Elastic', ''],
+            ['Inelastic', 'With inelastic demand a price rise increases revenue.'],
+            ['Unitary', 'With unitary elasticity revenue would stay roughly the same.'],
+            ['Perfectly inelastic', 'Then revenue would rise in direct proportion to the price.'],
+        ], 0, 'They lost more in customers than they gained per sale.'],
+        ['difficult', 'Why does government place excise taxes on cigarettes, alcohol and fuel rather than on clothing?', [
+            ['Demand for them is inelastic, so revenue is reliable', ''],
+            ['They are more expensive', 'Price level is not the reason.'],
+            ['Clothing cannot be taxed', 'It can be, and is, through VAT.'],
+            ['Demand for them is elastic', 'If it were elastic, the tax would collapse sales and raise little.'],
+        ], 0, 'Inelastic demand means buyers keep buying, so the tax raises predictable revenue.'],
+        ['difficult', 'Petrol demand is inelastic in the short run but more elastic over five years because:', [
+            ['People have time to move closer to work or change vehicles', ''],
+            ['Petrol becomes a luxury', 'It remains a necessity for most drivers.'],
+            ['Prices always fall eventually', 'The change is in behaviour, not in price.'],
+            ['Government subsidises it', 'Subsidies would affect price, not elasticity.'],
+        ], 0, 'Time allows substitution, and substitution is what makes demand elastic.'],
+        ['extreme', 'A firm with elastic demand wants to raise total revenue. It should:', [
+            ['Lower the price', ''],
+            ['Raise the price', 'With elastic demand that reduces revenue.'],
+            ['Keep the price and cut costs', 'That raises profit, not revenue, and the question asks about revenue.'],
+            ['Nothing can raise revenue', 'Lowering price raises revenue when demand is elastic.'],
+        ], 0, 'The extra customers gained more than offset the lower price per unit.'],
+        ['extreme', 'Demand for a product has PED of exactly 1. A 15% price increase will:', [
+            ['Leave total revenue roughly unchanged', ''],
+            ['Raise total revenue by 15%', 'That would require perfectly inelastic demand.'],
+            ['Reduce total revenue to zero', 'That would require perfectly elastic demand.'],
+            ['Reduce revenue by 15%', 'The quantity fall offsets the price rise, leaving revenue steady.'],
+        ], 0, 'Unitary elasticity means the proportional changes cancel out.'],
+    ],
+];

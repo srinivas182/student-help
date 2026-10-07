@@ -20,88 +20,157 @@ use Illuminate\Support\Str;
  */
 class DemoLessonSeeder extends Seeder
 {
+    /** Extra lessons, each with its own content file and optional translation. */
+    private const LESSONS = [
+        ['file' => 'newtons-second-law', 'translation' => 'newtons-second-law-af', 'language' => 'af'],
+        ['file' => 'photosynthesis', 'translation' => null, 'language' => null],
+        ['file' => 'bank-reconciliation', 'translation' => null, 'language' => null],
+        ['file' => 'compound-angles', 'translation' => null, 'language' => null],
+        ['file' => 'discursive-essay', 'translation' => null, 'language' => null],
+        ['file' => 'elasticity', 'translation' => null, 'language' => null],
+    ];
+
     public function run(): void
     {
-        $subject = $this->mathsSubject();
+        $author = User::whereIn('role', [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN])->first() ?? User::first();
 
-        if (! $subject) {
-            $this->command?->warn('No Mathematics subject found — seed the curriculum first.');
-
+        if (! $author) {
             return;
         }
-
-        $author = User::whereIn('role', [User::ROLE_ADMIN, User::ROLE_SUPER_ADMIN])->first()
-            ?? User::first();
 
         $reviewer = $this->reviewer($author);
-
         $english = Language::where('code', 'en')->first();
-        $zulu = Language::where('code', 'zu')->first();
 
-        if (! $english || ! $author) {
+        if (! $english) {
             return;
         }
 
-        $lesson = require database_path('seeders/content/trinomials-en.php');
-        $questions = require database_path('seeders/content/trinomials-en-questions.php');
+        $published = 0;
 
-        $topic = Topic::updateOrCreate(
-            ['slug' => 'factorising-trinomials-a-not-1'],
-            [
-                'curriculum_item_id' => $subject->id,
-                'created_by' => $author->id,
+        // The flagship lesson, with its isiZulu translation
+        if ($subject = $this->mathsSubject()) {
+            $lesson = require database_path('seeders/content/trinomials-en.php');
+            $questions = require database_path('seeders/content/trinomials-en-questions.php');
+
+            $topic = $this->makeTopic($subject, $author, [
+                'slug' => 'factorising-trinomials-a-not-1',
                 'title' => $lesson['title'],
                 'summary' => $lesson['summary'],
                 'objectives' => $lesson['objectives'],
-                'estimated_minutes' => $lesson['minutes'],
+                'minutes' => $lesson['minutes'],
+            ], 'CAPS Grade 11 Mathematics: algebraic expressions');
+
+            $this->publishVersion($topic, $english, $reviewer, $lesson, $questions);
+            $published++;
+
+            if ($zulu = Language::where('code', 'zu')->first()) {
+                $translated = require database_path('seeders/content/trinomials-zu.php');
+                $translated['flashcards'] = $lesson['flashcards'];
+
+                $this->publishVersion($topic, $zulu, $reviewer, $translated, $questions);
+            }
+        }
+
+        foreach (self::LESSONS as $entry) {
+            $lesson = require database_path("seeders/content/{$entry['file']}.php");
+            $subject = $this->findSubject($lesson['subject'], $lesson['grade']);
+
+            if (! $subject) {
+                $this->command?->warn("Skipped {$lesson['title']}: no {$lesson['subject']} subject found.");
+
+                continue;
+            }
+
+            $questions = $this->normaliseQuestions($lesson['questions']);
+
+            $topic = $this->makeTopic($subject, $author, [
+                'slug' => $lesson['slug'],
+                'title' => $lesson['title'],
+                'summary' => $lesson['summary'],
+                'objectives' => $lesson['objectives'],
+                'minutes' => $lesson['minutes'],
+            ], "CAPS {$lesson['grade']} {$lesson['subject']} curriculum extract and teacher notes");
+
+            $this->publishVersion($topic, $english, $reviewer, $lesson, $questions);
+            $published++;
+
+            if ($entry['translation'] && $language = Language::where('code', $entry['language'])->first()) {
+                $translated = require database_path("seeders/content/{$entry['translation']}.php");
+                $translated['flashcards'] = $lesson['flashcards'];
+
+                $this->publishVersion($topic, $language, $reviewer, $translated, $questions);
+            }
+        }
+
+        $this->enrolDemoStudents();
+
+        $this->command?->info("Published {$published} demo lessons across "
+            .Topic::published()->get()->pluck('curriculum_item_id')->unique()->count().' subjects.');
+    }
+
+    /** The compact [level, question, options, index, explanation] form used by the lesson files. */
+    private function normaliseQuestions(array $questions): array
+    {
+        return collect($questions)->map(fn (array $q) => [
+            'level' => $q[0],
+            'question' => $q[1],
+            'options' => collect($q[2])->map(fn (array $option) => [
+                'text' => $option[0],
+                'misconception' => $option[1],
+            ])->all(),
+            'correct_index' => $q[3],
+            'explanation' => $q[4],
+        ])->all();
+    }
+
+    private function makeTopic(CurriculumItem $subject, User $author, array $attributes, string $sourceTitle): Topic
+    {
+        $topic = Topic::updateOrCreate(
+            ['slug' => $attributes['slug']],
+            [
+                'curriculum_item_id' => $subject->id,
+                'created_by' => $author->id,
+                'title' => $attributes['title'],
+                'summary' => $attributes['summary'],
+                'objectives' => $attributes['objectives'],
+                'estimated_minutes' => $attributes['minutes'],
                 'is_published' => true,
                 'position' => 0,
             ],
         );
 
-        // Source material, so the admin screen shows where the lesson came from
         $topic->sources()->delete();
         $topic->sources()->create([
             'uploaded_by' => $author->id,
             'kind' => 'text',
-            'title' => 'CAPS Grade 11 Mathematics: algebraic expressions',
-            'extracted_text' => 'Curriculum extract and teacher notes on factorising quadratic trinomials where the leading coefficient is not one, including the product-sum method and factorising by grouping.',
+            'title' => $sourceTitle,
+            'extracted_text' => $sourceTitle.'. Teacher notes and worked examples used to generate this lesson.',
             'rights_declared' => true,
             'extraction_status' => 'done',
         ]);
 
-        $this->publishVersion($topic, $english, $reviewer, [
-            'segments' => $lesson['segments'],
-            'notes' => $lesson['notes'],
-            'flashcards' => $lesson['flashcards'],
-        ], $questions);
+        return $topic;
+    }
 
-        // The isiZulu version: same lesson, terms kept in English for the exam
-        if ($zulu) {
-            $translated = require database_path('seeders/content/trinomials-zu.php');
-
-            $this->publishVersion($topic, $zulu, $reviewer, [
-                'segments' => $translated['segments'],
-                'notes' => $translated['notes'],
-                'flashcards' => $lesson['flashcards'],
-            ], $questions);
-        }
-
-        // Demo students must take the subject, or the lesson is invisible to them
-        $attached = 0;
+    /** Demo students must take the subjects, or the lessons are invisible to them. */
+    private function enrolDemoStudents(): void
+    {
+        $subjectIds = Topic::published()->pluck('curriculum_item_id')->unique();
 
         foreach (User::where('role', User::ROLE_STUDENT)->get() as $student) {
-            if (! $student->subjects()->where('curriculum_items.id', $subject->id)->exists()) {
-                $student->subjects()->syncWithoutDetaching([$subject->id => ['role' => 'subject']]);
-                $attached++;
+            foreach ($subjectIds as $subjectId) {
+                $student->subjects()->syncWithoutDetaching([$subjectId => ['role' => 'subject']]);
             }
         }
+    }
 
-        $this->command?->info(
-            'Demo lesson published in '.($zulu ? '2 languages' : '1 language')
-            .' with '.count($questions).' questions, visible to '
-            .User::where('role', User::ROLE_STUDENT)->count().' demo students.'
-        );
+    private function findSubject(string $name, string $grade): ?CurriculumItem
+    {
+        return CurriculumItem::ofType(CurriculumItem::TYPE_SUBJECT)
+            ->where('name', $name)
+            ->whereHas('parent', fn ($q) => $q->where('name', $grade))
+            ->first()
+            ?? CurriculumItem::ofType(CurriculumItem::TYPE_SUBJECT)->where('name', $name)->first();
     }
 
     private function publishVersion(
@@ -111,6 +180,7 @@ class DemoLessonSeeder extends Seeder
         array $content,
         array $questions,
     ): void {
+        $content['flashcards'] ??= [];
         $version = TopicVersion::updateOrCreate(
             ['topic_id' => $topic->id, 'language_id' => $language->id],
             [

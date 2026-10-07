@@ -1,0 +1,130 @@
+<?php
+
+return [
+    'slug' => 'discursive-essay',
+    'subject' => 'English Home Language',
+    'grade' => 'Grade 12',
+    'title' => 'Structuring a discursive essay',
+    'summary' => 'How to plan and write a balanced argument that scores well in Paper 3, with a model paragraph.',
+    'objectives' => [
+        'Distinguish a discursive essay from an argumentative one',
+        'Plan a balanced structure before writing',
+        'Write body paragraphs using point, evidence, explanation, link',
+    ],
+    'minutes' => 18,
+    'segments' => [
+        [
+            'title' => 'Discursive is not argumentative',
+            'narration' => "An argumentative essay takes a side and defends it. A discursive essay examines a question from more than one angle before reaching a measured conclusion.\n\nThe mistake that costs the most marks is writing an argumentative essay when the question asked for a discursive one. If the topic says \"discuss\", the marker is looking for balance.\n\nYou may still have a view. State it at the end, after you have treated the other side fairly. A conclusion that arrives at a position having genuinely weighed both sides reads as thoughtful. One that was obvious from paragraph one reads as a rant.",
+            'visual' => 'Two essay shapes side by side: one arrow pointing one way, one weighing scales settling slightly to one side.',
+            'check' => ['question' => 'The topic says "Discuss the impact of social media on teenagers." What is the marker looking for?', 'answer' => 'Both benefits and harms treated seriously, then a measured conclusion.'],
+        ],
+        [
+            'title' => 'Plan before you write',
+            'narration' => "Spend five minutes planning. In a 50-minute essay that is time well spent, not time lost.\n\nWrite the question at the top. Underneath, two columns: one for each side. Get three points in each column before you write a sentence.\n\nThen number them in the order you will use them. Strongest point last on the side you lean towards, because what a reader remembers is what came just before the conclusion.\n\nIf you cannot fill both columns, you have chosen a topic you do not know well enough. Change it now rather than discovering it in paragraph four.",
+            'visual' => 'A planning page with two columns and numbered points.',
+            'check' => ['question' => 'Why plan both columns before writing?', 'answer' => 'Because discovering you have nothing for the other side halfway through means restarting or writing an unbalanced essay.'],
+        ],
+        [
+            'title' => 'The introduction',
+            'narration' => "Three sentences is usually enough.\n\nOpen with something that makes the question feel alive: a statistic, a short scenario, a sharp observation. Avoid \"Since the dawn of time\" and avoid repeating the question back.\n\nThen narrow to the issue itself in one sentence.\n\nThen signal that you will consider more than one view. Something as plain as \"Both the opportunities and the costs deserve examination\" is enough. It tells the marker immediately that this is a discursive essay.",
+            'visual' => 'A three-sentence introduction annotated with its purpose.',
+            'check' => ['question' => 'What should the last sentence of your introduction do?', 'answer' => 'Signal that more than one view will be considered.'],
+        ],
+        [
+            'title' => 'Body paragraphs: point, evidence, explanation, link',
+            'narration' => "Each body paragraph does four things.\n\nPoint: one sentence stating the idea. Make it the first sentence so the marker can find it.\n\nEvidence: an example, a statistic, a reference to something real. South African examples read as more considered than borrowed American ones.\n\nExplanation: why this evidence supports the point. This is the part students skip, and it is where the marks are.\n\nLink: a sentence connecting to the next paragraph or back to the question.\n\nFour sentences minimum, six or seven is comfortable.",
+            'visual' => 'A paragraph with its four parts colour-coded.',
+            'check' => ['question' => 'Which of the four parts do students most often leave out?', 'answer' => 'Explanation — saying why the evidence supports the point.'],
+        ],
+        [
+            'title' => 'Model paragraph, then yours',
+            'narration' => "Here is one on social media.\n\n\"Social media has widened access to information for learners in under-resourced schools. A matriculant in rural Limpopo can now watch a Physical Sciences explanation that would once have required a tutor her family could not afford. This matters because the gap between well-resourced and poorly-resourced schools has historically been a gap in access to teaching, not in ability. Where that access improves, so does the fairness of the outcome.\"\n\nPoint, evidence, explanation, link. Four sentences.\n\nNow write one on the other side: a cost of social media for teenagers. Use the same four-part shape.",
+            'visual' => 'The model paragraph with each part labelled, and a blank frame for the learner.',
+            'check' => ['question' => 'What should your paragraph end with?', 'answer' => 'A link sentence connecting to the next idea or back to the question.'],
+        ],
+        [
+            'title' => 'The conclusion, and what loses marks',
+            'narration' => "Do not introduce new evidence. Do not simply list what you said.\n\nAcknowledge the strength of the side you did not take, then state your position and why the balance tips that way for you. That is what a measured conclusion looks like.\n\nThree things that cost marks regularly. Writing in the first person throughout when the register should be more formal. Rhetorical questions used as a substitute for argument. And running out of time, which is why the plan matters.\n\nLeave three minutes to read it back. You will find at least one sentence that does not say what you meant.",
+            'visual' => 'A conclusion annotated, beside a list of common errors.',
+            'check' => ['question' => 'Should a conclusion introduce new evidence?', 'answer' => 'No. It weighs what has already been argued and states a position.'],
+        ],
+    ],
+    'notes' => "# The discursive essay\n\n## Discursive vs argumentative\n\n| Discursive | Argumentative |\n|---|---|\n| Examines several views | Defends one view |\n| Measured conclusion | Persuasive throughout |\n| \"Discuss\", \"examine\" | \"Argue\", \"convince\" |\n\n## Structure\n\n1. **Introduction** (3 sentences) — hook, issue, signal balance\n2. **Body** — 2 to 3 paragraphs each side\n3. **Conclusion** — acknowledge the other side, state your position\n\n## Every body paragraph\n\n- **P**oint — one sentence, first\n- **E**vidence — example or statistic, preferably South African\n- **E**xplanation — why it supports the point *(most often skipped)*\n- **L**ink — to the next idea or back to the question\n\n## Timing a 50-minute essay\n\n| Minutes | Task |\n|---|---|\n| 5 | Plan both columns |\n| 40 | Write |\n| 3 | Read back |\n| 2 | Spare |\n\n## Loses marks\n\n- Argumentative essay when discursive was asked\n- Missing explanation sentences\n- Rhetorical questions instead of argument\n- New evidence in the conclusion",
+    'flashcards' => [
+        ['front' => 'Discursive or argumentative: "Discuss the impact of…"', 'back' => 'Discursive. Balance is required.'],
+        ['front' => 'The four parts of a body paragraph?', 'back' => 'Point, Evidence, Explanation, Link.'],
+        ['front' => 'Which part do students most often skip?', 'back' => 'Explanation — why the evidence supports the point.'],
+        ['front' => 'How long should planning take in a 50-minute essay?', 'back' => 'About five minutes, on both columns.'],
+        ['front' => 'Should the conclusion introduce new evidence?', 'back' => 'No. It weighs what has been argued and states a position.'],
+        ['front' => 'Where should your strongest point go?', 'back' => 'Last, just before the conclusion, on the side you lean towards.'],
+    ],
+    'questions' => [
+        ['basic', 'A discursive essay differs from an argumentative one because it:', [
+            ['Examines more than one view before concluding', ''],
+            ['Never reaches a conclusion', 'A measured conclusion is expected.'],
+            ['Is always longer', 'Length is set by the paper, not the type.'],
+            ['Uses no evidence', 'Evidence is required in both.'],
+        ], 0, '"Discuss" signals that balance is being marked.'],
+        ['basic', 'What do the letters in PEEL stand for?', [
+            ['Point, Evidence, Explanation, Link', ''],
+            ['Plan, Enter, Explain, Leave', 'Not a recognised structure.'],
+            ['Point, Example, Elaborate, List', 'Close, but "list" is not a paragraph function.'],
+            ['Paragraph, Essay, Edit, Length', 'These describe the task, not the paragraph.'],
+        ], 0, 'Each body paragraph should do all four in order.'],
+        ['basic', 'How many sentences is a good introduction?', [
+            ['About three', ''],
+            ['At least ten', 'That is a body paragraph in length and delays the argument.'],
+            ['One', 'Too thin to hook, narrow and signal balance.'],
+            ['It does not matter', 'A tight introduction leaves time for the body, which carries the marks.'],
+        ], 0, 'Hook, narrow to the issue, signal that both sides will be considered.'],
+        ['easy', 'The topic is "Discuss whether school uniforms should be compulsory." A good essay will:', [
+            ['Present arguments for and against before concluding', ''],
+            ['Argue strongly for uniforms throughout', 'That is argumentative, and the topic asked you to discuss.'],
+            ['List facts about uniforms with no position', 'A conclusion with a position is still expected.'],
+            ['Avoid any personal view', 'A measured view at the end is appropriate.'],
+        ], 0, 'Balance first, then a measured conclusion.'],
+        ['easy', 'Which sentence is the "explanation" in a PEEL paragraph?', [
+            ['The one saying why the evidence supports the point', ''],
+            ['The one giving a statistic', 'That is the evidence.'],
+            ['The first sentence', 'That is the point.'],
+            ['The last sentence', 'That is usually the link.'],
+        ], 0, 'Explanation connects the evidence to the argument, and is where most marks are won or lost.'],
+        ['intermediate', 'Why should your strongest point come last on your preferred side?', [
+            ['It sits closest to the conclusion, so it carries most weight', ''],
+            ['Markers only read the end', 'Markers read the whole essay.'],
+            ['It is traditional', 'There is a reason, not just convention.'],
+            ['Weak points should open the essay', 'Opening weakly damages the whole piece.'],
+        ], 0, 'What a reader meets just before the conclusion shapes how the conclusion lands.'],
+        ['intermediate', 'A student writes: "Social media is bad. Many teenagers use it. Therefore it should be banned." The main weakness is:', [
+            ['No explanation connecting the evidence to the claim', ''],
+            ['Too much evidence', 'There is barely any evidence.'],
+            ['The sentences are too long', 'They are short, and length is not the problem.'],
+            ['It uses the first person', 'It does not use the first person at all.'],
+        ], 0, 'That many teenagers use social media does not by itself show it is harmful. The explanation is missing.'],
+        ['difficult', 'Which conclusion is strongest for a discursive essay on social media?', [
+            ['"While the risks to wellbeing are real and should not be minimised, the gains in access to learning are, for most South African teenagers, the more consequential effect."', ''],
+            ['"In conclusion, social media has advantages and disadvantages."', 'True but empty. It states no position and weighs nothing.'],
+            ['"Social media is clearly destroying a generation, as anyone can see."', 'Overstated, and it abandons the balance the essay built.'],
+            ['"A new study released last week shows that screen time has risen by 40%."', 'New evidence does not belong in a conclusion.'],
+        ], 0, 'It acknowledges the other side, then states a position with a reason.'],
+        ['difficult', 'You have 50 minutes. You have written three paragraphs in 35 minutes and have two more plus a conclusion to go. The best response is:', [
+            ['Shorten the remaining paragraphs and protect time for the conclusion', ''],
+            ['Keep the same pace and leave out the conclusion', 'An essay without a conclusion loses structure marks heavily.'],
+            ['Stop and rewrite the earlier paragraphs more briefly', 'Rewriting spends time you no longer have.'],
+            ['Write the remaining points as a list', 'A list is not an essay and will be marked as unstructured.'],
+        ], 0, 'A complete essay with tighter paragraphs always scores better than an incomplete one.'],
+        ['extreme', 'A marker writes "descriptive rather than discursive" on an essay. This most likely means:', [
+            ['The student explained what things are rather than weighing arguments about them', ''],
+            ['The writing was too vivid', 'Vivid writing is not a fault here.'],
+            ['Too few paragraphs were used', 'That would be commented on as structure.'],
+            ['The spelling was poor', 'That would be marked under language.'],
+        ], 0, 'Describing a topic is not the same as discussing competing views about it.'],
+        ['extreme', 'Which opening sentence is most likely to earn credit in Paper 3?', [
+            ['"At 2am, a sixteen-year-old in Soweto is still scrolling, and her Maths exam is in six hours."', ''],
+            ['"In this essay I will discuss the impact of social media on teenagers."', 'Announcing the essay wastes the opening and signals a mechanical piece.'],
+            ['"Since the dawn of time, humans have communicated."', 'A cliché opening that says nothing about the topic.'],
+            ['"Social media is a platform used to share content online."', 'A definition, not a hook, and the marker already knows it.'],
+        ], 0, 'A concrete, local scene makes the question feel urgent and shows control of register from the first line.'],
+    ],
+];

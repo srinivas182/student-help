@@ -1,0 +1,136 @@
+<?php
+
+return [
+    'slug' => 'newtons-second-law',
+    'subject' => 'Physical Sciences',
+    'grade' => 'Grade 12',
+    'title' => "Newton's second law: F = ma in practice",
+    'summary' => 'Drawing free-body diagrams and applying F_net = ma to real systems, including inclines and connected objects.',
+    'objectives' => [
+        'Draw a correct free-body diagram for an object',
+        'Apply F_net = ma along a chosen positive direction',
+        'Solve problems involving inclines and connected objects',
+    ],
+    'minutes' => 25,
+    'segments' => [
+        [
+            'title' => 'Net force, not just force',
+            'narration' => "The law says F_net = ma. The word that costs most marks is \"net\".\n\nA 10 kg crate pushed with 50 N while friction pushes back with 20 N does not accelerate at 5 m·s⁻². The net force is 50 − 20 = 30 N, so a = 30 ÷ 10 = 3 m·s⁻².\n\nBefore you touch the formula, add up every force acting on the object, with direction. That sum is what goes into F_net.",
+            'visual' => 'A crate with a 50 N arrow right and a 20 N arrow left, resolving to a single 30 N arrow right.',
+            'check' => ['question' => 'A 4 kg box has 12 N forward and 4 N friction. What is a?', 'answer' => 'F_net = 8 N, so a = 2 m·s⁻².'],
+        ],
+        [
+            'title' => 'The free-body diagram',
+            'narration' => "Draw the object as a dot. Draw every force as an arrow leaving that dot. Label each one.\n\nFor a box on a table: weight (Fg or mg) down, normal force (F_N) up, applied force along the surface, friction opposing motion.\n\nTwo rules that catch people out. Only forces acting ON the object go on the diagram — not forces the object exerts on something else. And the normal force is not always equal to mg; on an incline it is smaller.",
+            'visual' => 'A dot with four labelled arrows, and a crossed-out diagram showing a reaction force wrongly included.',
+            'check' => ['question' => 'Why is F_N not equal to mg on an incline?', 'answer' => 'Because only the component of weight perpendicular to the surface presses into it: F_N = mg·cos θ.'],
+        ],
+        [
+            'title' => 'Choosing a positive direction',
+            'narration' => "Pick a direction and call it positive. Write it down. Every force in that direction is positive, every force against it is negative.\n\nIt does not matter which direction you choose, as long as you are consistent. Choosing the direction of motion usually keeps the numbers positive.\n\nIf your answer comes out negative, that is not a mistake. It means the acceleration is opposite to the direction you chose.",
+            'visual' => 'The same problem solved twice with opposite positive directions, reaching the same physical answer.',
+            'check' => ['question' => 'Your calculation gives a = −2 m·s⁻². What does that mean?', 'answer' => 'The acceleration is 2 m·s⁻² in the direction opposite to the one you chose as positive.'],
+        ],
+        [
+            'title' => 'Worked example: the incline',
+            'narration' => "A 5 kg block slides down a frictionless 30° incline. Find its acceleration.\n\nTake down-the-slope as positive. The only force along the slope is the component of weight: mg·sin θ.\n\nThat is 5 × 9.8 × sin 30° = 5 × 9.8 × 0.5 = 24.5 N.\n\nF_net = ma, so 24.5 = 5a, giving a = 4.9 m·s⁻² down the slope.\n\nNotice the mass cancels if you work symbolically: a = g·sin θ. Every object slides down a frictionless incline at the same rate.",
+            'visual' => 'An incline with weight resolved into components parallel and perpendicular to the surface.',
+            'check' => ['question' => 'What is the acceleration on a frictionless 20° incline?', 'answer' => 'a = 9.8 × sin 20° = 3.4 m·s⁻².'],
+        ],
+        [
+            'title' => 'Your turn: add friction',
+            'narration' => "Same 5 kg block, same 30° incline, but now with a frictional force of 10 N up the slope.\n\nYou already know the component of weight down the slope is 24.5 N.\n\nWork out F_net, then a. Take down-the-slope as positive.\n\nWhen you have it, ask yourself whether the answer should be bigger or smaller than 4.9, and check that it is.",
+            'visual' => 'The same incline with a friction arrow added up the slope, and a blank solution frame.',
+            'check' => ['question' => 'What is the acceleration?', 'answer' => 'F_net = 24.5 − 10 = 14.5 N, so a = 2.9 m·s⁻² down the slope. Smaller than before, as expected.'],
+        ],
+        [
+            'title' => 'Connected objects, and what markers want',
+            'narration' => "Two boxes joined by a rope move together, so they share one acceleration. You can treat them as a single object of combined mass to find a, then look at one box alone to find the tension.\n\nA 3 kg and a 2 kg box pulled by 20 N: a = 20 ÷ 5 = 4 m·s⁻². Then for the 2 kg box alone, T = ma = 8 N.\n\nIn the exam: always draw the free-body diagram, always state your positive direction, always write F_net = ma before substituting. Those are method marks you get even if the arithmetic slips.",
+            'visual' => 'Two boxes with a rope, solved first as a system and then as one box for tension.',
+            'check' => ['question' => 'Why can you treat connected objects as one mass first?', 'answer' => 'Because the rope forces them to have the same acceleration, and the tension is internal to the system.'],
+        ],
+    ],
+    'notes' => "# Newton's second law\n\n**F_net = ma**\n\n## Method\n\n1. Draw a **free-body diagram** — every force acting ON the object.\n2. Choose and **state a positive direction**.\n3. Write **F_net = ma** before substituting.\n4. Add forces with signs, solve for the unknown.\n5. Check the sign and the size of your answer.\n\n## Forces you will meet\n\n| Force | Symbol | Notes |\n|---|---|---|\n| Weight | Fg = mg | always straight down, g = 9.8 m·s⁻² |\n| Normal | F_N | perpendicular to the surface; = mg·cos θ on an incline |\n| Friction | f = μF_N | opposes motion |\n| Tension | T | same throughout an ideal rope |\n\n## Inclines\n\n- Along the slope: mg·sin θ\n- Into the slope: mg·cos θ\n- Frictionless: a = g·sin θ, independent of mass\n\n## Connected objects\n\nFind **a** using the total mass, then find **tension** from one object alone.\n\n## Common mistakes\n\n- Using applied force instead of net force\n- Putting reaction forces on the free-body diagram\n- Assuming F_N = mg on an incline\n- Not stating the positive direction, then losing track of signs",
+    'flashcards' => [
+        ['front' => 'What does the "net" in F_net = ma mean?', 'back' => 'The vector sum of every force acting on the object, not just the applied force.'],
+        ['front' => 'Component of weight along an incline?', 'back' => 'mg·sin θ'],
+        ['front' => 'Component of weight into an incline?', 'back' => 'mg·cos θ, which equals F_N when nothing else presses on the surface.'],
+        ['front' => 'Acceleration on a frictionless incline?', 'back' => 'a = g·sin θ. The mass cancels.'],
+        ['front' => 'Two boxes joined by a rope. What do they share?', 'back' => 'The same acceleration.'],
+        ['front' => 'Your answer for a is negative. What does it mean?', 'back' => 'The acceleration points opposite to your chosen positive direction.'],
+    ],
+    'questions' => [
+        ['basic', 'What does F_net mean in F_net = ma?', [
+            ['The vector sum of all forces on the object', ''],
+            ['The largest force acting on the object', 'Only the largest force matters if nothing opposes it. Forces must be added with direction.'],
+            ['The force you apply', 'Friction, weight and normal force all count too.'],
+            ['The force the object exerts', 'That is a reaction force on something else, not a force on this object.'],
+        ], 0, 'F_net is the resultant of every force acting on the object.'],
+        ['basic', 'Which forces belong on a free-body diagram?', [
+            ['Forces the object exerts on other objects', 'Those act on other objects, so they belong on other diagrams.'],
+            ['Only forces acting on the object itself', ''],
+            ['All forces in the problem', 'Forces on other objects go on their own diagrams.'],
+            ['Only the applied force and weight', 'Normal force and friction are usually present too.'],
+        ], 1, 'A free-body diagram shows only the forces acting ON the chosen object.'],
+        ['basic', 'A 6 kg object experiences a net force of 18 N. What is its acceleration?', [
+            ['3 m·s⁻²', ''],
+            ['108 m·s⁻²', 'That multiplies instead of dividing. a = F_net ÷ m.'],
+            ['0.33 m·s⁻²', 'Mass divided by force, the wrong way round.'],
+            ['24 m·s⁻²', 'Adding rather than dividing.'],
+        ], 0, 'a = F_net ÷ m = 18 ÷ 6 = 3 m·s⁻².'],
+        ['easy', 'A 10 kg crate is pushed with 60 N while friction resists with 25 N. Find a.', [
+            ['3.5 m·s⁻²', ''],
+            ['6 m·s⁻²', 'This uses the applied force only and ignores friction.'],
+            ['2.5 m·s⁻²', 'This uses the friction force as if it were the net force.'],
+            ['8.5 m·s⁻²', 'The forces have been added rather than subtracted. Friction opposes the push.'],
+        ], 0, 'F_net = 60 − 25 = 35 N, so a = 35 ÷ 10 = 3.5 m·s⁻².'],
+        ['easy', 'On a 25° incline, the normal force on a 4 kg block is closest to:', [
+            ['39.2 N', 'That is mg, which would only be correct on a horizontal surface.'],
+            ['35.5 N', ''],
+            ['16.6 N', 'That is mg·sin θ, the component along the slope, not into it.'],
+            ['9.8 N', 'That is g, not a force on this block.'],
+        ], 1, 'F_N = mg·cos θ = 4 × 9.8 × cos 25° = 35.5 N.'],
+        ['intermediate', 'A 5 kg block slides down a frictionless 30° incline. Its acceleration is:', [
+            ['4.9 m·s⁻²', ''],
+            ['9.8 m·s⁻²', 'That is free fall. Only the component along the slope accelerates it.'],
+            ['8.5 m·s⁻²', 'That uses cos 30° instead of sin 30°. Along the slope it is sin.'],
+            ['2.45 m·s⁻²', 'The mass has been divided in twice.'],
+        ], 0, 'a = g·sin θ = 9.8 × 0.5 = 4.9 m·s⁻². Mass cancels.'],
+        ['intermediate', 'The same 5 kg block on the same 30° incline now has 10 N of friction. Find a.', [
+            ['2.9 m·s⁻²', ''],
+            ['4.9 m·s⁻²', 'Friction has been ignored.'],
+            ['6.9 m·s⁻²', 'Friction has been added instead of subtracted. It acts up the slope.'],
+            ['2.0 m·s⁻²', 'Check the arithmetic: F_net = 24.5 − 10 = 14.5 N.'],
+        ], 0, 'F_net = mg·sin θ − f = 24.5 − 10 = 14.5 N, so a = 14.5 ÷ 5 = 2.9 m·s⁻².'],
+        ['difficult', 'A 3 kg and a 2 kg box joined by a rope are pulled by 20 N on a frictionless surface. The tension is:', [
+            ['8 N', ''],
+            ['20 N', 'That is the applied force. Tension is the force the rope exerts on one box.'],
+            ['12 N', 'This is ma for the 3 kg box, but the rope pulls the 2 kg box.'],
+            ['4 N', 'This uses the acceleration without multiplying by the right mass.'],
+        ], 0, 'a = 20 ÷ 5 = 4 m·s⁻². For the 2 kg box alone, T = 2 × 4 = 8 N.'],
+        ['difficult', 'A 2 kg object is pulled at 30° above the horizontal with 15 N. The vertical component of that force:', [
+            ['Reduces the normal force', ''],
+            ['Increases the normal force', 'An upward component lifts the object slightly, pressing it less into the surface.'],
+            ['Has no effect on the normal force', 'It directly changes how hard the object presses down.'],
+            ['Equals the weight', 'Only coincidentally, and not here: 15·sin 30° = 7.5 N, while mg = 19.6 N.'],
+        ], 0, 'F_N = mg − F·sin θ = 19.6 − 7.5 = 12.1 N. Less normal force also means less friction.'],
+        ['extreme', 'A lift accelerates upward at 2 m·s⁻². A 60 kg person stands on a scale inside. The scale reads:', [
+            ['708 N', ''],
+            ['588 N', 'That is mg, what the scale reads when the lift is still or moving at constant speed.'],
+            ['120 N', 'That is ma alone. The scale supports the weight as well.'],
+            ['468 N', 'That subtracts ma. Upward acceleration makes the reading larger, not smaller.'],
+        ], 0, 'F_N − mg = ma, so F_N = m(g + a) = 60 × 11.8 = 708 N.'],
+        ['extreme', 'Two blocks, 4 kg on a table and 6 kg hanging over a frictionless pulley. The acceleration is:', [
+            ['5.88 m·s⁻²', ''],
+            ['9.8 m·s⁻²', 'That would be free fall, but the 4 kg block is being dragged along too.'],
+            ['3.92 m·s⁻²', 'This uses the wrong mass as the driving force.'],
+            ['1.63 m·s⁻²', 'Check: the driving force is the weight of the hanging block, 58.8 N.'],
+        ], 0, 'Driving force = 6 × 9.8 = 58.8 N. Total mass = 10 kg. a = 5.88 m·s⁻².'],
+        ['extreme', 'In the lift problem, at what upward acceleration would the scale read double the person\'s normal weight?', [
+            ['9.8 m·s⁻²', ''],
+            ['19.6 m·s⁻²', 'That would make the reading three times normal: m(g + 19.6) = 3mg.'],
+            ['4.9 m·s⁻²', 'That gives 1.5 times normal weight.'],
+            ['2 m·s⁻²', 'That gives roughly 1.2 times normal weight.'],
+        ], 0, 'F_N = m(g + a) = 2mg requires a = g = 9.8 m·s⁻².'],
+    ],
+];

@@ -1,0 +1,130 @@
+<?php
+
+return [
+    'slug' => 'bank-reconciliation',
+    'subject' => 'Accounting',
+    'grade' => 'Grade 11',
+    'title' => 'Bank reconciliation, step by step',
+    'summary' => 'Why the bank statement and the cash journals disagree, and how to reconcile them the way markers expect.',
+    'objectives' => [
+        'Explain why the two records differ',
+        'Identify outstanding deposits, outstanding cheques and bank-only entries',
+        'Prepare a bank reconciliation statement that balances',
+    ],
+    'minutes' => 20,
+    'segments' => [
+        [
+            'title' => 'Why they disagree',
+            'narration' => "Your cash journals and the bank statement are both correct, and they still show different balances. That is normal, not an error.\n\nThe reason is timing. You record a cheque the day you write it; the bank records it the day someone cashes it. You record a deposit on Friday afternoon; the bank processes it on Monday.\n\nThere is also information the bank has that you do not yet: service fees, interest, and a debit order you forgot about.\n\nReconciling means explaining the difference, not making one side wrong.",
+            'visual' => 'Two columns, cash journal and bank statement, with arrows showing the same transactions landing on different dates.',
+            'check' => ['question' => 'Does a difference between the two balances mean someone made a mistake?', 'answer' => 'No. Most differences are timing, or entries the bank knows about and you have not recorded yet.'],
+        ],
+        [
+            'title' => 'The two kinds of difference',
+            'narration' => "Sort every difference into one of two boxes.\n\nBox one: things the bank does not know yet. Deposits you have made that have not cleared, and cheques you have issued that have not been presented. These go on the reconciliation statement.\n\nBox two: things you do not know yet. Service fees, interest earned, debit orders, and dishonoured cheques. These go into your cash journals, because your records are genuinely incomplete.\n\nGetting this split right is most of the work.",
+            'visual' => 'Two labelled boxes with example items sorted into each.',
+            'check' => ['question' => 'Where does a bank service fee go?', 'answer' => 'Into the Cash Payments Journal, because you did not know about it. Not on the reconciliation statement.'],
+        ],
+        [
+            'title' => 'Updating the journals first',
+            'narration' => "Always start here. Work down the bank statement and find every entry that is not in your journals.\n\nService fees and interest on overdraft go to the Cash Payments Journal. Interest earned goes to the Cash Receipts Journal. A debit order you have not recorded goes to payments.\n\nA dishonoured cheque is the one people miss. You received the cheque and recorded it as income. The bank has now reversed it, so you must reverse it too: it goes into the Cash Payments Journal.\n\nOnly once the journals are updated do you work out your corrected bank account balance.",
+            'visual' => 'A bank statement with unrecorded entries circled and arrows to the correct journal.',
+            'check' => ['question' => 'A R450 cheque from a debtor is dishonoured. What do you do?', 'answer' => 'Record R450 in the Cash Payments Journal to reverse the receipt, and the debtor owes you again.'],
+        ],
+        [
+            'title' => 'Worked example',
+            'narration' => "Your updated cash book shows R12 400. The bank statement shows R15 150.\n\nOutstanding deposits: R2 300 banked on the last day, not yet on the statement.\nOutstanding cheques: R5 050 issued but not yet presented.\n\nStart with the bank statement balance of R15 150.\nAdd outstanding deposits: 15 150 + 2 300 = 17 450.\nSubtract outstanding cheques: 17 450 − 5 050 = 12 400.\n\nThat matches the cash book. The reconciliation balances.",
+            'visual' => 'The reconciliation laid out line by line, ending with the two figures matching.',
+            'check' => ['question' => 'Why add outstanding deposits to the bank balance?', 'answer' => 'Because the money is yours and in your records, but the bank has not credited it yet.'],
+        ],
+        [
+            'title' => 'Your turn',
+            'narration' => "Bank statement balance: R8 700.\nOutstanding deposit: R1 450.\nOutstanding cheques: R2 150 and R600.\n\nWork out the balance that should appear in the cash book.\n\nStart from the bank statement, add what the bank has not received, subtract what the bank has not paid out.",
+            'visual' => 'A blank reconciliation frame with the three figures given.',
+            'check' => ['question' => 'What is the cash book balance?', 'answer' => '8 700 + 1 450 − 2 750 = R7 400.'],
+        ],
+        [
+            'title' => 'When it does not balance',
+            'narration' => "If the two figures do not match, work through this order.\n\nFirst, check that every bank statement entry is in your journals. A missed service fee is the usual culprit.\n\nSecond, check your addition and subtraction on the reconciliation statement, including the signs.\n\nThird, check for a transposed figure. If your difference divides exactly by nine, you have almost certainly swapped two digits: R540 written as R450 gives a difference of R90.\n\nIn the exam, show every line even if you cannot make it balance. Method marks are awarded for the correct treatment of each item.",
+            'visual' => 'A checklist with the divide-by-nine test highlighted.',
+            'check' => ['question' => 'Your difference is R270. What should you suspect?', 'answer' => 'A transposition error, since 270 divides exactly by 9.'],
+        ],
+    ],
+    'notes' => "# Bank reconciliation\n\n## Why balances differ\n\n**Timing** — you and the bank record the same transaction on different days.\n**Information** — the bank knows about fees and interest before you do.\n\n## Step 1: Update the journals\n\nEntries on the bank statement that are not in your books:\n\n| Item | Journal |\n|---|---|\n| Service fees | Cash Payments |\n| Interest on overdraft | Cash Payments |\n| Debit orders | Cash Payments |\n| Dishonoured cheques | Cash Payments |\n| Interest earned | Cash Receipts |\n| Direct deposits by debtors | Cash Receipts |\n\n## Step 2: The reconciliation statement\n\n```\nBalance per bank statement          XXX\nAdd: outstanding deposits           XXX\nLess: outstanding cheques          (XXX)\n= Balance per cash book             XXX\n```\n\n## If it does not balance\n\n1. Every bank statement entry recorded?\n2. Addition and signs correct?\n3. Difference divisible by 9? Transposed digits.\n\n## Common mistakes\n\n- Putting service fees on the reconciliation statement instead of in the journals\n- Forgetting to reverse a dishonoured cheque\n- Adding outstanding cheques instead of subtracting them",
+    'flashcards' => [
+        ['front' => 'Outstanding deposit: add or subtract from the bank statement balance?', 'back' => 'Add. The bank has not credited it yet.'],
+        ['front' => 'Outstanding cheque: add or subtract?', 'back' => 'Subtract. The bank has not paid it yet.'],
+        ['front' => 'Where does a service fee go?', 'back' => 'Cash Payments Journal. You did not know about it.'],
+        ['front' => 'Where does interest earned go?', 'back' => 'Cash Receipts Journal.'],
+        ['front' => 'A cheque you received is dishonoured. What now?', 'back' => 'Reverse it in the Cash Payments Journal; the debtor owes you again.'],
+        ['front' => 'Your difference divides exactly by 9. What does that suggest?', 'back' => 'A transposition error — two digits swapped.'],
+    ],
+    'questions' => [
+        ['basic', 'Why do the cash book and bank statement usually differ?', [
+            ['Because of timing and entries the bank knows first', ''],
+            ['Because one of them is always wrong', 'Both can be correct. Differences are normal.'],
+            ['Because the bank charges interest', 'Interest is one cause, but timing differences are the main one.'],
+            ['Because of theft', 'Possible but rare. Most differences are timing.'],
+        ], 0, 'Transactions reach the two records on different dates, and the bank records fees before you see them.'],
+        ['basic', 'An outstanding deposit is one that:', [
+            ['You have banked but the bank has not credited yet', ''],
+            ['The bank has credited but you have not recorded', 'That would be a direct deposit, which goes into your journals.'],
+            ['Has been returned unpaid', 'That is a dishonoured cheque.'],
+            ['You plan to make next month', 'Future transactions do not appear anywhere yet.'],
+        ], 0, 'The money is in your records but not yet on the statement, so it is added to the bank balance.'],
+        ['basic', 'A bank service fee of R85 appears on the statement only. What do you do?', [
+            ['Record it in the Cash Payments Journal', ''],
+            ['Add it to the reconciliation statement', 'The reconciliation statement is only for timing differences.'],
+            ['Ignore it', 'It is a real expense and must be recorded.'],
+            ['Record it in the Cash Receipts Journal', 'It reduces your money, so it is a payment.'],
+        ], 0, 'You did not know about it, so your records are incomplete. Update the journals first.'],
+        ['easy', 'Bank statement R10 000, outstanding deposit R1 500, outstanding cheques R2 000. Cash book balance?', [
+            ['R9 500', ''],
+            ['R10 500', 'The cheques have been added instead of subtracted.'],
+            ['R8 500', 'The deposit has been subtracted instead of added.'],
+            ['R13 500', 'Both adjustments have been added.'],
+        ], 0, '10 000 + 1 500 − 2 000 = R9 500.'],
+        ['easy', 'Interest earned of R120 appears on the bank statement. Where does it go?', [
+            ['Cash Receipts Journal', ''],
+            ['Cash Payments Journal', 'Interest earned increases your money, so it is a receipt.'],
+            ['Reconciliation statement', 'Only timing differences go there.'],
+            ['Nowhere, the bank handles it', 'Your records must reflect it.'],
+        ], 0, 'It is money you received that you had not recorded.'],
+        ['intermediate', 'A R640 cheque from a debtor is dishonoured. The correct treatment is:', [
+            ['Cash Payments Journal R640, and the debtor owes you again', ''],
+            ['Cash Receipts Journal R640', 'That would record it as income a second time.'],
+            ['Reconciliation statement as an outstanding cheque', 'It is not a timing difference; the payment has failed.'],
+            ['No entry, since it cancels out', 'You already recorded the receipt, so it must be reversed.'],
+        ], 0, 'The original receipt must be reversed and the debt reinstated.'],
+        ['intermediate', 'After updating the journals your cash book shows R4 200. The bank statement shows R6 800 with outstanding cheques of R3 100. What outstanding deposit would make it balance?', [
+            ['R500', ''],
+            ['R2 600', 'That is the difference before considering the cheques.'],
+            ['R3 600', 'Check the direction: deposits are added, cheques subtracted.'],
+            ['R9 400', 'Far too large; the bank balance is already higher than the cash book.'],
+        ], 0, '6 800 + x − 3 100 = 4 200, so x = R500.'],
+        ['difficult', 'Your reconciliation is out by R270. The most likely cause is:', [
+            ['A transposition error', ''],
+            ['A missing service fee', 'Possible, but 270 dividing exactly by 9 points strongly at transposed digits.'],
+            ['An outstanding cheque', 'That would be a round transaction amount, not a tell-tale multiple of 9.'],
+            ['The bank made an error', 'Check your own work first; bank errors are rare.'],
+        ], 0, 'A difference divisible by 9 almost always means two digits have been swapped.'],
+        ['difficult', 'A cheque for R1 230 was recorded in the journals as R1 320. The cash book will be:', [
+            ['Understated by R90', ''],
+            ['Overstated by R90', 'Recording a larger payment than actual makes the balance too low, not too high.'],
+            ['Understated by R2 550', 'That adds the two figures rather than taking the difference.'],
+            ['Unaffected', 'The error changes the recorded balance.'],
+        ], 0, 'You recorded R90 more going out than really did, so the cash book balance is R90 too low.'],
+        ['extreme', 'A business has a bank overdraft. On the reconciliation statement, outstanding cheques are:', [
+            ['Still subtracted from the bank statement balance', ''],
+            ['Added, because the balance is negative', 'The direction of each adjustment does not change with an overdraft; only the signs of the balances do.'],
+            ['Ignored under an overdraft', 'They are still unpresented and must be shown.'],
+            ['Split between added and subtracted', 'There is no such treatment.'],
+        ], 0, 'The logic is unchanged: the bank has not yet paid them, so they reduce the balance. Only the opening figure is negative.'],
+        ['extreme', 'Which of these would NOT appear on the bank reconciliation statement?', [
+            ['A debit order recorded by the bank but not by you', ''],
+            ['A deposit made on the last day of the month', 'That is an outstanding deposit and does appear.'],
+            ['A cheque issued but not presented', 'That is an outstanding cheque and does appear.'],
+            ['A stale cheque being cancelled', 'This affects the outstanding cheques list, so it does appear.'],
+        ], 0, 'Items the bank knows and you do not go into the journals, not onto the reconciliation statement.'],
+    ],
+];

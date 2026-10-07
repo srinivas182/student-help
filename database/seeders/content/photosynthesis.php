@@ -1,0 +1,130 @@
+<?php
+
+return [
+    'slug' => 'photosynthesis-light-reactions',
+    'subject' => 'Life Sciences',
+    'grade' => 'Grade 11',
+    'title' => 'Photosynthesis: the light and dark reactions',
+    'summary' => 'What happens in the grana and the stroma, and how to answer the questions examiners actually ask.',
+    'objectives' => [
+        'Describe the light-dependent reactions and where they occur',
+        'Describe the Calvin cycle and what it needs from the light reactions',
+        'Interpret graphs of limiting factors',
+    ],
+    'minutes' => 22,
+    'segments' => [
+        [
+            'title' => 'Two reactions, two places',
+            'narration' => "Photosynthesis is not one process. It is two, happening in different parts of the chloroplast.\n\nThe light-dependent reactions happen in the grana, the stacks of membranes. They need light.\n\nThe light-independent reactions, the Calvin cycle, happen in the stroma, the fluid around the grana. They do not need light directly.\n\nThe second set depends on products of the first, which is why both stop in the dark eventually. The common error is calling the Calvin cycle the dark reaction and then claiming it only happens at night. It runs in daylight too.",
+            'visual' => 'A chloroplast cross-section with grana and stroma labelled, and the two reactions placed in each.',
+            'check' => ['question' => 'Where does the Calvin cycle take place?', 'answer' => 'In the stroma, the fluid surrounding the grana.'],
+        ],
+        [
+            'title' => 'The light reactions',
+            'narration' => "Chlorophyll in the grana absorbs light. That energy does two jobs.\n\nFirst, it splits water: photolysis. Water breaks into hydrogen and oxygen. The oxygen is released as a by-product. Every bubble of oxygen from a pondweed experiment comes from water, not carbon dioxide.\n\nSecond, the energy is captured as ATP and NADPH. These are the two things the Calvin cycle needs.\n\nSo: light in, oxygen out, ATP and NADPH passed on.",
+            'visual' => 'Light striking a granum, water splitting, oxygen leaving, ATP and NADPH moving towards the stroma.',
+            'check' => ['question' => 'Where does the oxygen released by a plant come from?', 'answer' => 'From the splitting of water during photolysis, not from carbon dioxide.'],
+        ],
+        [
+            'title' => 'The Calvin cycle',
+            'narration' => "In the stroma, carbon dioxide from the air is fixed into an organic molecule. This is carbon fixation.\n\nThe ATP and NADPH from the light reactions supply the energy and the hydrogen to reduce that molecule into glucose.\n\nThe cycle regenerates its starting compound, which is why it is a cycle rather than a line.\n\nSummary equation: 6CO₂ + 12H₂O → C₆H₁₂O₆ + 6O₂ + 6H₂O. Learn it with the water on both sides. Writing 6H₂O only on the left is the version that loses marks.",
+            'visual' => 'A circular diagram with CO₂ entering, ATP and NADPH entering, glucose leaving.',
+            'check' => ['question' => 'What two things does the Calvin cycle need from the light reactions?', 'answer' => 'ATP and NADPH.'],
+        ],
+        [
+            'title' => 'Limiting factors',
+            'narration' => "Three things can limit the rate: light intensity, carbon dioxide concentration and temperature.\n\nAt any moment, the rate is set by whichever is in shortest supply. That is the limiting factor.\n\nOn a graph, a rising line means the factor on the x-axis is limiting. A flat line means something else has become limiting instead.\n\nTemperature behaves differently from the other two. It rises, peaks, then falls, because enzymes denature above their optimum. Light and carbon dioxide plateau; they do not fall.",
+            'visual' => 'Three graphs side by side: light and CO₂ plateauing, temperature peaking and falling.',
+            'check' => ['question' => 'A graph of rate against light intensity is flat. What does that tell you?', 'answer' => 'Light is no longer limiting. Something else, usually CO₂ or temperature, now limits the rate.'],
+        ],
+        [
+            'title' => 'Your turn: read the graph',
+            'narration' => "A graph shows photosynthesis rate against light intensity, measured at 0.04% CO₂ and again at 0.1% CO₂.\n\nBoth lines rise together at low light, then separate, with the 0.1% line plateauing higher.\n\nWhy do they overlap at low light intensity? And what is limiting the rate at the plateau of each line?\n\nAnswer both before moving on.",
+            'visual' => 'Two curves overlapping at low x, diverging and plateauing at different heights.',
+            'check' => ['question' => 'What is your answer?', 'answer' => 'At low light, light is limiting for both, so CO₂ makes no difference. At each plateau, CO₂ concentration is the limiting factor.'],
+        ],
+        [
+            'title' => 'What examiners want',
+            'narration' => "Three habits worth building.\n\nUse the word \"limiting\" explicitly. \"Light is the limiting factor between 0 and 20 units\" earns the mark; \"light affects it\" does not.\n\nName the location. Many questions award a mark simply for saying grana or stroma.\n\nWhen asked to explain a plateau, name what has become limiting instead. Saying the rate stops increasing describes the graph; naming the new limiting factor explains it.\n\nAnd always include the units when reading values off a graph.",
+            'visual' => 'A model answer with the mark-earning phrases underlined.',
+            'check' => ['question' => 'What is the difference between describing and explaining a plateau?', 'answer' => 'Describing says the rate stopped rising. Explaining names the factor that has become limiting.'],
+        ],
+    ],
+    'notes' => "# Photosynthesis\n\n**6CO₂ + 12H₂O → C₆H₁₂O₆ + 6O₂ + 6H₂O**\n\n## Light-dependent reactions — in the **grana**\n\n- Chlorophyll absorbs light\n- **Photolysis**: water splits; oxygen released as a by-product\n- ATP and NADPH produced and passed to the stroma\n\n## Light-independent reactions (Calvin cycle) — in the **stroma**\n\n- CO₂ fixed into an organic molecule\n- ATP and NADPH used to reduce it to glucose\n- Starting compound regenerated\n- Runs in daylight too, not only at night\n\n## Limiting factors\n\n| Factor | Graph shape | Why |\n|---|---|---|\n| Light intensity | rises then plateaus | another factor takes over |\n| CO₂ concentration | rises then plateaus | another factor takes over |\n| Temperature | rises, peaks, falls | enzymes denature past the optimum |\n\n## Exam phrasing\n\n- Say **\"limiting factor\"** explicitly\n- Name the **location**: grana or stroma\n- Explaining a plateau means **naming what is limiting instead**\n- Include **units** when reading a graph",
+    'flashcards' => [
+        ['front' => 'Where do the light reactions occur?', 'back' => 'In the grana of the chloroplast.'],
+        ['front' => 'Where does the Calvin cycle occur?', 'back' => 'In the stroma.'],
+        ['front' => 'Where does released oxygen come from?', 'back' => 'From photolysis — the splitting of water.'],
+        ['front' => 'What does the Calvin cycle need from the light reactions?', 'back' => 'ATP and NADPH.'],
+        ['front' => 'Why does the temperature graph fall after its peak?', 'back' => 'Enzymes denature above the optimum temperature.'],
+        ['front' => 'A graph plateaus. What should your explanation name?', 'back' => 'The factor that has become limiting instead.'],
+    ],
+    'questions' => [
+        ['basic', 'Where do the light-dependent reactions take place?', [
+            ['In the grana', ''],
+            ['In the stroma', 'The stroma is where the Calvin cycle happens.'],
+            ['In the mitochondria', 'That is respiration, a different process in a different organelle.'],
+            ['In the cell wall', 'The cell wall has no role in photosynthesis.'],
+        ], 0, 'The grana are the membrane stacks containing chlorophyll.'],
+        ['basic', 'The oxygen released during photosynthesis comes from:', [
+            ['Water', ''],
+            ['Carbon dioxide', 'A very common error. The carbon and oxygen in CO₂ end up in glucose.'],
+            ['Glucose', 'Glucose is a product, not a source of the released oxygen.'],
+            ['The air', 'Oxygen is produced by the plant, not absorbed and released.'],
+        ], 0, 'Photolysis splits water, releasing oxygen as a by-product.'],
+        ['basic', 'Which two products pass from the light reactions to the Calvin cycle?', [
+            ['ATP and NADPH', ''],
+            ['Glucose and oxygen', 'Those are end products, not intermediates passed on.'],
+            ['Water and carbon dioxide', 'Those are raw materials entering the process.'],
+            ['ATP and oxygen', 'Oxygen is released, not used by the Calvin cycle.'],
+        ], 0, 'ATP supplies energy and NADPH supplies hydrogen for reduction.'],
+        ['easy', 'The Calvin cycle is called light-independent because:', [
+            ['It does not use light directly, though it relies on light reaction products', ''],
+            ['It only happens at night', 'It runs in daylight too, whenever ATP and NADPH are available.'],
+            ['It does not need energy', 'It needs ATP, which is energy.'],
+            ['It happens in darkness only', 'The same misconception. The name refers to light not being used directly.'],
+        ], 0, 'No light is absorbed in the stroma, but the cycle stops once ATP and NADPH run out.'],
+        ['easy', 'On a graph of rate against CO₂ concentration, a rising section means:', [
+            ['CO₂ is the limiting factor over that range', ''],
+            ['Temperature is limiting', 'If temperature were limiting, adding CO₂ would not raise the rate.'],
+            ['Nothing is limiting', 'Something always limits the rate.'],
+            ['The plant is dying', 'A rising rate indicates the opposite.'],
+        ], 0, 'If increasing a factor increases the rate, that factor is limiting.'],
+        ['intermediate', 'Two curves of rate against light intensity, at 0.04% and 0.1% CO₂, overlap at low light. Why?', [
+            ['Light is limiting for both, so CO₂ makes no difference', ''],
+            ['CO₂ is limiting for both', 'If CO₂ were limiting, the two concentrations would give different rates immediately.'],
+            ['Temperature is limiting', 'Temperature would affect both curves equally at all light levels, not just low ones.'],
+            ['The measurements are wrong', 'Overlap at low light is the expected result.'],
+        ], 0, 'When light is in short supply, extra CO₂ cannot be used, so both treatments behave identically.'],
+        ['intermediate', 'Why does the temperature curve fall after its peak while the light curve plateaus?', [
+            ['Enzymes denature above the optimum temperature', ''],
+            ['The plant runs out of water', 'Water supply is a separate factor and would affect both curves.'],
+            ['Light becomes limiting', 'That would cause a plateau, not a fall.'],
+            ['CO₂ is used up', 'That also causes a plateau rather than a decline.'],
+        ], 0, 'High temperature changes enzyme shape permanently, so the rate drops rather than levelling off.'],
+        ['difficult', 'A pondweed produces 20 bubbles per minute at 10 cm from a lamp and 5 at 20 cm. This is consistent with:', [
+            ['Light intensity falling with the square of distance', ''],
+            ['Light intensity falling in proportion to distance', 'That would predict 10 bubbles, not 5.'],
+            ['Temperature being the limiting factor', 'Temperature was not changed, so it cannot explain the difference.'],
+            ['The pondweed tiring', 'That would show as a decline over time, not with distance.'],
+        ], 0, 'Doubling the distance quarters the intensity, and the rate quarters with it, so light is limiting here.'],
+        ['difficult', 'A plant in bright light with ample CO₂ at 45°C photosynthesises slowly. The best explanation is:', [
+            ['Enzymes have denatured at that temperature', ''],
+            ['Light is limiting', 'The light is described as bright, so it is not in short supply.'],
+            ['CO₂ is limiting', 'CO₂ is described as ample.'],
+            ['The stomata are open', 'Open stomata would help gas exchange, not hinder it.'],
+        ], 0, 'With light and CO₂ both plentiful, the remaining factor is temperature, and 45°C is above the optimum for most plants.'],
+        ['extreme', 'In an experiment, oxygen production stops immediately when light is removed, but CO₂ uptake continues briefly. Why?', [
+            ['The Calvin cycle runs on ATP and NADPH already made', ''],
+            ['The plant stores oxygen', 'Oxygen production depends directly on photolysis, which stops at once.'],
+            ['CO₂ uptake is unrelated to photosynthesis', 'It is carbon fixation, the first step of the Calvin cycle.'],
+            ['The equipment is faulty', 'This is the expected result and demonstrates the two reactions are separate.'],
+        ], 0, 'Photolysis stops instantly without light, but the stroma still holds a short-lived supply of ATP and NADPH.'],
+        ['extreme', 'A farmer in a Limpopo greenhouse already has strong light and warm temperatures. The most useful intervention is:', [
+            ['Enrich the CO₂ concentration', ''],
+            ['Add more lighting', 'Light is already plentiful, so it is not limiting.'],
+            ['Raise the temperature further', 'Risky: pushing past the optimum would denature enzymes and reduce the rate.'],
+            ['Increase humidity', 'Humidity affects transpiration more than photosynthesis rate.'],
+        ], 0, 'With light and temperature already adequate, CO₂ is the remaining limiting factor.'],
+    ],
+];

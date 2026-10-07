@@ -1,0 +1,130 @@
+<?php
+
+return [
+    'slug' => 'compound-angle-identities',
+    'subject' => 'Mathematics',
+    'grade' => 'Grade 12',
+    'title' => 'Compound and double angle identities',
+    'summary' => 'Using the compound angle formulas, deriving the double angle forms, and choosing the right one in an exam.',
+    'objectives' => [
+        'Apply the compound angle formulas for sine and cosine',
+        'Derive and use the double angle identities',
+        'Choose the correct form of cos 2A for a given problem',
+    ],
+    'minutes' => 24,
+    'segments' => [
+        [
+            'title' => 'The formulas, and the sign trap',
+            'narration' => "Four formulas sit on the information sheet, and the signs are where marks are lost.\n\nsin(A + B) = sin A cos B + cos A sin B.\nsin(A − B) = sin A cos B − cos A sin B.\n\nFor sine, the sign inside matches the sign in the expansion. Easy.\n\ncos(A + B) = cos A cos B − sin A sin B.\ncos(A − B) = cos A cos B + sin A sin B.\n\nFor cosine, the sign flips. Plus inside gives minus in the expansion. Write that on your formula sheet in the first minute of the exam.",
+            'visual' => 'The four formulas with the matching signs in sine and the flipped signs in cosine highlighted.',
+            'check' => ['question' => 'Expand cos(x − 30°).', 'answer' => 'cos x cos 30° + sin x sin 30°. The sign flips, so minus inside gives plus.'],
+        ],
+        [
+            'title' => 'Using them to find exact values',
+            'narration' => "The formulas let you find exact values for angles that are not on the special triangles.\n\nTake 75°. Write it as 45° + 30°, both of which you know.\n\nsin 75° = sin 45° cos 30° + cos 45° sin 30°.\n\nSubstitute: (√2/2)(√3/2) + (√2/2)(1/2) = √6/4 + √2/4 = (√6 + √2)/4.\n\nThe trick is spotting which known angles add or subtract to the one you want. 15° is 45° − 30°. 105° is 60° + 45°.",
+            'visual' => 'The special triangles beside the substitution worked line by line.',
+            'check' => ['question' => 'How would you write 15° using known angles?', 'answer' => '45° − 30°.'],
+        ],
+        [
+            'title' => 'Deriving the double angle formulas',
+            'narration' => "You do not need to memorise these separately. They come from the compound formulas by letting B equal A.\n\nsin 2A = sin(A + A) = sin A cos A + cos A sin A = 2 sin A cos A.\n\ncos 2A = cos(A + A) = cos A cos A − sin A sin A = cos²A − sin²A.\n\nThat is the derivation examiners sometimes ask for directly, so it is worth being able to write those two lines from memory.",
+            'visual' => 'The substitution B = A shown step by step for both.',
+            'check' => ['question' => 'Derive sin 2A.', 'answer' => 'sin(A + A) = sin A cos A + cos A sin A = 2 sin A cos A.'],
+        ],
+        [
+            'title' => 'Three forms of cos 2A, and choosing one',
+            'narration' => "cos 2A has three equivalent forms, and picking the right one is most of the skill.\n\ncos²A − sin²A.\n1 − 2sin²A.\n2cos²A − 1.\n\nThe second and third come from substituting sin²A + cos²A = 1.\n\nHow to choose: look at what else is in the equation. If the rest of the expression is in terms of sine, use 1 − 2sin²A so everything is in sine. If it is in cosine, use 2cos²A − 1.\n\nChoosing the form that matches the rest of the question turns a messy problem into a quadratic you can solve.",
+            'visual' => 'The three forms with arrows showing which to pick based on what the rest of the equation contains.',
+            'check' => ['question' => 'The equation also contains sin x. Which form of cos 2x should you use?', 'answer' => '1 − 2sin²x, so the whole equation is in sine.'],
+        ],
+        [
+            'title' => 'Your turn: solve an equation',
+            'narration' => "Solve cos 2x + 3 sin x = 2 for x in [0°, 360°].\n\nThe equation contains sin x, so choose the form of cos 2x that is in sine.\n\nThat gives 1 − 2sin²x + 3 sin x = 2.\n\nRearrange into a quadratic in sin x, then factorise. Let s = sin x if that helps you see it.\n\nWhen you have your values of sin x, check each one is between −1 and 1 before finding the angles.",
+            'visual' => 'The substitution made, with the rearrangement left blank.',
+            'check' => ['question' => 'What are the solutions?', 'answer' => '2sin²x − 3sin x + 1 = 0 gives (2sin x − 1)(sin x − 1) = 0, so sin x = ½ or 1: x = 30°, 90° or 150°.'],
+        ],
+        [
+            'title' => 'Proving identities, and exam habits',
+            'narration' => "When asked to prove an identity, work on one side only until it matches the other. Do not move terms across the equals sign; that assumes what you are proving.\n\nStart with the messier side. Expand compound angles, replace double angles, and look for sin²+cos² to collapse into 1.\n\nThree habits. Write the formula before substituting into it, because that alone earns a mark. State restrictions when dividing, such as cos x ≠ 0. And in a general solution, write the full form with k ∈ ℤ, not just the angles in one revolution.",
+            'visual' => 'A proof laid out with only the left side changing, line by line.',
+            'check' => ['question' => 'Why should you work on one side only when proving an identity?', 'answer' => 'Moving terms across assumes the identity is true, which is what you are trying to prove.'],
+        ],
+    ],
+    'notes' => "# Compound and double angle identities\n\n## Compound angles\n\n| Formula | Sign |\n|---|---|\n| sin(A + B) = sin A cos B + cos A sin B | matches |\n| sin(A − B) = sin A cos B − cos A sin B | matches |\n| cos(A + B) = cos A cos B − sin A sin B | **flips** |\n| cos(A − B) = cos A cos B + sin A sin B | **flips** |\n\n## Double angles (set B = A)\n\n- sin 2A = **2 sin A cos A**\n- cos 2A = **cos²A − sin²A** = **1 − 2sin²A** = **2cos²A − 1**\n\n## Choosing the form of cos 2A\n\n| Rest of equation contains | Use |\n|---|---|\n| sin | 1 − 2sin²A |\n| cos | 2cos²A − 1 |\n| both, or a proof | cos²A − sin²A |\n\n## Exact values\n\n- 15° = 45° − 30°\n- 75° = 45° + 30°\n- 105° = 60° + 45°\n\n## Proving identities\n\n- Work on **one side only**\n- Start with the messier side\n- Watch for sin²A + cos²A = 1\n- Never move terms across the equals sign\n\n## Exam habits\n\n- Write the formula before substituting — it is a mark\n- State restrictions when dividing\n- General solutions need **+ k·360°, k ∈ ℤ**",
+    'flashcards' => [
+        ['front' => 'cos(A + B) = ?', 'back' => 'cos A cos B − sin A sin B. The sign flips.'],
+        ['front' => 'sin(A − B) = ?', 'back' => 'sin A cos B − cos A sin B. The sign matches.'],
+        ['front' => 'sin 2A = ?', 'back' => '2 sin A cos A'],
+        ['front' => 'The three forms of cos 2A?', 'back' => 'cos²A − sin²A, 1 − 2sin²A, 2cos²A − 1.'],
+        ['front' => 'The equation also contains sin x. Which cos 2x?', 'back' => '1 − 2sin²x, so everything is in sine.'],
+        ['front' => 'Proving an identity: what must you not do?', 'back' => 'Move terms across the equals sign. Work on one side only.'],
+    ],
+    'questions' => [
+        ['basic', 'cos(A + B) expands to:', [
+            ['cos A cos B − sin A sin B', ''],
+            ['cos A cos B + sin A sin B', 'That is cos(A − B). For cosine the sign flips.'],
+            ['cos A sin B + sin A cos B', 'That is the shape of the sine formula.'],
+            ['cos A + cos B', 'Trigonometric functions do not distribute over addition.'],
+        ], 0, 'For cosine, a plus inside becomes a minus in the expansion.'],
+        ['basic', 'sin 2A equals:', [
+            ['2 sin A cos A', ''],
+            ['2 sin A', 'The cos A factor has been dropped.'],
+            ['sin²A − cos²A', 'That resembles a form of cos 2A, with the signs the wrong way round.'],
+            ['sin A + sin A', 'That is 2 sin A, which is not the same as sin 2A.'],
+        ], 0, 'Set B = A in sin(A + B) to get 2 sin A cos A.'],
+        ['basic', 'Which is NOT a valid form of cos 2A?', [
+            ['2 sin²A − 1', ''],
+            ['cos²A − sin²A', 'This is the direct form.'],
+            ['1 − 2sin²A', 'Valid, obtained using sin²A + cos²A = 1.'],
+            ['2cos²A − 1', 'Valid, the cosine version.'],
+        ], 0, 'The sine form is 1 − 2sin²A. Reversing it changes the sign of the whole expression.'],
+        ['easy', 'Expand cos(x − 60°).', [
+            ['cos x cos 60° + sin x sin 60°', ''],
+            ['cos x cos 60° − sin x sin 60°', 'That is cos(x + 60°). The sign flips.'],
+            ['cos x − cos 60°', 'Cosine does not distribute over subtraction.'],
+            ['sin x cos 60° − cos x sin 60°', 'That is the sine expansion.'],
+        ], 0, 'Minus inside gives plus in the expansion, for cosine.'],
+        ['easy', 'To find the exact value of sin 75°, write 75° as:', [
+            ['45° + 30°', ''],
+            ['90° − 15°', 'True, but 15° is not a special angle you know directly.'],
+            ['25° × 3', 'Compound angle formulas work on sums and differences, not multiples like this.'],
+            ['60° + 20°', '20° is not a special angle.'],
+        ], 0, 'Both 45° and 30° come from the special triangles.'],
+        ['intermediate', 'For the equation cos 2x + 3 sin x = 2, which form of cos 2x should you use?', [
+            ['1 − 2sin²x', ''],
+            ['2cos²x − 1', 'That would leave both sine and cosine in the equation.'],
+            ['cos²x − sin²x', 'That also leaves two functions, making it harder to solve.'],
+            ['It does not matter', 'Choosing the matching form is what turns it into a solvable quadratic.'],
+        ], 0, 'The rest of the equation is in sine, so use the sine form and get a quadratic in sin x.'],
+        ['intermediate', 'Solve cos 2x + 3 sin x = 2 for x in [0°, 360°].', [
+            ['x = 30°, 90° or 150°', ''],
+            ['x = 30° or 150°', 'The solution sin x = 1 has been missed.'],
+            ['x = 90° only', 'The solution sin x = ½ has been missed.'],
+            ['x = 60°, 90° or 120°', 'Check the factorisation: sin x = ½ gives 30° and 150°.'],
+        ], 0, '2sin²x − 3sin x + 1 = 0 factorises to (2sin x − 1)(sin x − 1) = 0.'],
+        ['difficult', 'Simplify sin(90° − x) cos x + cos(90° − x) sin x.', [
+            ['1', ''],
+            ['sin x', 'Collapse the expression first using the compound angle formula.'],
+            ['cos 2x', 'The signs here match the sine formula, not cosine.'],
+            ['0', 'Substitute x = 0 to check: the expression gives 1.'],
+        ], 0, 'The expression is sin((90° − x) + x) = sin 90° = 1.'],
+        ['difficult', 'If sin A = 3/5 and A is acute, then cos 2A equals:', [
+            ['7/25', ''],
+            ['24/25', 'That is sin 2A, which is 2 × (3/5) × (4/5).'],
+            ['−7/25', 'The sign is wrong: 1 − 2(9/25) = 1 − 18/25 = 7/25.'],
+            ['9/25', 'That is sin²A, not cos 2A.'],
+        ], 0, 'cos 2A = 1 − 2sin²A = 1 − 2(9/25) = 7/25.'],
+        ['extreme', 'Prove that (sin 2x) ÷ (1 + cos 2x) = tan x. Which substitution makes the denominator collapse?', [
+            ['cos 2x = 2cos²x − 1', ''],
+            ['cos 2x = 1 − 2sin²x', 'The denominator becomes 2 − 2sin²x, which does not cancel as cleanly.'],
+            ['cos 2x = cos²x − sin²x', 'Workable but longer; the cosine form collapses in one step.'],
+            ['sin 2x = 2 sin x cos x only', 'The numerator alone does not complete the proof.'],
+        ], 0, '1 + (2cos²x − 1) = 2cos²x, so the expression becomes 2 sin x cos x ÷ 2cos²x = tan x.'],
+        ['extreme', 'The general solution of sin 2x = cos x is:', [
+            ['x = 90° + k·180° or x = 30° + k·360° or x = 150° + k·360°', ''],
+            ['x = 30° + k·360° only', 'Factorising gives cos x(2 sin x − 1) = 0, so cos x = 0 also yields solutions.'],
+            ['x = 90° + k·360° only', 'The branch where sin x = ½ has been dropped.'],
+            ['x = 45° + k·180°', 'Substituting 45° does not satisfy the equation.'],
+        ], 0, '2 sin x cos x = cos x gives cos x(2 sin x − 1) = 0. Never divide by cos x — that loses solutions.'],
+    ],
+];
