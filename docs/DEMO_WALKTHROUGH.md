@@ -54,7 +54,29 @@ As `moderator@dxstudenthelp.co.za`:
 2. Open the conversation review: masked and original text side by side.
 3. Take an action. The written outcome is required and goes to the audit log.
 
-## 5. Notifications (2 minutes)
+## 5. AI Tutor (6 minutes)
+
+Sign in as `student@dxstudenthelp.co.za` and open **Learn**.
+
+1. **Pick a language.** English and isiZulu are both published for the Grade 11
+   Mathematics topic. Choose isiZulu and open the lesson.
+2. **Note what stayed in English.** The explanation is in isiZulu, but `ax² + bx + c`,
+   "common factor", "grouping" and the formulas are in English — because the NSC
+   paper is written in English.
+3. **Work through the lesson.** Eight parts, each with a pause-and-think question.
+   Press "Listen to this part" for narration. Jump back to any part.
+4. **Open Revision notes and Flashcards.** Same content, three ways in.
+5. **Finish and test yourself.** Only Basic is unlocked. Score 80% and Easy opens.
+6. **Get one wrong deliberately.** The result names the actual mistake —
+   "Using c instead of a × c. That only works when a is 1." — rather than showing
+   a red cross.
+7. **Read the footer.** "Written with AI and checked by Kgomotso Sithole,
+   BSc Mathematics." That is the line that makes a parent comfortable.
+
+Then as `admin@dxstudenthelp.co.za`, open **AI Tutor** to see the topic, its
+source material and both language versions with the reviewer named against each.
+
+## 6. Notifications (2 minutes)
 
 The bell in the header polls every 30 seconds. The notifications page lists
 everything and lets the user choose in-app and email per event. Account,
