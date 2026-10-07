@@ -47,14 +47,17 @@ beforeEach(function () {
 it('shows each portal its own landing page with a link to the other door', function () {
     $this->get('http://student-help.rightally.io/')
         ->assertInertia(fn ($page) => $page
-            ->component('Welcome')
-            ->where('portal', 'student')
-            ->where('otherPortal.url', 'http://teacher-help.rightally.io/'));
+            ->component('Public/StudentLanding')
+            ->where('brand.key', 'student')
+            ->where('brand.otherUrl', 'http://teacher-help.rightally.io/')
+            ->has('stats.tutors'));
 
     $this->get('http://teacher-help.rightally.io/')
         ->assertInertia(fn ($page) => $page
-            ->where('portal', 'teacher')
-            ->where('otherPortal.url', 'http://student-help.rightally.io/'));
+            ->component('Public/TeacherLanding')
+            ->where('brand.key', 'teacher')
+            ->where('brand.otherUrl', 'http://student-help.rightally.io/')
+            ->has('stats.openRequests'));
 });
 
 it('sends a signed-in user from the landing page to their own portal home', function () {
