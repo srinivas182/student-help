@@ -1,5 +1,6 @@
 import ApplicationLogo from '@/Components/ApplicationLogo';
 import Dropdown from '@/Components/Dropdown';
+import NavGroup from '@/Components/NavGroup';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import NotificationBell from '@/Components/NotificationBell';
@@ -7,6 +8,54 @@ import GlobalSearch from '@/Components/GlobalSearch';
 import MobileTabBar from '@/Components/MobileTabBar';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
+
+interface StaffSection {
+    label: string;
+    items: { label: string; href: string; pattern: string; description?: string }[];
+}
+
+/** Staff navigation, shared by the desktop dropdowns and the mobile menu. */
+function staffSections(): StaffSection[] {
+    return [
+        {
+            label: 'People',
+            items: [
+                { label: 'Users', href: route('admin.users.index'), pattern: 'admin.users.*', description: 'Accounts, suspensions, invitations' },
+                { label: 'Tutor verification', href: route('admin.verification.index'), pattern: 'admin.verification.*', description: 'Documents awaiting review' },
+                { label: 'Subject coverage', href: route('admin.coverage'), pattern: 'admin.coverage', description: 'Where tutors are thin' },
+                { label: 'Roles and permissions', href: route('admin.roles.index'), pattern: 'admin.roles.*', description: 'Who can do what' },
+            ],
+        },
+        {
+            label: 'Content',
+            items: [
+                { label: 'AI Tutor topics', href: route('admin.topics.index'), pattern: 'admin.topics.*', description: 'Generate and publish lessons' },
+                { label: 'Study material', href: route('admin.resources.index'), pattern: 'admin.resources.*', description: 'Uploads awaiting approval' },
+                { label: 'Curriculum', href: route('admin.curriculum.index'), pattern: 'admin.curriculum.*', description: 'Grades, subjects and topics' },
+                { label: 'Announcements', href: route('admin.announcements.index'), pattern: 'admin.announcements.*', description: 'Messages to students and tutors' },
+                { label: 'School links', href: route('admin.schoolLinks.index'), pattern: 'admin.schoolLinks.*', description: 'Classes claiming a school name' },
+            ],
+        },
+        {
+            label: 'Safeguarding',
+            items: [
+                { label: 'Reports queue', href: route('moderation.index'), pattern: 'moderation.index', description: 'Reported messages and posts' },
+                { label: 'Study groups', href: route('moderation.groups'), pattern: 'moderation.groups*', description: 'Flagged group conversations' },
+                { label: 'Voice notes', href: route('moderation.voice'), pattern: 'moderation.voice*', description: 'Flagged or untranscribed audio' },
+                { label: 'Audit log', href: route('admin.audit'), pattern: 'admin.audit', description: 'Who did what, and when' },
+            ],
+        },
+        {
+            label: 'Settings',
+            items: [
+                { label: 'Platform settings', href: route('admin.settings'), pattern: 'admin.settings', description: 'Limits, consent, policy version' },
+                { label: 'Study assistant', href: route('admin.assistant'), pattern: 'admin.assistant*', description: 'AI mode, quotas and spend' },
+                { label: 'Gateways', href: route('admin.gateways'), pattern: 'admin.gateways*', description: 'Email, SMS and WhatsApp' },
+                { label: 'Security', href: route('admin.security'), pattern: 'admin.security*', description: 'Two-factor and staff accounts' },
+            ],
+        },
+    ];
+}
 
 export default function Authenticated({
     header,
@@ -19,6 +68,7 @@ export default function Authenticated({
 
     // Staff work on desktop and need the full menu; the tab bar is for learners
     const isStaff = ['admin', 'super_admin', 'moderator'].includes(user.role);
+    const STAFF_SECTIONS = isStaff ? staffSections() : [];
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -43,71 +93,89 @@ export default function Authenticated({
                                 {user.role === 'student' && (
                                     <>
                                         <NavLink
+                                            href={route('dashboard')}
+                                            active={route().current('dashboard')}
+                                        >
+                                            Home
+                                        </NavLink>
+                                        <NavLink
                                             href={route('requests.index')}
                                             active={route().current('requests.*')}
                                         >
-                                            My requests
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('resources.index')}
-                                            active={route().current('resources.index')}
-                                        >
-                                            Study material
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('classrooms.index')}
-                                            active={route().current('classrooms.*')}
-                                        >
-                                            My classes
+                                            My questions
                                         </NavLink>
                                         <NavLink
                                             href={route('learn.index')}
-                                            active={route().current('learn.*')}
+                                            active={route().current('learn.*') || route().current('assessment.*')}
                                         >
                                             Learn
                                         </NavLink>
-                                        <NavLink
-                                            href={route('learn.reviews')}
-                                            active={route().current('learn.reviews')}
-                                        >
-                                            Review
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('assistant.index')}
-                                            active={route().current('assistant.*')}
-                                        >
-                                            Assistant
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('community.index')}
-                                            active={route().current('community.*')}
-                                        >
-                                            Community
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('studyGroups.index')}
-                                            active={route().current('studyGroups.*')}
-                                        >
-                                            Study groups
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('progress')}
-                                            active={route().current('progress')}
-                                        >
-                                            Progress
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('billing.plans')}
-                                            active={route().current('billing.*')}
-                                        >
-                                            Plans
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('announcements.index')}
-                                            active={route().current('announcements.index')}
-                                        >
-                                            Announcements
-                                        </NavLink>
+
+                                        <NavGroup
+                                            label="Study"
+                                            items={[
+                                                {
+                                                    label: 'Study material',
+                                                    href: route('resources.index'),
+                                                    pattern: 'resources.*',
+                                                    description: 'Notes, past papers and solutions',
+                                                },
+                                                {
+                                                    label: 'Study assistant',
+                                                    href: route('assistant.index'),
+                                                    pattern: 'assistant.*',
+                                                    description: 'An instant explanation while you wait',
+                                                },
+                                                {
+                                                    label: 'My classes',
+                                                    href: route('classrooms.index'),
+                                                    pattern: 'classrooms.*',
+                                                    description: 'Classes your teacher set up',
+                                                },
+                                            ]}
+                                        />
+
+                                        <NavGroup
+                                            label="Community"
+                                            items={[
+                                                {
+                                                    label: 'Subject boards',
+                                                    href: route('community.index'),
+                                                    pattern: 'community.*',
+                                                    description: 'Ask and answer in your subjects',
+                                                },
+                                                {
+                                                    label: 'Study groups',
+                                                    href: route('studyGroups.index'),
+                                                    pattern: 'studyGroups.*',
+                                                    description: 'Work through things together',
+                                                },
+                                                {
+                                                    label: 'Announcements',
+                                                    href: route('announcements.index'),
+                                                    pattern: 'announcements.*',
+                                                    description: 'News from DX',
+                                                },
+                                            ]}
+                                        />
+
+                                        <NavGroup
+                                            label="Me"
+                                            items={[
+                                                {
+                                                    label: 'My progress',
+                                                    href: route('progress'),
+                                                    pattern: 'progress',
+                                                    description: 'Streak, subjects and stats',
+                                                },
+                                                {
+                                                    label: 'Plans',
+                                                    href: route('billing.plans'),
+                                                    pattern: 'billing.*',
+                                                    description: 'What is free and what is not',
+                                                },
+                                            ]}
+                                        />
                                     </>
                                 )}
 
@@ -161,7 +229,7 @@ export default function Authenticated({
                                     </NavLink>
                                 )}
 
-                                {['admin', 'super_admin', 'moderator'].includes(user.role) && (
+                                {isStaff && (
                                     <>
                                         <NavLink
                                             href={route('admin.dashboard')}
@@ -169,102 +237,14 @@ export default function Authenticated({
                                         >
                                             Overview
                                         </NavLink>
-                                        <NavLink
-                                            href={route('admin.users.index')}
-                                            active={route().current('admin.users.*')}
-                                        >
-                                            Users
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.verification.index')}
-                                            active={route().current('admin.verification.*')}
-                                        >
-                                            Verification
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.curriculum.index')}
-                                            active={route().current('admin.curriculum.*')}
-                                        >
-                                            Curriculum
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.coverage')}
-                                            active={route().current('admin.coverage')}
-                                        >
-                                            Coverage
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('moderation.index')}
-                                            active={route().current('moderation.index')}
-                                        >
-                                            Moderation
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('moderation.groups')}
-                                            active={route().current('moderation.groups*')}
-                                        >
-                                            Groups
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('moderation.voice')}
-                                            active={route().current('moderation.voice*')}
-                                        >
-                                            Voice
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.schoolLinks.index')}
-                                            active={route().current('admin.schoolLinks.*')}
-                                        >
-                                            Schools
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.announcements.index')}
-                                            active={route().current('admin.announcements.*')}
-                                        >
-                                            Announce
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.resources.index')}
-                                            active={route().current('admin.resources.*')}
-                                        >
-                                            Material
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.roles.index')}
-                                            active={route().current('admin.roles.*')}
-                                        >
-                                            Roles
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.topics.index')}
-                                            active={route().current('admin.topics.*')}
-                                        >
-                                            AI Tutor
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.assistant')}
-                                            active={route().current('admin.assistant*')}
-                                        >
-                                            AI
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.gateways')}
-                                            active={route().current('admin.gateways*')}
-                                        >
-                                            Gateways
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.security')}
-                                            active={route().current('admin.security*')}
-                                        >
-                                            Security
-                                        </NavLink>
-                                        <NavLink
-                                            href={route('admin.settings')}
-                                            active={route().current('admin.settings')}
-                                        >
-                                            Settings
-                                        </NavLink>
+
+                                        {STAFF_SECTIONS.map((section) => (
+                                            <NavGroup
+                                                key={section.label}
+                                                label={section.label}
+                                                items={section.items}
+                                            />
+                                        ))}
                                     </>
                                 )}
                             </div>
@@ -376,6 +356,26 @@ export default function Authenticated({
                         >
                             Dashboard
                         </ResponsiveNavLink>
+
+                        {/* Staff have no tab bar, so every destination must be
+                            reachable here or it cannot be reached on a phone. */}
+                        {isStaff &&
+                            STAFF_SECTIONS.map((section) => (
+                                <div key={section.label} className="pt-2">
+                                    <p className="px-4 pb-1 text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                                        {section.label}
+                                    </p>
+                                    {section.items.map((item) => (
+                                        <ResponsiveNavLink
+                                            key={item.href}
+                                            href={item.href}
+                                            active={route().current(item.pattern)}
+                                        >
+                                            {item.label}
+                                        </ResponsiveNavLink>
+                                    ))}
+                                </div>
+                            ))}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
