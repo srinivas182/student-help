@@ -54,6 +54,7 @@ Route::get('/', PortalLandingController::class)->name('home');
 // PayFast server-to-server notification: no session, no CSRF, verified by signature
 Route::post('/billing/notify', [BillingController::class, 'notify'])
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
+    ->middleware('throttle:webhooks')
     ->name('billing.notify');
 
 // Staff invitations — public, token-authenticated (SRS: AUTH-08)
@@ -82,7 +83,7 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
     Route::prefix('requests')->name('requests.')->group(function () {
         Route::get('/', [HelpRequestController::class, 'index'])->name('index');
         Route::get('/new', [HelpRequestController::class, 'create'])->name('create');
-        Route::post('/', [HelpRequestController::class, 'store'])->name('store');
+        Route::post('/', [HelpRequestController::class, 'store'])->middleware('throttle:requests')->name('store');
         Route::get('/{helpRequest}', [HelpRequestController::class, 'show'])->name('show');
         Route::post('/{helpRequest}/cancel', [HelpRequestController::class, 'cancel'])->name('cancel');
         Route::post('/{helpRequest}/confirm', [HelpRequestController::class, 'confirm'])->name('confirm');
@@ -108,7 +109,7 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
     Route::prefix('resources')->name('resources.')->group(function () {
         Route::get('/', [ResourceController::class, 'index'])->name('index');
         Route::get('/mine', [ResourceController::class, 'mine'])->name('mine');
-        Route::post('/', [ResourceController::class, 'store'])->name('store');
+        Route::post('/', [ResourceController::class, 'store'])->middleware('throttle:uploads')->name('store');
         Route::get('/{resource}', [ResourceController::class, 'show'])->name('show');
         Route::get('/{resource}/download', [ResourceController::class, 'download'])->name('download');
     });
@@ -146,7 +147,7 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
     // AI study assistant
     Route::prefix('assistant')->name('assistant.')->group(function () {
         Route::get('/', [AssistantController::class, 'index'])->name('index');
-        Route::post('/ask', [AssistantController::class, 'ask'])->name('ask');
+        Route::post('/ask', [AssistantController::class, 'ask'])->middleware('throttle:assistant')->name('ask');
         Route::post('/{answer}/escalate', [AssistantController::class, 'escalate'])->name('escalate');
         Route::post('/{answer}/feedback', [AssistantController::class, 'feedback'])->name('feedback');
     });
@@ -173,8 +174,10 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
     });
 
     // One search box across lessons, material, community and your own questions
-    Route::get('/search', [SearchController::class, 'index'])->name('search');
-    Route::get('/search/quick', [SearchController::class, 'quick'])->name('search.quick');
+    Route::middleware('throttle:search')->group(function () {
+        Route::get('/search', [SearchController::class, 'index'])->name('search');
+        Route::get('/search/quick', [SearchController::class, 'quick'])->name('search.quick');
+    });
 
     // Plans and payments
     Route::prefix('billing')->name('billing.')->group(function () {
@@ -206,7 +209,7 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
 
     // Voice note lessons
     Route::prefix('voice-notes')->name('voiceNotes.')->group(function () {
-        Route::post('/', [VoiceNoteController::class, 'store'])->name('store');
+        Route::post('/', [VoiceNoteController::class, 'store'])->middleware('throttle:uploads')->name('store');
         Route::get('/{voiceNote}/play', [VoiceNoteController::class, 'play'])->name('play');
         Route::delete('/{voiceNote}', [VoiceNoteController::class, 'destroy'])->name('destroy');
     });
@@ -215,7 +218,7 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
     Route::prefix('conversations')->name('conversations.')->group(function () {
         Route::get('/{helpRequest}', [ConversationController::class, 'show'])->name('show');
         Route::get('/{helpRequest}/poll', [ConversationController::class, 'poll'])->name('poll');
-        Route::post('/{helpRequest}/messages', [ConversationController::class, 'store'])->name('store');
+        Route::post('/{helpRequest}/messages', [ConversationController::class, 'store'])->middleware('throttle:messaging')->name('store');
         Route::post('/{helpRequest}/messages/{message}/report', [ConversationController::class, 'report'])->name('report');
     });
 
@@ -261,9 +264,9 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::get('/topics', [TopicController::class, 'index'])->name('topics.index');
         Route::post('/topics', [TopicController::class, 'store'])->name('topics.store');
         Route::get('/topics/{topic}', [TopicController::class, 'show'])->name('topics.show');
-        Route::post('/topics/{topic}/sources', [TopicController::class, 'addSource'])->name('topics.sources');
+        Route::post('/topics/{topic}/sources', [TopicController::class, 'addSource'])->middleware('throttle:uploads')->name('topics.sources');
         Route::post('/topics/{topic}/estimate', [TopicController::class, 'estimate'])->name('topics.estimate');
-        Route::post('/topics/{topic}/code', [TopicController::class, 'requestCode'])->name('topics.code');
+        Route::post('/topics/{topic}/code', [TopicController::class, 'requestCode'])->middleware('throttle:codes')->name('topics.code');
         Route::post('/topics/{topic}/generate', [TopicController::class, 'generate'])->name('topics.generate');
         Route::delete('/sources/{source}', [TopicController::class, 'destroySource'])->name('topics.sources.destroy');
 

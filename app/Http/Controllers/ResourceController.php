@@ -92,7 +92,7 @@ class ResourceController extends Controller
             'description' => ['nullable', 'string', 'max:1000'],
             'resource_type' => ['required', Rule::in(array_keys(ResourceService::TYPES))],
             'file' => ['nullable', 'file', 'mimes:pdf,doc,docx,ppt,pptx,jpg,jpeg,png,mp3,m4a', 'max:'.($maxMb * 1024)],
-            'external_url' => ['nullable', 'url', 'max:500', 'required_without:file'],
+            'external_url' => ['nullable', 'url', 'max:500', 'required_without:file', new \App\Rules\SafeUrl],
             'curriculum_item_ids' => ['required', 'array', 'min:1'],
             'curriculum_item_ids.*' => ['integer', 'exists:curriculum_items,id'],
             // Copyright declaration — DX carries the liability otherwise.

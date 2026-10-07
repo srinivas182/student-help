@@ -110,7 +110,7 @@ export default function Show({
                                 <a
                                     href={route('admin.documents.show', doc.id)}
                                     target="_blank"
-                                    rel="noreferrer"
+                                    rel="noopener noreferrer"
                                     className="rounded-lg border border-slate-300 px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50"
                                 >
                                     View

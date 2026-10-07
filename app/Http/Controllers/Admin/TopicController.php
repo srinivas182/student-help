@@ -134,7 +134,7 @@ class TopicController extends Controller
             'title' => ['nullable', 'string', 'max:150'],
             'file' => ['nullable', 'required_if:kind,pdf,document', 'file', 'mimes:pdf,doc,docx,txt', 'max:20480'],
             'text' => ['nullable', 'required_if:kind,text', 'string', 'max:100000'],
-            'external_url' => ['nullable', 'required_if:kind,link', 'url', 'max:500'],
+            'external_url' => ['nullable', 'required_if:kind,link', 'url', 'max:500', new \App\Rules\SafeUrl],
             // Generated lessons are derivative works; scanned textbooks are not ours to use.
             'rights_declared' => ['accepted'],
         ], [

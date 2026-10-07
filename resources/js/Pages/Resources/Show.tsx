@@ -98,7 +98,7 @@ export default function Show({
                             <a
                                 href={resource.externalUrl}
                                 target="_blank"
-                                rel="noreferrer"
+                                rel="noopener noreferrer"
                                 className="rounded-lg border border-slate-300 px-5 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
                             >
                                 Open link
