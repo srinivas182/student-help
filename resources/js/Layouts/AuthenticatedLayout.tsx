@@ -92,6 +92,12 @@ export default function Authenticated({
                                             Progress
                                         </NavLink>
                                         <NavLink
+                                            href={route('billing.plans')}
+                                            active={route().current('billing.*')}
+                                        >
+                                            Plans
+                                        </NavLink>
+                                        <NavLink
                                             href={route('announcements.index')}
                                             active={route().current('announcements.index')}
                                         >

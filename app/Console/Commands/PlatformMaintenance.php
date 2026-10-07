@@ -20,6 +20,12 @@ class PlatformMaintenance extends Command
 
     public function handle(): int
     {
+        $lapsed = app(\App\Domains\Billing\Services\SubscriptionService::class)->expireLapsed();
+
+        if ($lapsed > 0) {
+            $this->components->info("{$lapsed} subscription(s) expired back to the free plan.");
+        }
+
         $dry = (bool) $this->option('dry-run');
 
         $expiredCodes = DB::table('one_time_codes')

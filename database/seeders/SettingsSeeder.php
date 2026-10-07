@@ -60,6 +60,12 @@ class SettingsSeeder extends Seeder
             'ai_tutor_input_cost_per_million' => 3.0,
             'ai_tutor_output_cost_per_million' => 15.0,
             'usd_to_zar' => 18.0,
+
+            // Payments: off until DX adds their PayFast credentials
+            'payfast_merchant_id' => '',
+            'payfast_merchant_key' => '',
+            'payfast_passphrase' => '',
+            'payfast_sandbox' => true,
         ];
 
         foreach ($settings as $key => $value) {

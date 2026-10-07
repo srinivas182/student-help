@@ -26,6 +26,11 @@ class SettingsController extends Controller
         'max_attachments_per_request' => ['label' => 'Maximum attachments per request', 'type' => 'integer'],
         'prohibited_words' => ['label' => 'Prohibited words', 'type' => 'list', 'help' => 'Messages containing these are flagged for a moderator. One word or phrase per line.'],
         'policy_version' => ['label' => 'Policy version', 'type' => 'string', 'help' => 'Recorded against each consent so you can prove which version was agreed.'],
+        'monetisation_mode' => ['label' => 'Monetisation', 'type' => 'string', 'help' => 'free or freemium. While free, nobody is limited or charged.'],
+        'free_monthly_request_allowance' => ['label' => 'Free plan: requests per month', 'type' => 'integer'],
+        'payfast_merchant_id' => ['label' => 'PayFast merchant ID', 'type' => 'string'],
+        'payfast_merchant_key' => ['label' => 'PayFast merchant key', 'type' => 'string'],
+        'payfast_passphrase' => ['label' => 'PayFast passphrase', 'type' => 'string', 'help' => 'Set this in your PayFast dashboard and paste it here. Payments are rejected without a matching signature.'],
     ];
 
     public function edit(): Response
@@ -60,6 +65,11 @@ class SettingsController extends Controller
             'settings.prohibited_words' => ['array'],
             'settings.prohibited_words.*' => ['string', 'max:60'],
             'settings.policy_version' => ['required', 'string', 'max:16'],
+            'settings.monetisation_mode' => ['nullable', 'in:free,freemium'],
+            'settings.free_monthly_request_allowance' => ['nullable', 'integer', 'between:0,100'],
+            'settings.payfast_merchant_id' => ['nullable', 'string', 'max:32'],
+            'settings.payfast_merchant_key' => ['nullable', 'string', 'max:64'],
+            'settings.payfast_passphrase' => ['nullable', 'string', 'max:64'],
         ]);
 
         foreach ($validated['settings'] as $key => $value) {

@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             CurriculumSeeder::class,
             LanguageSeeder::class,
             RoleSeeder::class,
+            PlanSeeder::class,
             SettingsSeeder::class,
             DemoDataSeeder::class,
         ]);

@@ -31,6 +31,7 @@ use App\Http\Controllers\PortalLandingController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\AssessmentController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\TwoFactorController;
@@ -48,6 +49,11 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', PortalLandingController::class)->name('home');
+
+// PayFast server-to-server notification: no session, no CSRF, verified by signature
+Route::post('/billing/notify', [BillingController::class, 'notify'])
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
+    ->name('billing.notify');
 
 // Staff invitations — public, token-authenticated (SRS: AUTH-08)
 Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');
@@ -163,6 +169,16 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/recovery-codes', [TwoFactorController::class, 'regenerateRecovery'])->name('recovery');
         Route::delete('/', [TwoFactorController::class, 'disable'])->name('disable');
         Route::delete('/devices', [TwoFactorController::class, 'forgetDevices'])->name('devices');
+    });
+
+    // Plans and payments
+    Route::prefix('billing')->name('billing.')->group(function () {
+        Route::get('/', [BillingController::class, 'plans'])->name('plans');
+        Route::get('/history', [BillingController::class, 'history'])->name('history');
+        Route::get('/checkout/{plan}', [BillingController::class, 'checkout'])->name('checkout');
+        Route::get('/return', [BillingController::class, 'return'])->name('return');
+        Route::get('/cancel', [BillingController::class, 'cancel'])->name('cancel');
+        Route::post('/cancel-subscription', [BillingController::class, 'cancelSubscription'])->name('cancelSubscription');
     });
 
     // Progress and recognition (SRS: PRG-01 – PRG-03)
