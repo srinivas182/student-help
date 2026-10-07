@@ -34,6 +34,7 @@ use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\StudyGroupController;
 use App\Http\Controllers\VoiceNoteController;
@@ -170,6 +171,10 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::delete('/', [TwoFactorController::class, 'disable'])->name('disable');
         Route::delete('/devices', [TwoFactorController::class, 'forgetDevices'])->name('devices');
     });
+
+    // One search box across lessons, material, community and your own questions
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
+    Route::get('/search/quick', [SearchController::class, 'quick'])->name('search.quick');
 
     // Plans and payments
     Route::prefix('billing')->name('billing.')->group(function () {

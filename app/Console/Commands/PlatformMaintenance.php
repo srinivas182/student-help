@@ -20,6 +20,19 @@ class PlatformMaintenance extends Command
 
     public function handle(): int
     {
+        $nudged = 0;
+
+        foreach (app(\App\Domains\Engagement\Services\StreakService::class)->studentsToNudge() as $student) {
+            $student->notify(new \App\Notifications\StreakAtRisk(
+                app(\App\Domains\Progress\Services\ProgressService::class)->currentStreak($student),
+            ));
+            $nudged++;
+        }
+
+        if ($nudged > 0) {
+            $this->components->info("{$nudged} streak reminder(s) sent.");
+        }
+
         $lapsed = app(\App\Domains\Billing\Services\SubscriptionService::class)->expireLapsed();
 
         if ($lapsed > 0) {

@@ -40,6 +40,7 @@ class HandleInertiaRequests extends Middleware
                     'email' => $request->user()->email,
                     'role' => $request->user()->role,
                     'can_participate' => $request->user()->canParticipate(),
+                    'can_self_study' => $request->user()->canSelfStudy(),
                     'is_minor' => $request->user()->isMinor(),
                     'can_review' => $request->user()->hasPermission('topics.review'),
                 ] : null,

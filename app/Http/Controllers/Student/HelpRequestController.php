@@ -96,6 +96,12 @@ class HelpRequestController extends Controller
         $helpRequest->load(['subject:id,name', 'tutor:id,first_name,last_name', 'tutor.tutorProfile']);
 
         return Inertia::render('Requests/Show', [
+            // While tutor numbers are thin, an instant answer beats an empty page
+            'assistantOffer' => [
+                'available' => app(\App\Domains\Assistant\Services\AssistantService::class)->isOfferedFor($helpRequest),
+                'immediate' => app(\App\Domains\Assistant\Services\AssistantSettings::class)->isDirectAskAllowed(),
+                'waitHours' => app(\App\Domains\Assistant\Services\AssistantSettings::class)->fallbackAfterHours(),
+            ],
             'request' => $this->summary($helpRequest) + [
                 'description' => $helpRequest->description,
                 'tutorBio' => $helpRequest->tutor?->tutorProfile?->bio,

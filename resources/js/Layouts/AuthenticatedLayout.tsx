@@ -3,6 +3,8 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import NotificationBell from '@/Components/NotificationBell';
+import GlobalSearch from '@/Components/GlobalSearch';
+import MobileTabBar from '@/Components/MobileTabBar';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode, useState } from 'react';
 
@@ -14,6 +16,9 @@ export default function Authenticated({
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+
+    // Staff work on desktop and need the full menu; the tab bar is for learners
+    const isStaff = ['admin', 'super_admin', 'moderator'].includes(user.role);
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -266,6 +271,10 @@ export default function Authenticated({
                         </div>
 
                         <div className="hidden sm:ms-6 sm:flex sm:items-center sm:gap-2">
+                            <div className="hidden lg:block">
+                                <GlobalSearch />
+                            </div>
+
                             <NotificationBell />
                             <div className="relative ms-3">
                                 <Dropdown>
@@ -403,7 +412,10 @@ export default function Authenticated({
                 </header>
             )}
 
-            <main>{children}</main>
+            {/* Padding keeps the last line of content clear of the tab bar */}
+            <main className="pb-20 md:pb-0">{children}</main>
+
+            {!isStaff && <MobileTabBar />}
         </div>
     );
 }

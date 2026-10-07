@@ -17,12 +17,33 @@ interface RequestDetail {
     updatedAt: string | null;
 }
 
-export default function Show({ request }: { request: RequestDetail }) {
+export default function Show({
+    assistantOffer, request }: {
+    assistantOffer: { available: boolean; immediate: boolean; waitHours: number }; request: RequestDetail }) {
     const act = (name: string) => router.post(route(name, request.id));
 
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-slate-800">Help request</h2>}>
             <Head title={request.topic} />
+
+                {/* Waiting with nothing to do is how a student decides to leave */}
+                {assistantOffer.available && (
+                    <div className="rounded-xl border border-indigo-200 bg-indigo-50 p-5">
+                        <p className="font-medium text-indigo-900">
+                            Want a first explanation while you wait?
+                        </p>
+                        <p className="mt-1 text-sm text-indigo-800">
+                            The study assistant can walk you through the method now. It is AI, not a person,
+                            and a verified tutor will still reply to this question.
+                        </p>
+                        <Link
+                            href={route('assistant.index')}
+                            className="mt-3 inline-block rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+                        >
+                            Get an instant explanation
+                        </Link>
+                    </div>
+                )}
 
             <div className="mx-auto max-w-3xl space-y-5 px-4 py-8 sm:px-6">
                 <Link href={route('requests.index')} className="text-sm text-slate-500 hover:text-slate-800">

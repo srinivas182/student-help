@@ -1,3 +1,7 @@
+import GlobalSearch from '@/Components/GlobalSearch';
+import NextActionCard, { NextAction } from '@/Components/NextActionCard';
+import StreakCard, { Streak } from '@/Components/StreakCard';
+import SubjectProgressList, { SubjectProgress } from '@/Components/SubjectProgressList';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, usePage } from '@inertiajs/react';
 
@@ -11,11 +15,19 @@ interface RequestRow {
 }
 
 interface Props {
+    nextActions: NextAction[];
+    streak: Streak | null;
+    subjectProgress: SubjectProgress[];
     context: string[];
     subjects: { id: number; name: string; code: string | null }[];
     requests: RequestRow[];
     stats: { open: number; resolved: number; subjects: number; rating: string | null };
-    participation: { canParticipate: boolean; isMinor: boolean; consentStatus: string | null };
+    participation: {
+        canParticipate: boolean;
+        isMinor: boolean;
+        consentStatus: string | null;
+        canSelfStudy: boolean;
+    };
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -36,7 +48,16 @@ function Stat({ label, value }: { label: string; value: string | number }) {
     );
 }
 
-export default function Dashboard({ context, subjects, requests, stats, participation }: Props) {
+export default function Dashboard({
+    nextActions,
+    streak,
+    subjectProgress,
+    context,
+    subjects,
+    requests,
+    stats,
+    participation,
+}: Props) {
     const user = usePage().props.auth.user as { first_name?: string; name: string };
     const firstName = user.first_name ?? user.name.split(' ')[0];
 
@@ -52,8 +73,8 @@ export default function Dashboard({ context, subjects, requests, stats, particip
                     <div className="rounded-xl border border-amber-200 bg-amber-50 p-5" role="status">
                         <h3 className="font-semibold text-amber-900">Waiting for parent or guardian approval</h3>
                         <p className="mt-1 text-sm text-amber-800">
-                            You can browse study resources and announcements now. Asking a tutor for help,
-                            messaging and posting in the community unlock as soon as your guardian approves
+                            Lessons, revision notes and self-testing are open to you right now. Asking a tutor
+                            for help, messaging and posting in the community unlock as soon as your guardian approves
                             the consent email we sent them.
                         </p>
                     </div>
@@ -61,6 +82,23 @@ export default function Dashboard({ context, subjects, requests, stats, particip
 
                 <section className="rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 p-6 text-white">
                     <h1 className="text-2xl font-semibold">Hello {firstName}</h1>
+
+                {/* One answer to "what now?", before anything else on the page */}
+                {nextActions.length > 0 && (
+                    <section className="space-y-3">
+                        {nextActions.map((action) => (
+                            <NextActionCard key={action.kind + action.url} action={action} />
+                        ))}
+                    </section>
+                )}
+
+                <div className="lg:hidden">
+                    <GlobalSearch compact />
+                </div>
+
+                {streak && <StreakCard streak={streak} />}
+
+                <SubjectProgressList subjects={subjectProgress} />
                     <p className="mt-1 text-sm text-indigo-100">
                         {context.length > 0 ? context.join(' · ') : 'Your learning space'}
                     </p>

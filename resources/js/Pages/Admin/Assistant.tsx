@@ -23,7 +23,9 @@ export default function Assistant({
     settings,
     providers,
     usage,
+    launchAdvice,
 }: {
+    launchAdvice: { mode: string; verifiedTutors: number; thinCoverage: boolean };
     settings: Settings;
     providers: Record<string, string>;
     usage: {
@@ -56,6 +58,24 @@ export default function Assistant({
     return (
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-slate-800">Study assistant</h2>}>
             <Head title="Study assistant settings" />
+
+            {/* Cold start: with few tutors, silence is what loses a student */}
+            {launchAdvice.thinCoverage && launchAdvice.mode !== 'always' && (
+                <div className="mx-auto mt-6 max-w-3xl px-4 sm:px-6">
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+                        <p className="font-medium text-amber-900">
+                            Only {launchAdvice.verifiedTutors} verified{' '}
+                            {launchAdvice.verifiedTutors === 1 ? 'tutor' : 'tutors'} so far
+                        </p>
+                        <p className="mt-1 text-sm text-amber-800">
+                            Until tutor numbers grow, a learner who asks at 9pm may wait overnight for
+                            nothing and not come back. Setting the assistant to answer immediately gives
+                            them something useful straight away, clearly marked as AI, with a tutor reply
+                            still to follow. Switch back to fallback once coverage is healthy.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             <div className="mx-auto max-w-3xl space-y-5 px-4 py-8 sm:px-6">
                 <div className="grid gap-4 sm:grid-cols-4">

@@ -157,6 +157,11 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /** Subjects the student finds challenging, or the tutor supports. */
+    public function activityDays(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Progress\Models\ActivityDay::class);
+    }
+
     public function subjects(): BelongsToMany
     {
         return $this->belongsToMany(CurriculumItem::class, 'academic_selections')
@@ -190,6 +195,18 @@ class User extends Authenticatable implements MustVerifyEmail
      * CON-03: a minor without approved consent may browse, but may not
      * raise requests, message anyone, or post publicly.
      */
+    /**
+     * Self-study needs no other person involved, so a learner waiting on
+     * guardian approval can read, watch and test themselves straight away.
+     * Only contact with other people waits for consent.
+     */
+    public function canSelfStudy(): bool
+    {
+        // Gate on being blocked rather than on being explicitly active: a
+        // missing status should never quietly lock a learner out of studying.
+        return ! in_array($this->status, ['suspended', 'banned'], true);
+    }
+
     public function canParticipate(): bool
     {
         return ! $this->isMinor() || $this->hasGuardianConsent();

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\Engagement\Services\NextActionService;
+use App\Domains\Engagement\Services\StreakService;
+use App\Domains\Engagement\Services\SubjectProgressService;
 use App\Domains\Tutoring\Models\HelpRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -10,6 +13,13 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
+    public function __construct(
+        private readonly NextActionService $nextActions,
+        private readonly StreakService $streaks,
+        private readonly SubjectProgressService $subjectProgress,
+    ) {
+    }
+
     public function __invoke(Request $request): Response|RedirectResponse
     {
         $user = $request->user();
@@ -36,7 +46,13 @@ class DashboardController extends Controller
                 'updated' => $r->last_activity_at?->diffForHumans(),
             ]);
 
+        $isStudent = ! $user->isTutor() && ! $user->isStaff();
+
         return Inertia::render('Dashboard', [
+            // The one thing a student should see first: what to do now
+            'nextActions' => $isStudent ? $this->nextActions->forStudent($user) : [],
+            'streak' => $isStudent ? $this->streaks->summary($user) : null,
+            'subjectProgress' => $isStudent ? $this->subjectProgress->forStudent($user) : [],
             'context' => $user->academicContext()->orderBy('position')->pluck('name'),
             'subjects' => $subjects,
             'requests' => $requests,
@@ -54,6 +70,7 @@ class DashboardController extends Controller
                 'canParticipate' => $user->canParticipate(),
                 'isMinor' => $user->isMinor(),
                 'consentStatus' => $user->guardianConsent?->status,
+                'canSelfStudy' => $user->canSelfStudy(),
             ],
         ]);
     }
