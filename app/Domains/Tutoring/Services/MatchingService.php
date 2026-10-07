@@ -34,10 +34,14 @@ class MatchingService
                 ->where('is_available', true)
                 ->whereHas('subjects', fn ($s) => $s->where('curriculum_items.id', $request->subject_id)))
             ->with('tutorProfile')
+            // Current load comes back with the tutors rather than one query each:
+            // at 800 tutors that was 800 round trips per match.
+            ->withCount(['assignedRequests as active_load' => fn ($q) => $q
+                ->where('status', HelpRequest::STATUS_ASSIGNED)])
             ->get()
             // Best-rated and least-loaded tutors first, so work spreads fairly.
             ->sortByDesc(fn (User $tutor) => ($tutor->tutorProfile->average_rating ?? 3.5) * 10
-                - $tutor->assignedRequests()->where('status', HelpRequest::STATUS_ASSIGNED)->count())
+                - (int) $tutor->active_load)
             ->values();
     }
 

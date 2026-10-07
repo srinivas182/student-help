@@ -36,6 +36,24 @@ class BenchmarkQueries extends Command
 
                 return $request ? app(MatchingService::class)->eligibleTutors($request)->count() : 0;
             },
+            'Admin dashboard counts' => fn () => HelpRequest::selectRaw('status, count(*) as total')
+                ->groupBy('status')->pluck('total', 'status')->count(),
+            'Subject coverage report' => fn () => DB::table('tutor_subjects')
+                ->join('tutor_profiles', 'tutor_profiles.id', '=', 'tutor_subjects.tutor_profile_id')
+                ->where('tutor_profiles.verification_status', 'approved')
+                ->select('tutor_subjects.curriculum_item_id', DB::raw('count(*) as tutors'))
+                ->groupBy('tutor_subjects.curriculum_item_id')->get()->count(),
+            'Student dashboard' => function () {
+                $student = User::where('role', 'student')->first();
+
+                return $student
+                    ? HelpRequest::where('student_id', $student->id)
+                        ->whereIn('status', ['open', 'assigned', 'escalated'])
+                        ->with('subject:id,name', 'tutor:id,first_name')->get()->count()
+                    : 0;
+            },
+            'Unanswered community board' => fn () => DB::table('community_posts')
+                ->whereNull('parent_id')->where('replies_count', 0)->limit(15)->get()->count(),
         ];
 
         $rows = [];
