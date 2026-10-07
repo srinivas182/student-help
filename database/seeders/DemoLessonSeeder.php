@@ -219,7 +219,9 @@ class DemoLessonSeeder extends Seeder
         $reviewer = User::where('email', 'reviewer@dxstudenthelp.co.za')->first();
 
         if (! $reviewer) {
-            $reviewer = User::factory()->create([
+            // Never User::factory() here: factories need Faker, which is a dev
+            // dependency and absent from a --no-dev production install.
+            $reviewer = User::create([
                 'first_name' => 'Kgomotso',
                 'last_name' => 'Sithole',
                 'name' => 'Kgomotso Sithole',
@@ -229,6 +231,7 @@ class DemoLessonSeeder extends Seeder
                 'email_verified_at' => now(),
                 'date_of_birth' => now()->subYears(34),
                 'onboarding_completed_at' => now(),
+                'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(32)),
             ]);
         }
 
