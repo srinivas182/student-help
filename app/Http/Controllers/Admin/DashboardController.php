@@ -9,6 +9,8 @@ use App\Domains\Tutoring\Models\TutorProfile;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Support\CacheKeys;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -24,8 +26,21 @@ class DashboardController extends Controller
         $days = (int) $request->integer('days', 30);
         $since = now()->subDays($days);
 
-        return Inertia::render('Admin/Dashboard', [
-            'days' => $days,
+        // Five minutes is fresh enough for an operational dashboard, and saves a
+        // dozen aggregate queries on every page load.
+        $data = Cache::remember(
+            CacheKeys::adminDashboard($days),
+            CacheKeys::TTL_DASHBOARD,
+            fn () => $this->metrics($since),
+        );
+
+        return Inertia::render('Admin/Dashboard', array_merge(['days' => $days], $data));
+    }
+
+    /** @return array<string, mixed> */
+    private function metrics(\Illuminate\Support\Carbon $since): array
+    {
+        return [
             'people' => [
                 'students' => User::where('role', User::ROLE_STUDENT)->count(),
                 'newStudents' => User::where('role', User::ROLE_STUDENT)->where('created_at', '>=', $since)->count(),
@@ -85,7 +100,7 @@ class DashboardController extends Controller
                     'resolved' => $p->resolved_count,
                     'rating' => $p->average_rating,
                 ]),
-        ]);
+        ];
     }
 
     private function medianHours(string $from, string $to): ?float

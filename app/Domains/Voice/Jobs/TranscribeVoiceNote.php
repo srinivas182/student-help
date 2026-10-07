@@ -19,6 +19,7 @@ class TranscribeVoiceNote implements ShouldQueue
 
     public function __construct(private readonly int $voiceNoteId)
     {
+        $this->onQueue('transcription');
     }
 
     public function handle(Transcriber $transcriber, VoiceNoteService $service): void

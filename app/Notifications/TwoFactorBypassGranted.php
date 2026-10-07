@@ -18,6 +18,7 @@ class TwoFactorBypassGranted extends Notification implements ShouldQueue
         private readonly string $reason,
         private readonly string $until,
     ) {
+        $this->onQueue('urgent');
     }
 
     public function via(object $notifiable): array

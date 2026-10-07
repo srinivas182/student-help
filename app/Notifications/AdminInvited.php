@@ -14,6 +14,7 @@ class AdminInvited extends Notification implements ShouldQueue
 
     public function __construct(private readonly AdminInvitation $invitation)
     {
+        $this->onQueue('urgent');
     }
 
     public function via(object $notifiable): array

@@ -20,6 +20,11 @@ abstract class PlatformNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    public function __construct()
+    {
+        $this->onQueue('notifications');
+    }
+
     abstract public function event(): string;
 
     abstract public function title(User $notifiable): string;

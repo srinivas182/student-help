@@ -54,6 +54,46 @@ class CurriculumItem extends Model
     }
 
     /** Ancestors from the root down to this item's parent. */
+    /**
+     * Subjects are read on every onboarding step, subject picker and resource
+     * filter, and change a few times a year. Worth caching.
+     */
+    public static function cachedSubjects(): \Illuminate\Support\Collection
+    {
+        // Plain arrays rather than hydrated models: smaller in the cache, and
+        // immune to the serialisation problems models have across deploys.
+        $rows = cache()->remember(
+            \App\Support\CacheKeys::curriculumSubjects(),
+            \App\Support\CacheKeys::TTL_CURRICULUM,
+            fn () => static::ofType(static::TYPE_SUBJECT)->active()
+                ->get(['id', 'parent_id', 'name', 'code'])
+                ->toArray(),
+        );
+
+        return collect($rows);
+    }
+
+    public static function cachedChildren(?int $parentId): \Illuminate\Support\Collection
+    {
+        $rows = cache()->remember(
+            \App\Support\CacheKeys::curriculumChildren($parentId),
+            \App\Support\CacheKeys::TTL_CURRICULUM,
+            fn () => static::where('parent_id', $parentId)->active()
+                ->orderBy('position')
+                ->get(['id', 'parent_id', 'type', 'name', 'code', 'description'])
+                ->toArray(),
+        );
+
+        return collect($rows);
+    }
+
+    protected static function booted(): void
+    {
+        // Any edit clears the cache, so admin changes show immediately
+        static::saved(fn () => \App\Support\CacheKeys::forgetCurriculum());
+        static::deleted(fn () => \App\Support\CacheKeys::forgetCurriculum());
+    }
+
     public function ancestors(): array
     {
         $chain = [];
