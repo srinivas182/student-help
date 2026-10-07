@@ -1,0 +1,10 @@
+# DX Student Help — cPanel user crontab
+# Add in cPanel → Cron Jobs, or: crontab -e as the cPanel user.
+#
+# One entry only. Laravel's scheduler decides what runs when:
+#   requests:maintain   every 15 min  escalation and auto-close
+#   platform:maintain   daily 03:15   expire codes, prune logs, streak nudges
+#   reviews:remind      daily 16:00   spaced review reminders
+#   horizon:snapshot    every 5 min   queue metrics
+
+* * * * * /usr/local/bin/ea-php83 /home/CPANELUSER/APPDIR/artisan schedule:run >> /dev/null 2>&1

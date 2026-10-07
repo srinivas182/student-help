@@ -20,3 +20,8 @@ Schedule::command('reviews:remind')->dailyAt('16:00')->withoutOverlapping();
 
 // Keep Horizon's metrics useful
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
+
+// Heartbeat so platform:health can tell whether the cron entry is actually running
+Schedule::call(fn () => \Illuminate\Support\Facades\Cache::put(
+    'health:scheduler_last_run', now(), now()->addDay(),
+))->everyFiveMinutes()->name('scheduler-heartbeat');

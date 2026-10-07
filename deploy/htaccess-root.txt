@@ -1,0 +1,21 @@
+# Only needed if the subdomain document root could not be pointed at public/.
+# Place at /home/CPANELUSER/APPDIR/.htaccess
+#
+# Pointing the document root straight at public/ is better: it keeps .env,
+# vendor/ and storage/ outside the web root entirely. Use this only as a
+# fallback when cPanel will not let you set the document root.
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Refuse anything sensitive that could otherwise be served directly
+<FilesMatch "^(\.env|\.env\..*|composer\.(json|lock)|package(-lock)?\.json|artisan)$">
+    Require all denied
+</FilesMatch>
+
+RedirectMatch 404 /\.git
+RedirectMatch 404 /storage/
+RedirectMatch 404 /vendor/

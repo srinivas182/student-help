@@ -12,7 +12,7 @@ return [
 
     'student' => [
         'name' => env('STUDENT_PORTAL_NAME', 'DX Student Help'),
-        'host' => env('STUDENT_PORTAL_HOST', 'student-help.rightally.io'),
+        'host' => env('STUDENT_PORTAL_HOST', 'x-student-help.mcs.bz'),
         'roles' => ['student'],
         'home' => 'dashboard',
         'tagline' => 'Get help from verified tutors, in your subjects.',
@@ -20,7 +20,7 @@ return [
 
     'teacher' => [
         'name' => env('TEACHER_PORTAL_NAME', 'The X Teacher Help'),
-        'host' => env('TEACHER_PORTAL_HOST', 'teacher-help.rightally.io'),
+        'host' => env('TEACHER_PORTAL_HOST', 'x-teacher-help.mcs.bz'),
         'roles' => ['tutor', 'moderator', 'admin', 'super_admin'],
         'home' => 'tutor.home',
         'tagline' => 'Support your students, share material, host classes.',
