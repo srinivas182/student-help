@@ -1,10 +1,16 @@
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useEffect } from 'react';
 
 /** Scheduling a session: when, how long, online with a link or in a room. */
-export default function ScheduleForm({ classroomId }: { classroomId: number }) {
-    const [open, setOpen] = useState(false);
-
+export default function ScheduleForm({
+    classroomId,
+    open,
+    onClose,
+}: {
+    classroomId: number;
+    open: boolean;
+    onClose: () => void;
+}) {
     const form = useForm({
         title: '',
         description: '',
@@ -26,24 +32,51 @@ export default function ScheduleForm({ classroomId }: { classroomId: number }) {
             preserveScroll: true,
             onSuccess: () => {
                 form.reset();
-                setOpen(false);
+                onClose();
             },
         });
     };
 
+    useEffect(() => {
+        const escape = (event: KeyboardEvent) => event.key === 'Escape' && onClose();
+
+        document.addEventListener('keydown', escape);
+
+        return () => document.removeEventListener('keydown', escape);
+    }, [onClose]);
+
     if (!open) {
-        return (
-            <button
-                onClick={() => setOpen(true)}
-                className="rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-500"
-            >
-                Schedule a session
-            </button>
-        );
+        return null;
     }
 
     return (
-        <form onSubmit={submit} className="space-y-4 rounded-xl border border-slate-200 bg-white p-5">
+        <div
+            className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+            onClick={onClose}
+        >
+            <form
+                onSubmit={submit}
+                onClick={(e) => e.stopPropagation()}
+                className="max-h-[92vh] w-full max-w-lg space-y-5 overflow-y-auto rounded-t-2xl bg-white p-6 shadow-xl sm:rounded-2xl"
+            >
+                <div className="flex items-start justify-between gap-4">
+                    <div>
+                        <h2 className="text-lg font-semibold text-slate-900">Schedule a session</h2>
+                        <p className="mt-0.5 text-sm text-slate-600">
+                            Everyone in the class is told as soon as you save it.
+                        </p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        aria-label="Close"
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                    >
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
             <div>
                 <label className="text-sm font-medium text-slate-700">What is the session?</label>
                 <input
@@ -172,22 +205,23 @@ export default function ScheduleForm({ classroomId }: { classroomId: number }) {
                 className="block w-full rounded-lg border-slate-300 text-sm"
             />
 
-            <div className="flex gap-3">
-                <button
-                    type="submit"
-                    disabled={form.processing}
-                    className="rounded-lg bg-teal-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-teal-500 disabled:bg-slate-300"
-                >
-                    {form.processing ? 'Scheduling…' : 'Schedule it'}
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="rounded-lg border border-slate-300 px-5 py-2 text-sm text-slate-600"
-                >
-                    Cancel
-                </button>
-            </div>
-        </form>
+                <div className="flex gap-3 border-t border-slate-100 pt-5">
+                    <button
+                        type="submit"
+                        disabled={form.processing}
+                        className="flex-1 rounded-lg bg-teal-600 px-6 py-3 text-sm font-semibold text-white hover:bg-teal-500 disabled:bg-slate-300"
+                    >
+                        {form.processing ? 'Scheduling…' : 'Schedule it'}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="rounded-lg border border-slate-300 px-5 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
     );
 }

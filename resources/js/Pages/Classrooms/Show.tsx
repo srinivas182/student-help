@@ -54,6 +54,7 @@ export default function Show({
         createdAt: string | null;
     }[];
 }) {
+    const [scheduling, setScheduling] = useState(false);
     const [posting, setPosting] = useState(false);
 
     const form = useForm({ type: 'note', title: '', body: '', due_at: '' });
@@ -76,12 +77,35 @@ export default function Show({
 
                 {/* The schedule: without it a class is just a noticeboard */}
                 <section className="rounded-xl border border-slate-200 bg-white p-6">
-                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                        <h2 className="font-semibold text-slate-900">Schedule</h2>
-                        {isTeacher && <ScheduleForm classroomId={classroom.id} />}
+                    <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                            <h2 className="font-semibold text-slate-900">Schedule</h2>
+                            <p className="mt-0.5 text-sm text-slate-600">
+                                {isTeacher
+                                    ? 'When your class meets, online or in person.'
+                                    : 'When this class meets. You will be told about any changes.'}
+                            </p>
+                        </div>
+
+                        {isTeacher && (
+                            <button
+                                onClick={() => setScheduling(true)}
+                                className="shrink-0 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-500"
+                            >
+                                Schedule a session
+                            </button>
+                        )}
                     </div>
 
                     <SessionList sessions={sessions} isTeacher={isTeacher} />
+
+                    {isTeacher && (
+                        <ScheduleForm
+                            classroomId={classroom.id}
+                            open={scheduling}
+                            onClose={() => setScheduling(false)}
+                        />
+                    )}
                 </section>
 
             <div className="mx-auto max-w-4xl space-y-5 px-4 py-8 sm:px-6">
