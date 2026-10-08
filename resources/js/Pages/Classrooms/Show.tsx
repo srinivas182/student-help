@@ -1,5 +1,6 @@
 import VoiceNotePlayer from '@/Components/VoiceNotePlayer';
 import VoiceRecorder from '@/Components/VoiceRecorder';
+import ClassFeed, { ClassPost } from '@/Components/Classroom/ClassFeed';
 import ScheduleForm from '@/Components/Classroom/ScheduleForm';
 import SessionList, { ClassSession } from '@/Components/Classroom/SessionList';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -41,7 +42,7 @@ export default function Show({
         pendingSchool: string | null;
     };
     isTeacher: boolean;
-    posts: Post[];
+    posts: ClassPost[];
     members: { id: number; name: string; joinedAt: string | null }[];
     memberCount: number;
     voiceNotes: {
@@ -239,74 +240,12 @@ export default function Show({
                     </section>
                 )}
 
-                <section className="space-y-3">
-                    {posts.length === 0 ? (
-                        <p className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-12 text-center text-sm text-slate-500">
-                            {isTeacher
-                                ? 'Nothing posted yet. Share a note or set a task for your class.'
-                                : 'Your teacher has not posted anything yet.'}
-                        </p>
-                    ) : (
-                        posts.map((post) => (
-                            <article
-                                key={post.id}
-                                className={`rounded-xl border bg-white p-5 ${
-                                    post.isOverdue && !post.completed ? 'border-rose-300' : 'border-slate-200'
-                                }`}
-                            >
-                                <div className="flex flex-wrap items-start justify-between gap-3">
-                                    <div className="min-w-0 flex-1">
-                                        <div className="flex items-center gap-2">
-                                            {post.type === 'task' && (
-                                                <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[11px] font-medium text-indigo-800">
-                                                    Task
-                                                </span>
-                                            )}
-                                            <p className="font-medium text-slate-900">{post.title}</p>
-                                        </div>
-                                        <p className="mt-2 whitespace-pre-line text-sm text-slate-700">
-                                            {post.body}
-                                        </p>
-                                        {post.resource && (
-                                            <Link
-                                                href={route('resources.show', post.resource.id)}
-                                                className="mt-2 inline-block text-xs font-medium text-indigo-600"
-                                            >
-                                                📎 {post.resource.title}
-                                            </Link>
-                                        )}
-                                        <p className="mt-3 text-xs text-slate-400">
-                                            {post.author} · {post.postedAt}
-                                            {post.dueAt ? ` · due ${post.dueAt}` : ''}
-                                            {isTeacher && post.type === 'task'
-                                                ? ` · ${post.completedCount}/${memberCount} done`
-                                                : ''}
-                                        </p>
-                                    </div>
+                <section>
+                    <h2 className="mb-3 font-semibold text-slate-900">
+                        {isTeacher ? 'Class feed' : 'Questions and notes'}
+                    </h2>
 
-                                    {!isTeacher && post.type === 'task' && (
-                                        <button
-                                            onClick={() =>
-                                                router.post(
-                                                    route('classrooms.posts.complete', [classroom.id, post.id]),
-                                                    {},
-                                                    { preserveScroll: true },
-                                                )
-                                            }
-                                            disabled={post.completed}
-                                            className={`shrink-0 rounded-lg px-4 py-2 text-xs font-semibold ${
-                                                post.completed
-                                                    ? 'bg-emerald-100 text-emerald-800'
-                                                    : 'bg-indigo-600 text-white hover:bg-indigo-500'
-                                            }`}
-                                        >
-                                            {post.completed ? 'Done ✓' : 'Mark as done'}
-                                        </button>
-                                    )}
-                                </div>
-                            </article>
-                        ))
-                    )}
+                    <ClassFeed classroomId={classroom.id} posts={posts} isTeacher={isTeacher} />
                 </section>
 
                 {isTeacher && members.length > 0 && (

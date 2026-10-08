@@ -167,7 +167,15 @@ class ClassroomController extends Controller
                 'schoolLinkStatus' => $classroom->school_link_status,
             ],
             'isTeacher' => $isTeacher,
-            'posts' => $classroom->posts()->with(['author:id,first_name,last_name', 'resource:id,title'])
+            'posts' => $classroom->posts()
+                ->topLevel()
+                ->where('is_removed', false)
+                ->with([
+                    'author:id,first_name,last_name',
+                    'resource:id,title',
+                    'replies' => fn ($q) => $q->where('is_removed', false)->with('author:id,first_name,last_name'),
+                ])
+                ->latest()
                 ->get()
                 ->map(fn (ClassroomPost $post) => [
                     'id' => $post->id,
@@ -175,12 +183,20 @@ class ClassroomController extends Controller
                     'title' => $post->title,
                     'body' => $post->body,
                     'author' => $post->author?->name,
+                    'isMine' => $post->author_id === $user->id,
                     'resource' => $post->resource ? ['id' => $post->resource->id, 'title' => $post->resource->title] : null,
                     'dueAt' => $post->due_at?->toFormattedDateString(),
                     'isOverdue' => $post->isOverdue(),
                     'completed' => $post->completedBy()->where('users.id', $user->id)->exists(),
                     'completedCount' => $isTeacher ? $post->completedBy()->count() : null,
                     'postedAt' => $post->created_at?->diffForHumans(),
+                    'replies' => $post->replies->map(fn (ClassroomPost $reply) => [
+                        'id' => $reply->id,
+                        'body' => $reply->body,
+                        'author' => $reply->author?->name,
+                        'isTeacher' => $reply->author_id === $classroom->teacher_id,
+                        'postedAt' => $reply->created_at?->diffForHumans(),
+                    ]),
                 ]),
             'members' => $isTeacher
                 ? $classroom->students()->get(['users.id', 'first_name', 'last_name'])
@@ -257,19 +273,30 @@ class ClassroomController extends Controller
 
     public function post(Request $request, Classroom $classroom): RedirectResponse
     {
-        abort_unless($classroom->teacher_id === $request->user()->id, 403);
+        $user = $request->user();
+        $isTeacher = $classroom->teacher_id === $user->id;
+
+        // Students may ask; only the teacher posts notes and sets tasks
+        abort_unless(
+            $isTeacher || $classroom->students()->whereKey($user->id)->exists(),
+            403,
+        );
 
         $validated = $request->validate([
-            'type' => ['required', Rule::in([ClassroomPost::TYPE_NOTE, ClassroomPost::TYPE_TASK])],
+            'type' => ['required', Rule::in($isTeacher
+                ? [ClassroomPost::TYPE_NOTE, ClassroomPost::TYPE_TASK]
+                : [ClassroomPost::TYPE_QUESTION])],
             'title' => ['required', 'string', 'max:150'],
             'body' => ['required', 'string', 'max:3000'],
             'resource_id' => ['nullable', 'integer', 'exists:resources,id'],
             'due_at' => ['nullable', 'date', 'after:now'],
         ]);
 
-        $classroom->posts()->create([...$validated, 'author_id' => $request->user()->id]);
+        $this->createPost($classroom, $user, $validated, $isTeacher);
 
-        return back()->with('success', 'Posted to the class.');
+        return back()->with('success', $isTeacher
+            ? 'Posted to the class.'
+            : 'Your question is on the class page. Your teacher will see it.');
     }
 
     public function complete(Request $request, Classroom $classroom, ClassroomPost $post): RedirectResponse
@@ -368,5 +395,64 @@ class ClassroomController extends Controller
 
         return redirect()->route('classrooms.show', $classroom)
             ->with('success', "You have joined {$classroom->name}.");
+    }
+
+    /** A reply on a class post, from the teacher or any member. */
+    public function reply(Request $request, Classroom $classroom, ClassroomPost $post): RedirectResponse
+    {
+        $user = $request->user();
+
+        abort_unless($post->classroom_id === $classroom->id, 404);
+        abort_unless(
+            $classroom->teacher_id === $user->id || $classroom->students()->whereKey($user->id)->exists(),
+            403,
+        );
+
+        $validated = $request->validate([
+            'body' => ['required', 'string', 'max:2000'],
+        ]);
+
+        $this->createPost($classroom, $user, [
+            'type' => ClassroomPost::TYPE_QUESTION,
+            'title' => null,
+            'body' => $validated['body'],
+            'parent_id' => $post->id,
+        ], $classroom->teacher_id === $user->id);
+
+        $post->increment('replies_count');
+
+        return back()->with('success', 'Reply posted.');
+    }
+
+    /**
+     * Writes a post, masking contact details in anything a student wrote.
+     * The original is kept for moderators, as everywhere else on the platform.
+     */
+    private function createPost(Classroom $classroom, \App\Models\User $author, array $data, bool $isTeacher): ClassroomPost
+    {
+        $body = $data['body'];
+        $original = null;
+
+        if (! $isTeacher) {
+            $filter = app(\App\Domains\Tutoring\Services\ContentFilter::class);
+            $result = $filter->mask($body);
+
+            if ($result['masked'] || $filter->shouldFlag($body)) {
+                $original = $body;
+                $body = $result['body'];
+            }
+        }
+
+        return $classroom->posts()->create([
+            'author_id' => $author->id,
+            'type' => $data['type'],
+            'title' => $data['title'] ?? null,
+            'body' => $body,
+            'body_original' => $original,
+            'is_flagged' => $original !== null,
+            'parent_id' => $data['parent_id'] ?? null,
+            'resource_id' => $data['resource_id'] ?? null,
+            'due_at' => $data['due_at'] ?? null,
+        ]);
     }
 }

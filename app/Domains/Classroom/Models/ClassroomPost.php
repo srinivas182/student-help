@@ -13,16 +13,18 @@ class ClassroomPost extends Model
 {
     use HasFactory;
 
+    public const TYPE_QUESTION = 'question';
+
     public const TYPE_NOTE = 'note';
     public const TYPE_TASK = 'task';
 
     protected $fillable = [
-        'classroom_id', 'author_id', 'type', 'title', 'body', 'resource_id', 'due_at',
+        'classroom_id', 'author_id', 'type', 'title', 'body', 'resource_id', 'due_at', 'parent_id', 'body_original', 'is_flagged', 'is_removed',
     ];
 
     protected function casts(): array
     {
-        return ['due_at' => 'datetime'];
+        return ['due_at' => 'datetime', 'is_flagged' => 'boolean', 'is_removed' => 'boolean'];
     }
 
     public function classroom(): BelongsTo
@@ -49,5 +51,20 @@ class ClassroomPost extends Model
     public function isOverdue(): bool
     {
         return $this->type === self::TYPE_TASK && $this->due_at !== null && $this->due_at->isPast();
+    }
+
+    public function replies(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(self::class, 'parent_id')->oldest();
+    }
+
+    public function parent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function scopeTopLevel(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->whereNull('parent_id');
     }
 }
