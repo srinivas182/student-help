@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\InvitationController;
 use App\Http\Controllers\Admin\VerificationController;
 use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\ClassSessionController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\AssistantController;
 use App\Http\Controllers\CommunityController;
@@ -103,6 +104,15 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/{classroom}/code', [ClassroomController::class, 'rotateCode'])->name('code');
         Route::post('/{classroom}/posts', [ClassroomController::class, 'post'])->name('posts.store');
         Route::post('/{classroom}/posts/{post}/complete', [ClassroomController::class, 'complete'])->name('posts.complete');
+
+        // Scheduled sessions: when the class actually meets, and where
+        Route::post('/{classroom}/sessions', [ClassSessionController::class, 'store'])->name('sessions.store');
+        Route::put('/sessions/{session}', [ClassSessionController::class, 'update'])->name('sessions.update');
+        Route::post('/sessions/{session}/cancel', [ClassSessionController::class, 'cancel'])->name('sessions.cancel');
+        Route::post('/sessions/{session}/respond', [ClassSessionController::class, 'respond'])->name('sessions.respond');
+        Route::get('/sessions/{session}/join', [ClassSessionController::class, 'join'])->name('sessions.join');
+        Route::post('/{classroom}/discoverable', [ClassroomController::class, 'setDiscoverable'])->name('discoverable');
+        Route::post('/{classroom}/request-join', [ClassroomController::class, 'requestJoin'])->name('requestJoin');
     });
 
     // Study material: notes, past papers, solutions (SRS: RES-01 – RES-08)

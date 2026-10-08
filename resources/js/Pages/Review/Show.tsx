@@ -1,3 +1,4 @@
+import Markdown from '@/Components/Markdown';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
@@ -210,9 +211,7 @@ export default function Show({
                 {version.lessonNotes && (
                     <section className="rounded-xl border border-slate-200 bg-white p-5">
                         <h2 className="font-semibold text-slate-900">Revision notes</h2>
-                        <pre className="mt-3 whitespace-pre-wrap font-sans text-sm text-slate-700">
-                            {version.lessonNotes}
-                        </pre>
+                        <Markdown source={version.lessonNotes} className="mt-3" />
                     </section>
                 )}
 

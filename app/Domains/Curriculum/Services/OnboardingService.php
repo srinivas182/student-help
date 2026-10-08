@@ -25,6 +25,20 @@ class OnboardingService
         CurriculumItem::TYPE_FACULTY => ['Select your faculty', 'We will tailor your resources and tutors to it.'],
     ];
 
+    /**
+     * Tutors walk the same curriculum tree, but they are not students: asking
+     * a qualified teacher "where are you studying" and "select your faculty"
+     * reads as though the platform does not know who they are.
+     */
+    private const TUTOR_PROMPTS = [
+        CurriculumItem::TYPE_PATHWAY => ['What do you teach?', 'Choose the pathway your learners are following.'],
+        CurriculumItem::TYPE_INSTITUTION_TYPE => ['Which kind of institution?', 'Where the learners you want to help are studying.'],
+        CurriculumItem::TYPE_TRACK => ['Which programme type?', 'The track your learners are enrolled in.'],
+        CurriculumItem::TYPE_QUALIFICATION => ['Which qualification?', 'The qualification you can help learners with.'],
+        CurriculumItem::TYPE_LEVEL => ['Which level do you teach?', 'Choose the grade or year you are confident teaching.'],
+        CurriculumItem::TYPE_FACULTY => ['Which faculty?', 'We will route questions in this area to you.'],
+    ];
+
     /** The nodes the user has already chosen, in order from pathway downwards. */
     public function context(User $user): Collection
     {
@@ -46,7 +60,11 @@ class OnboardingService
         }
 
         $type = $options->first()->type;
-        [$title, $subtitle] = self::PROMPTS[$type] ?? ['Select an option', 'Choose the option that applies to you.'];
+        $prompts = $user->isTutor() ? self::TUTOR_PROMPTS : self::PROMPTS;
+
+        [$title, $subtitle] = $prompts[$type] ?? ($user->isTutor()
+            ? ['Select an option', 'Choose what applies to the learners you want to help.']
+            : ['Select an option', 'Choose the option that applies to you.']);
 
         return [
             'type' => $type,

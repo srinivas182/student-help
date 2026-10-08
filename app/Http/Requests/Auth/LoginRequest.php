@@ -50,6 +50,30 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Signing in at the wrong door used to authenticate, then redirect
+        // across domains — where the session cookie does not follow, so the
+        // person landed back on a login page with no explanation at all.
+        $portal = app(\App\Domains\Identity\Portal::class);
+
+        if (! $portal->isSharedHost($this)) {
+            $belongsTo = $portal->forUser(Auth::user());
+            $arrivedAt = $portal->current($this);
+
+            if ($belongsTo !== $arrivedAt) {
+                $name = (string) config("portals.{$belongsTo}.name");
+                $url = $portal->urlFor($belongsTo);
+
+                Auth::logout();
+                $this->session()->invalidate();
+
+                throw ValidationException::withMessages([
+                    'email' => $belongsTo === 'student'
+                        ? "This is the teacher site. Students sign in at {$url} — that is where your account lives."
+                        : "This is the student site. Tutors and staff sign in at {$url} ({$name}).",
+                ]);
+            }
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

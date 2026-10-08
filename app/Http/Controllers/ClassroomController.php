@@ -27,12 +27,48 @@ class ClassroomController extends Controller
         $user = $request->user();
 
         if ($user->isStudent()) {
+            $subjectIds = $user->subjects()->pluck('curriculum_items.id');
+            $myClassIds = $user->classrooms()->pluck('classrooms.id');
+
             return Inertia::render('Classrooms/StudentIndex', [
                 'classrooms' => $user->classrooms()
                     ->with(['teacher:id,first_name,last_name', 'institution:id,name', 'subject:id,name'])
                     ->withCount('students')
                     ->get()
                     ->map(fn (Classroom $c) => $this->present($c)),
+
+                // Everything coming up, across every class they are in
+                'upcoming' => app(\App\Domains\Classroom\Services\SessionService::class)
+                    ->upcomingFor($user)
+                    ->map(fn (\App\Domains\Classroom\Models\ClassSession $session) => [
+                        'id' => $session->id,
+                        'title' => $session->title,
+                        'classroom' => $session->classroom?->name,
+                        'classroomId' => $session->classroom_id,
+                        'whenLabel' => $session->whenLabel(),
+                        'mode' => $session->mode,
+                        'location' => $session->location,
+                        'isJoinable' => $session->isJoinable(),
+                    ]),
+
+                // A code is not the only way in: open classes in their own
+                // subjects are listed so a learner can find one themselves
+                'discoverable' => Classroom::discoverable()
+                    ->whereNotIn('id', $myClassIds)
+                    ->when($subjectIds->isNotEmpty(), fn ($q) => $q->whereIn('curriculum_item_id', $subjectIds))
+                    ->with(['teacher:id,first_name,last_name', 'subject:id,name'])
+                    ->withCount('students')
+                    ->limit(12)
+                    ->get()
+                    ->map(fn (Classroom $c) => [
+                        'id' => $c->id,
+                        'name' => $c->name,
+                        'about' => $c->about,
+                        'teacher' => $c->teacher?->name,
+                        'subject' => $c->subject?->name,
+                        'students' => $c->students_count,
+                        'nextSession' => $c->sessions()->upcoming()->first()?->whenLabel(),
+                    ]),
             ]);
         }
 
@@ -94,9 +130,38 @@ class ClassroomController extends Controller
 
         $classroom->load(['teacher:id,first_name,last_name', 'institution:id,name', 'subject:id,name']);
 
+        $user = $request->user();
+
         return Inertia::render('Classrooms/Show', [
+            // The schedule is the point of a class: without it this page is a
+            // noticeboard and nobody knows when to turn up.
+            'sessions' => $classroom->sessions()
+                ->where('starts_at', '>=', now()->subWeek())
+                ->orderBy('starts_at')
+                ->with('attendees:id')
+                ->get()
+                ->map(fn (\App\Domains\Classroom\Models\ClassSession $session) => [
+                    'id' => $session->id,
+                    'title' => $session->title,
+                    'description' => $session->description,
+                    'mode' => $session->mode,
+                    'meetingUrl' => $session->isJoinable() ? $session->meeting_url : null,
+                    'location' => $session->location,
+                    'startsAt' => $session->starts_at->toIso8601String(),
+                    'whenLabel' => $session->whenLabel(),
+                    'durationMinutes' => $session->duration_minutes,
+                    'status' => $session->status,
+                    'cancelReason' => $session->cancel_reason,
+                    'isJoinable' => $session->isJoinable(),
+                    'isPast' => $session->isPast(),
+                    'repeats' => $session->repeats ?? ($session->parent_session_id ? 'weekly' : null),
+                    'goingCount' => $session->attendees->count(),
+                    'myResponse' => $session->attendees->firstWhere('id', $user->id)?->pivot?->response,
+                ]),
             'classroom' => $this->present($classroom) + [
                 'description' => $classroom->description,
+                'about' => $classroom->about,
+                'isDiscoverable' => (bool) $classroom->is_discoverable,
                 'joinCode' => $isTeacher ? $classroom->join_code : null,
                 'joinCodeActive' => $classroom->join_code_active,
                 'schoolLinkStatus' => $classroom->school_link_status,
@@ -122,7 +187,9 @@ class ClassroomController extends Controller
                     ->map(fn (User $student) => [
                         'id' => $student->id,
                         'name' => $student->name,
-                        'joinedAt' => $student->pivot->joined_at?->toFormattedDateString(),
+                        'joinedAt' => $student->pivot->joined_at
+                            ? \Illuminate\Support\Carbon::parse($student->pivot->joined_at)->toFormattedDateString()
+                            : null,
                     ])
                 : [],
             'memberCount' => $classroom->students()->count(),
@@ -249,5 +316,57 @@ class ClassroomController extends Controller
             'students' => $classroom->students_count ?? $classroom->students()->count(),
             'capacity' => $classroom->capacity,
         ];
+    }
+
+    /** A teacher can list the class so students in that subject can find it. */
+    public function setDiscoverable(Request $request, Classroom $classroom): \Illuminate\Http\RedirectResponse
+    {
+        abort_unless($classroom->teacher_id === $request->user()->id, 403);
+
+        $validated = $request->validate([
+            'is_discoverable' => ['required', 'boolean'],
+            'about' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $classroom->update([
+            'is_discoverable' => $validated['is_discoverable'],
+            'about' => $validated['about'] ?? $classroom->about,
+        ]);
+
+        return back()->with('success', $validated['is_discoverable']
+            ? 'Students studying this subject can now find your class.'
+            : 'Your class is private again. Only your join code works.');
+    }
+
+    /** Joining an open class, without needing a code from the teacher. */
+    public function requestJoin(Request $request, Classroom $classroom): \Illuminate\Http\RedirectResponse
+    {
+        $user = $request->user();
+
+        abort_unless($classroom->is_discoverable && ! $classroom->is_archived, 404);
+
+        if (! $user->canParticipate()) {
+            return back()->withErrors([
+                'join' => 'Your parent or guardian needs to approve your account before you can join a class.',
+            ]);
+        }
+
+        if ($classroom->students()->whereKey($user->id)->exists()) {
+            return redirect()->route('classrooms.show', $classroom);
+        }
+
+        if ($classroom->capacity && $classroom->students()->count() >= $classroom->capacity) {
+            return back()->withErrors(['join' => 'That class is full.']);
+        }
+
+        $classroom->members()->updateOrCreate(
+            ['user_id' => $user->id],
+            ['status' => \App\Domains\Classroom\Models\ClassroomMember::STATUS_ACTIVE, 'joined_at' => now()],
+        );
+
+        audit('classroom.joined', $classroom, ['via' => 'discovery']);
+
+        return redirect()->route('classrooms.show', $classroom)
+            ->with('success', "You have joined {$classroom->name}.");
     }
 }

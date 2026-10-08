@@ -1,3 +1,4 @@
+import Markdown from '@/Components/Markdown';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
@@ -192,9 +193,7 @@ export default function Preview({
                 {tab === 'notes' && (
                     <section className="rounded-xl border border-slate-200 bg-white p-6">
                         {notes ? (
-                            <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-slate-700">
-                                {notes}
-                            </pre>
+                            <Markdown source={notes} />
                         ) : (
                             <p className="text-sm text-slate-500">No revision notes.</p>
                         )}

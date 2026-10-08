@@ -1,5 +1,7 @@
 import VoiceNotePlayer from '@/Components/VoiceNotePlayer';
 import VoiceRecorder from '@/Components/VoiceRecorder';
+import ScheduleForm from '@/Components/Classroom/ScheduleForm';
+import SessionList, { ClassSession } from '@/Components/Classroom/SessionList';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
@@ -19,6 +21,7 @@ interface Post {
 }
 
 export default function Show({
+    sessions,
     classroom,
     isTeacher,
     posts,
@@ -26,6 +29,7 @@ export default function Show({
     memberCount,
     voiceNotes,
 }: {
+    sessions: ClassSession[];
     classroom: {
         id: number;
         displayName: string;
@@ -69,6 +73,16 @@ export default function Show({
             header={<h2 className="text-xl font-semibold text-slate-800">{classroom.displayName}</h2>}
         >
             <Head title={classroom.displayName} />
+
+                {/* The schedule: without it a class is just a noticeboard */}
+                <section className="rounded-xl border border-slate-200 bg-white p-6">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                        <h2 className="font-semibold text-slate-900">Schedule</h2>
+                        {isTeacher && <ScheduleForm classroomId={classroom.id} />}
+                    </div>
+
+                    <SessionList sessions={sessions} isTeacher={isTeacher} />
+                </section>
 
             <div className="mx-auto max-w-4xl space-y-5 px-4 py-8 sm:px-6">
                 <Link href={route('classrooms.index')} className="text-sm text-slate-500 hover:text-slate-800">

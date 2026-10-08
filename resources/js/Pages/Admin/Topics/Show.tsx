@@ -118,6 +118,52 @@ export default function Show({
         <AuthenticatedLayout header={<h2 className="text-xl font-semibold text-slate-800">{topic.title}</h2>}>
             <Head title={topic.title} />
 
+                {/* Three steps, with the current one obvious: the screen used to
+                    be three forms with no sense of order or progress. */}
+                <nav aria-label="Progress" className="rounded-xl border border-slate-200 bg-white p-5">
+                    <ol className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+                        {[
+                            {
+                                label: 'Add source material',
+                                hint: 'Notes, a past paper, or paste the text',
+                                done: sources.length > 0,
+                            },
+                            {
+                                label: 'Generate the lesson',
+                                hint: 'Pick languages and see the cost first',
+                                done: versions.length > 0,
+                            },
+                            {
+                                label: 'A teacher reviews it',
+                                hint: 'Nothing reaches students unchecked',
+                                done: versions.some((v) => v.status === 'published'),
+                            },
+                        ].map((step, index) => (
+                            <li key={step.label} className="flex flex-1 items-start gap-3">
+                                <span
+                                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                                        step.done
+                                            ? 'bg-emerald-600 text-white'
+                                            : 'bg-slate-200 text-slate-600'
+                                    }`}
+                                >
+                                    {step.done ? '✓' : index + 1}
+                                </span>
+                                <span className="min-w-0">
+                                    <span
+                                        className={`block text-sm font-medium ${
+                                            step.done ? 'text-slate-900' : 'text-slate-600'
+                                        }`}
+                                    >
+                                        {step.label}
+                                    </span>
+                                    <span className="block text-xs text-slate-500">{step.hint}</span>
+                                </span>
+                            </li>
+                        ))}
+                    </ol>
+                </nav>
+
             <div className="mx-auto max-w-4xl space-y-5 px-4 py-8 sm:px-6">
                 <Link href={route('admin.topics.index')} className="text-sm text-slate-500 hover:text-slate-800">
                     ← All topics
@@ -231,7 +277,9 @@ export default function Show({
 
                     {sources.length === 0 ? (
                         <p className="mt-4 text-sm text-slate-500">
-                            No sources yet. The lesson is built from what you add here.
+                            Nothing here yet. The lesson is written from whatever you add — a set
+                            of teacher notes, a past paper, or text pasted straight in. One good
+                            source is enough to start.
                         </p>
                     ) : (
                         <ul className="mt-4 divide-y divide-slate-100">
@@ -313,7 +361,8 @@ export default function Show({
                     </button>
                     {!canGenerate && (
                         <p className="mt-2 text-xs text-amber-700">
-                            Add at least one readable source first.
+                            Add at least one source above first — the lesson is built from it, not
+                            from the topic title alone.
                         </p>
                     )}
 

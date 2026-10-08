@@ -21,6 +21,7 @@ class NotificationPreferences
         'rating_received' => 'A student rates your help',
         'tutor_verification' => 'Your tutor verification is reviewed',
         'announcement' => 'Important announcements',
+        'class_session' => 'A class session is scheduled, moved or cancelled',
     ];
 
     /** Channels that cannot be disabled — account, security and consent email. */

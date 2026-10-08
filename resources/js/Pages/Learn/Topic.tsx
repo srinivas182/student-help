@@ -1,3 +1,4 @@
+import Markdown from '@/Components/Markdown';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -286,9 +287,13 @@ export default function Topic({
 
                 {tab === 'notes' && (
                     <article className="rounded-xl border border-slate-200 bg-white p-6">
-                        <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-slate-700">
-                            {version.notes ?? 'No revision notes for this lesson yet.'}
-                        </pre>
+                        {version.notes ? (
+                            <Markdown source={version.notes} />
+                        ) : (
+                            <p className="text-sm text-slate-500">
+                                No revision notes for this lesson yet.
+                            </p>
+                        )}
                     </article>
                 )}
 

@@ -25,13 +25,13 @@ class Classroom extends Model
 
     protected $fillable = [
         'teacher_id', 'name', 'description', 'type', 'institution_id', 'school_link_status',
-        'school_link_notes', 'curriculum_item_id', 'join_code', 'join_code_active',
+        'school_link_notes', 'curriculum_item_id', 'join_code', 'is_discoverable', 'about', 'join_code_active',
         'capacity', 'is_archived',
     ];
 
     protected function casts(): array
     {
-        return ['join_code_active' => 'boolean', 'is_archived' => 'boolean'];
+        return ['join_code_active' => 'boolean', 'is_archived' => 'boolean', 'is_discoverable' => 'boolean'];
     }
 
     public function teacher(): BelongsTo
@@ -54,11 +54,25 @@ class Classroom extends Model
         return $this->hasMany(ClassroomMember::class);
     }
 
+    public function sessions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ClassSession::class);
+    }
+
+    /** Classes a student may ask to join without needing a code. */
+    public function scopeDiscoverable(\Illuminate\Database\Eloquent\Builder $query): \Illuminate\Database\Eloquent\Builder
+    {
+        return $query->where('is_discoverable', true)->where('is_archived', false);
+    }
+
     public function students(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'classroom_members')
             ->wherePivot('status', ClassroomMember::STATUS_ACTIVE)
             ->withPivot(['status', 'joined_at'])
+            // Without this, joined_at comes back as a raw string and every
+            // date call on it fails
+            ->using(ClassroomMember::class)
             ->withTimestamps();
     }
 

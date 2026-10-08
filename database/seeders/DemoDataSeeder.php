@@ -524,6 +524,17 @@ class DemoDataSeeder extends Seeder
                 'capacity' => 40,
             ]);
 
+            // One class is open to discovery so the join-without-a-code flow
+            // can be demonstrated; the other stays code-only.
+            $classroom->update([
+                'is_discoverable' => $index === 0,
+                'about' => $index === 0
+                    ? 'Open to any Grade 11 learner taking this subject. We work through past papers together.'
+                    : null,
+            ]);
+
+            $this->seedSessions($classroom);
+
             foreach ($students->shuffle()->take(5) as $student) {
                 if ($student->canParticipate()) {
                     $service->join($classroom, $student);
@@ -760,6 +771,47 @@ class DemoDataSeeder extends Seeder
 
         $user->subjects()->sync($subjects->pluck('id')->mapWithKeys(fn ($id) => [$id => ['role' => 'subject']]));
         $user->update(['onboarding_completed_at' => now()->subDays(rand(5, 30))]);
+    }
+
+    /** Sessions, so the schedule is demonstrable rather than empty. */
+    private function seedSessions(\App\Domains\Classroom\Models\Classroom $classroom): void
+    {
+        \App\Domains\Classroom\Models\ClassSession::create([
+            'classroom_id' => $classroom->id,
+            'title' => 'Revision: factorising trinomials',
+            'description' => 'Bring your Paper 1 past paper and any question you are stuck on.',
+            'mode' => 'online',
+            'meeting_url' => 'https://meet.google.com/dxs-demo-abc',
+            'starts_at' => now()->addDays(2)->setTime(16, 0),
+            'duration_minutes' => 45,
+        ]);
+
+        // Through the service, so the weekly repeats are really created rather
+        // than just labelled as recurring
+        app(\App\Domains\Classroom\Services\SessionService::class)->schedule(
+            $classroom,
+            $classroom->teacher,
+            [
+                'title' => 'Weekly maths catch-up',
+                'mode' => 'in_person',
+                'location' => 'Room 12, the school library',
+                'starts_at' => now()->addDay()->setTime(14, 30),
+                'duration_minutes' => 60,
+                'repeats' => 'weekly',
+                'repeats_until' => now()->addWeeks(6),
+            ],
+        );
+
+        // One already past, so the archive is visible too
+        \App\Domains\Classroom\Models\ClassSession::create([
+            'classroom_id' => $classroom->id,
+            'title' => 'Introduction and goal setting',
+            'mode' => 'online',
+            'meeting_url' => 'https://meet.google.com/dxs-demo-xyz',
+            'starts_at' => now()->subWeek()->setTime(15, 0),
+            'duration_minutes' => 30,
+            'status' => 'done',
+        ]);
     }
 
     /**
