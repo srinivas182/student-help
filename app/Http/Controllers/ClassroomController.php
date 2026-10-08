@@ -292,7 +292,9 @@ class ClassroomController extends Controller
             'due_at' => ['nullable', 'date', 'after:now'],
         ]);
 
-        $this->createPost($classroom, $user, $validated, $isTeacher);
+        $post = $this->createPost($classroom, $user, $validated, $isTeacher);
+
+        $this->notifyAboutPost($classroom, $post, $user, $isTeacher);
 
         return back()->with('success', $isTeacher
             ? 'Posted to the class.'
@@ -412,7 +414,7 @@ class ClassroomController extends Controller
             'body' => ['required', 'string', 'max:2000'],
         ]);
 
-        $this->createPost($classroom, $user, [
+        $reply = $this->createPost($classroom, $user, [
             'type' => ClassroomPost::TYPE_QUESTION,
             'title' => null,
             'body' => $validated['body'],
@@ -420,6 +422,8 @@ class ClassroomController extends Controller
         ], $classroom->teacher_id === $user->id);
 
         $post->increment('replies_count');
+
+        $this->notifyAboutReply($classroom, $post, $reply, $user);
 
         return back()->with('success', 'Reply posted.');
     }
@@ -454,5 +458,72 @@ class ClassroomController extends Controller
             'resource_id' => $data['resource_id'] ?? null,
             'due_at' => $data['due_at'] ?? null,
         ]);
+    }
+
+    /**
+     * A new question goes to the teacher. A teacher's note or task goes to the
+     * whole class, because that is what it is for.
+     */
+    private function notifyAboutPost(
+        Classroom $classroom,
+        ClassroomPost $post,
+        \App\Models\User $author,
+        bool $isTeacher,
+    ): void {
+        if ($isTeacher) {
+            $recipients = $classroom->students()->get();
+            $headline = $post->type === ClassroomPost::TYPE_TASK
+                ? "New task in {$classroom->name}"
+                : "New post in {$classroom->name}";
+        } else {
+            // Only the teacher: a class of thirty does not need telling that
+            // one of them asked something
+            $recipients = collect([$classroom->teacher])->filter();
+            $headline = "New question in {$classroom->name}";
+        }
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        \Illuminate\Support\Facades\Notification::send(
+            $recipients,
+            new \App\Notifications\ClassPostActivity($post, $headline, $author->first_name),
+        );
+    }
+
+    /**
+     * A reply reaches the people in that conversation: whoever asked, anyone
+     * who already replied, and the teacher. Not the whole class.
+     */
+    private function notifyAboutReply(
+        Classroom $classroom,
+        ClassroomPost $post,
+        ClassroomPost $reply,
+        \App\Models\User $author,
+    ): void {
+        $participantIds = $post->replies()->pluck('author_id')
+            ->push($post->author_id)
+            ->push($classroom->teacher_id)
+            ->unique()
+            ->reject(fn ($id) => $id === $author->id)
+            ->values();
+
+        if ($participantIds->isEmpty()) {
+            return;
+        }
+
+        $recipients = \App\Models\User::whereIn('id', $participantIds)->get();
+
+        \Illuminate\Support\Facades\Notification::send(
+            $recipients,
+            new \App\Notifications\ClassPostActivity(
+                $post,
+                $author->id === $classroom->teacher_id
+                    ? "Your teacher replied in {$classroom->name}"
+                    : "New reply in {$classroom->name}",
+                $author->first_name,
+            ),
+        );
     }
 }

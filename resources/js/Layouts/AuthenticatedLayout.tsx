@@ -4,6 +4,7 @@ import NavGroup from '@/Components/NavGroup';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import NotificationBell from '@/Components/NotificationBell';
+import AskFab from '@/Components/AskFab';
 import BuiltBy from '@/Components/BuiltBy';
 import GlobalSearch from '@/Components/GlobalSearch';
 import MobileTabBar from '@/Components/MobileTabBar';
@@ -429,6 +430,7 @@ export default function Authenticated({
             </footer>
 
             {!isStaff && <MobileTabBar />}
+            {!isStaff && <AskFab />}
         </div>
     );
 }

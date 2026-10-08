@@ -22,6 +22,7 @@ class NotificationPreferences
         'tutor_verification' => 'Your tutor verification is reviewed',
         'announcement' => 'Important announcements',
         'class_session' => 'A class session is scheduled, moved or cancelled',
+        'class_post' => 'Someone asks or answers in one of your classes',
     ];
 
     /** Channels that cannot be disabled — account, security and consent email. */
