@@ -1,5 +1,6 @@
 import VoiceNotePlayer from '@/Components/VoiceNotePlayer';
 import VoiceRecorder from '@/Components/VoiceRecorder';
+import ClassAsk from '@/Components/Classroom/ClassAsk';
 import ClassFeed, { ClassPost } from '@/Components/Classroom/ClassFeed';
 import ScheduleForm from '@/Components/Classroom/ScheduleForm';
 import SessionList, { ClassSession } from '@/Components/Classroom/SessionList';
@@ -22,6 +23,7 @@ interface Post {
 }
 
 export default function Show({
+    canParticipate,
     sessions,
     classroom,
     isTeacher,
@@ -30,6 +32,7 @@ export default function Show({
     memberCount,
     voiceNotes,
 }: {
+    canParticipate: boolean;
     sessions: ClassSession[];
     classroom: {
         id: number;
@@ -240,10 +243,20 @@ export default function Show({
                     </section>
                 )}
 
-                <section>
-                    <h2 className="mb-3 font-semibold text-slate-900">
-                        {isTeacher ? 'Class feed' : 'Questions and notes'}
-                    </h2>
+                <section id="class-feed">
+                    <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                        <h2 className="font-semibold text-slate-900">
+                            {isTeacher ? 'Class feed' : 'Questions and notes'}
+                        </h2>
+
+                        {!isTeacher && (
+                            <ClassAsk
+                                classroomId={classroom.id}
+                                teacherName={classroom.teacher}
+                                canParticipate={canParticipate}
+                            />
+                        )}
+                    </div>
 
                     <ClassFeed classroomId={classroom.id} posts={posts} isTeacher={isTeacher} />
                 </section>

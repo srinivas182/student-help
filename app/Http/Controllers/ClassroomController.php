@@ -209,6 +209,7 @@ class ClassroomController extends Controller
                     ])
                 : [],
             'memberCount' => $classroom->students()->count(),
+            'canParticipate' => $user->canParticipate(),
             'voiceNotes' => VoiceNote::where('attachable_type', $classroom->getMorphClass())
                 ->where('attachable_id', $classroom->id)
                 ->with('user:id,first_name,last_name')
@@ -553,5 +554,53 @@ class ClassroomController extends Controller
             ->report($user, $post, $validated['reason']);
 
         return back()->with('success', 'Thank you. A moderator will review this.');
+    }
+
+    /**
+     * Asking the class teacher directly, from inside the class.
+     *
+     * Reuses the help-request machinery rather than inventing a second
+     * messaging system: the subject and the tutor are both already known, so
+     * the learner skips the pick-a-subject, pick-a-topic, wait-for-a-tutor
+     * steps they would otherwise have to repeat.
+     */
+    public function askTeacher(Request $request, Classroom $classroom): RedirectResponse
+    {
+        $user = $request->user();
+
+        abort_unless($classroom->students()->whereKey($user->id)->exists(), 403);
+
+        if (! $user->canParticipate()) {
+            return back()->withErrors([
+                'ask' => 'Your parent or guardian needs to approve your account before you can message a tutor.',
+            ]);
+        }
+
+        abort_unless($classroom->teacher_id, 422, 'This class has no teacher to ask.');
+
+        $validated = $request->validate([
+            'topic' => ['required', 'string', 'max:150'],
+            'description' => ['required', 'string', 'min:10', 'max:2000'],
+        ], [
+            'description.min' => 'Give your teacher enough detail to help you.',
+        ]);
+
+        $helpRequest = \App\Domains\Tutoring\Models\HelpRequest::create([
+            'student_id' => $user->id,
+            'tutor_id' => $classroom->teacher_id,
+            'subject_id' => $classroom->curriculum_item_id,
+            'topic' => $validated['topic'],
+            'description' => $validated['description'],
+            'status' => \App\Domains\Tutoring\Models\HelpRequest::STATUS_ASSIGNED,
+            'assigned_at' => now(),
+            'last_activity_at' => now(),
+        ]);
+
+        $classroom->teacher?->notify(new \App\Notifications\RequestAccepted($helpRequest));
+
+        audit('help_request.created', $helpRequest, ['via' => 'classroom', 'classroom_id' => $classroom->id]);
+
+        return redirect()->route('conversations.show', $helpRequest)
+            ->with('success', "Your question has gone straight to {$classroom->teacher->first_name}.");
     }
 }

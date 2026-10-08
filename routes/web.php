@@ -108,6 +108,8 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
             ->middleware('throttle:messaging')->name('posts.reply');
         Route::post('/{classroom}/posts/{post}/report', [ClassroomController::class, 'reportPost'])
             ->name('posts.report');
+        Route::post('/{classroom}/ask-teacher', [ClassroomController::class, 'askTeacher'])
+            ->middleware('throttle:requests')->name('askTeacher');
 
         // Scheduled sessions: when the class actually meets, and where
         Route::post('/{classroom}/sessions', [ClassSessionController::class, 'store'])->name('sessions.store');

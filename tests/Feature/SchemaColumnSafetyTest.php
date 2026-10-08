@@ -26,15 +26,20 @@ it('references only columns that exist', function () {
 
     $offenders = [];
 
+    // Controllers query too — scanning only app/Domains missed them entirely
     $files = collect(File::allFiles(app_path('Domains')))
+        ->merge(File::allFiles(app_path('Http')))
+        ->merge(File::allFiles(app_path('Console')))
         ->filter(fn ($file) => $file->getExtension() === 'php');
 
     foreach ($files as $file) {
         $code = File::get($file->getPathname());
 
-        // where('column', …), whereNotNull('column'), orderBy('column'), pluck('column')
+        // Only methods that are query-builder specific. where() and pluck()
+        // are left out: collections have them too, and a collection key is not
+        // a column, which produced false positives on perfectly good code.
         preg_match_all(
-            "/->(?:where|orWhere|whereNot|whereNotNull|whereNull|orderBy|orderByDesc|pluck|groupBy)\(\s*'([a-z_]{3,40})'/",
+            "/->(?:whereNotNull|whereNull|orderBy|orderByDesc|groupBy|whereDate|whereIn)\(\s*'([a-z_]{3,40})'/",
             $code,
             $matches,
         );

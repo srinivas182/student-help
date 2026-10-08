@@ -42,6 +42,12 @@ export default function AskFab() {
         return null;
     }
 
+    // A class has its own ask button that already knows the subject and the
+    // teacher, so a second, vaguer one here would only confuse
+    if (route().current('classrooms.show')) {
+        return null;
+    }
+
     const options = [
         {
             label: 'Ask a tutor',
