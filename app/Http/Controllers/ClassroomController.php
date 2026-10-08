@@ -526,4 +526,32 @@ class ClassroomController extends Controller
             ),
         );
     }
+
+    /**
+     * Reporting a class post.
+     *
+     * Deletion stays with moderators — nothing in a class can be erased before
+     * it has been seen, which matters on a platform used by minors. So the
+     * route for a post someone regrets, or one a teacher wants gone, is to put
+     * it in front of a moderator rather than to remove it.
+     */
+    public function reportPost(Request $request, Classroom $classroom, ClassroomPost $post): RedirectResponse
+    {
+        $user = $request->user();
+
+        abort_unless($post->classroom_id === $classroom->id, 404);
+        abort_unless(
+            $classroom->teacher_id === $user->id || $classroom->students()->whereKey($user->id)->exists(),
+            403,
+        );
+
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'in:inappropriate,contact_details,academic_dishonesty,harassment,spam,other'],
+        ]);
+
+        app(\App\Domains\Tutoring\Services\ModerationService::class)
+            ->report($user, $post, $validated['reason']);
+
+        return back()->with('success', 'Thank you. A moderator will review this.');
+    }
 }

@@ -66,6 +66,14 @@ read is written to the audit log.
 **Tutor documents are visible to administrators.** Necessary for verification.
 Access is logged with the administrator's identity and timestamp.
 
+**Class posts cannot be deleted by their author or by the teacher.** Only
+moderators can remove content, and every removal is audit logged. This is a
+deliberate decision, confirmed with DX: allowing deletion would also allow
+someone to erase something before a moderator has seen it, which matters more
+on a platform used by minors than the convenience of tidying up a post. The
+route for a post that should not stand is the Report button, which puts it in
+front of a moderator without removing it.
+
 ## Before going live
 
 - [ ] `platform:security-check` passes

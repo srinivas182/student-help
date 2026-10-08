@@ -44,7 +44,9 @@ export default function ClassFeed({
     isTeacher: boolean;
 }) {
     const [replyingTo, setReplyingTo] = useState<number | null>(null);
+    const [reporting, setReporting] = useState<number | null>(null);
     const reply = useForm({ body: '' });
+    const report = useForm({ reason: 'inappropriate' });
     const ask = useForm({ type: 'question', title: '', body: '' });
 
     return (
@@ -205,12 +207,68 @@ export default function ClassFeed({
                                     </button>
                                 </div>
                             ) : (
-                                <button
-                                    onClick={() => setReplyingTo(post.id)}
-                                    className="mt-3 text-xs font-medium text-slate-500 hover:text-slate-800"
-                                >
-                                    Reply
-                                </button>
+                                <div className="mt-3 flex items-center gap-4">
+                                    <button
+                                        onClick={() => setReplyingTo(post.id)}
+                                        className="text-xs font-medium text-slate-500 hover:text-slate-800"
+                                    >
+                                        Reply
+                                    </button>
+
+                                    {/* Nothing here can be deleted, so reporting is
+                                        the route for a post that should not stand */}
+                                    <button
+                                        onClick={() => setReporting(reporting === post.id ? null : post.id)}
+                                        className="text-xs text-slate-400 hover:text-rose-600"
+                                    >
+                                        Report
+                                    </button>
+                                </div>
+                            )}
+
+                            {reporting === post.id && (
+                                <div className="mt-3 space-y-2 rounded-lg bg-slate-50 p-4">
+                                    <p className="text-xs text-slate-600">
+                                        A moderator will review this. Posts cannot be deleted, so nothing
+                                        disappears before it has been looked at.
+                                    </p>
+
+                                    <select
+                                        value={report.data.reason}
+                                        onChange={(e) => report.setData('reason', e.target.value)}
+                                        className="block w-full rounded-lg border-slate-300 text-sm"
+                                    >
+                                        <option value="inappropriate">Inappropriate content</option>
+                                        <option value="contact_details">Sharing contact details</option>
+                                        <option value="academic_dishonesty">Asking for answers, not help</option>
+                                        <option value="harassment">Harassment or bullying</option>
+                                        <option value="spam">Spam</option>
+                                        <option value="other">Something else</option>
+                                    </select>
+
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={() =>
+                                                report.post(
+                                                    route('classrooms.posts.report', [classroomId, post.id]),
+                                                    {
+                                                        preserveScroll: true,
+                                                        onSuccess: () => setReporting(null),
+                                                    },
+                                                )
+                                            }
+                                            className="rounded-lg bg-rose-600 px-4 py-2 text-xs font-semibold text-white"
+                                        >
+                                            Report it
+                                        </button>
+                                        <button
+                                            onClick={() => setReporting(null)}
+                                            className="rounded-lg border border-slate-300 px-4 py-2 text-xs text-slate-600"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
                             )}
                         </li>
                     ))}
