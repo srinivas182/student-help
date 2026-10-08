@@ -1,3 +1,4 @@
+import BuiltBy from '@/Components/BuiltBy';
 import { Link, usePage } from '@inertiajs/react';
 import { PropsWithChildren, ReactNode } from 'react';
 
@@ -120,7 +121,9 @@ export default function Guest({
 
                     {children}
 
-                    <p className="mt-10 border-t border-slate-100 pt-5 text-center text-xs text-slate-500">
+                    <BuiltBy className="mt-10 border-t border-slate-100 pt-5" />
+
+                    <p className="mt-3 text-center text-xs text-slate-500">
                         {panel.switchLabel}{' '}
                         <a
                             href={otherUrl}

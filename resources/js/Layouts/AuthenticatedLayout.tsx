@@ -4,6 +4,7 @@ import NavGroup from '@/Components/NavGroup';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import NotificationBell from '@/Components/NotificationBell';
+import BuiltBy from '@/Components/BuiltBy';
 import GlobalSearch from '@/Components/GlobalSearch';
 import MobileTabBar from '@/Components/MobileTabBar';
 import { Link, usePage } from '@inertiajs/react';
@@ -422,6 +423,10 @@ export default function Authenticated({
 
             {/* Padding keeps the last line of content clear of the tab bar */}
             <main className="pb-20 md:pb-0">{children}</main>
+
+            <footer className="border-t border-slate-200 bg-white px-4 py-6 pb-24 md:pb-6">
+                <BuiltBy />
+            </footer>
 
             {!isStaff && <MobileTabBar />}
         </div>

@@ -1,3 +1,4 @@
+import BuiltBy from '@/Components/BuiltBy';
 import { Head, useForm } from '@inertiajs/react';
 
 interface Props {
@@ -17,6 +18,7 @@ function Shell({ children }: { children: React.ReactNode }) {
                 <p className="mb-6 text-sm font-semibold tracking-wide text-indigo-600">DX STUDENT HELP</p>
                 {children}
             </div>
+            <BuiltBy className="mt-8 pb-6" />
         </div>
     );
 }

@@ -1,3 +1,4 @@
+import BuiltBy from '@/Components/BuiltBy';
 import { Head } from '@inertiajs/react';
 import { useEffect, useRef } from 'react';
 
@@ -61,6 +62,7 @@ export default function Checkout({
                     If nothing happens in a few seconds, press the button.
                 </p>
             </div>
+            <BuiltBy className="mt-8 pb-6" />
         </div>
     );
 }

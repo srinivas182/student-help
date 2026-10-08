@@ -1,3 +1,4 @@
+import BuiltBy from '@/Components/BuiltBy';
 import { Link } from '@inertiajs/react';
 import { PropsWithChildren, useState } from 'react';
 
@@ -170,11 +171,15 @@ export default function PublicLayout({
                         </div>
                     </div>
 
-                    <p className="mt-10 border-t border-slate-200 pt-6 text-xs text-slate-500">
-                        © {new Date().getFullYear()} The X Student Help (PTY) LTD. Built for South African
-                        learners. Every tutor is verified, and all conversations are monitored to keep young
-                        people safe.
-                    </p>
+                    <div className="mt-10 space-y-3 border-t border-slate-200 pt-6">
+                        <p className="text-xs text-slate-500">
+                            © {new Date().getFullYear()} The X Student Help (PTY) LTD. Built for South
+                            African learners. Every tutor is verified, and all conversations are monitored
+                            to keep young people safe.
+                        </p>
+
+                        <BuiltBy className="sm:text-left" />
+                    </div>
                 </div>
             </footer>
         </div>

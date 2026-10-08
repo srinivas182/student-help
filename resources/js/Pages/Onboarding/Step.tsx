@@ -1,3 +1,4 @@
+import BuiltBy from '@/Components/BuiltBy';
 import { Head, router, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
@@ -106,6 +107,7 @@ export default function Step({ step, canGoBack }: { step: StepData; canGoBack: b
                     You can always change this later in your profile settings.
                 </p>
             </div>
+            <BuiltBy className="mt-8 pb-6" />
         </div>
     );
 }

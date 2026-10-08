@@ -1,3 +1,4 @@
+import BuiltBy from '@/Components/BuiltBy';
 import { Head, Link } from '@inertiajs/react';
 
 /**
@@ -87,6 +88,10 @@ export default function Certificate({
                         </div>
                     </div>
                 </article>
+
+                {/* On screen only: a certificate the learner prints should carry
+                    DX's name, not ours. */}
+                <BuiltBy className="mt-8 print:hidden" />
             </div>
         </div>
     );

@@ -1,3 +1,4 @@
+import BuiltBy from '@/Components/BuiltBy';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
@@ -132,6 +133,7 @@ export default function Subjects({
                     </div>
                 </div>
             </form>
+            <BuiltBy className="mt-8 pb-6" />
         </div>
     );
 }
