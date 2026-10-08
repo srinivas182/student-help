@@ -33,7 +33,7 @@ class SubjectProgressService
             ->pluck('topic_id');
 
         $masteredIds = TopicMastery::where('user_id', $student->id)
-            ->where('highest_level_passed', '!=', null)
+            ->whereNotNull('highest_level')
             ->pluck('topic_id');
 
         return $subjects->map(function ($subject) use ($topics, $completedIds, $masteredIds) {
