@@ -47,50 +47,9 @@ export default function ClassFeed({
     const [reporting, setReporting] = useState<number | null>(null);
     const reply = useForm({ body: '' });
     const report = useForm({ reason: 'inappropriate' });
-    const ask = useForm({ type: 'question', title: '', body: '' });
 
     return (
         <div className="space-y-4">
-            {!isTeacher && (
-                <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        ask.post(route('classrooms.posts.store', classroomId), {
-                            preserveScroll: true,
-                            onSuccess: () => ask.reset(),
-                        });
-                    }}
-                    className="rounded-xl border border-slate-200 bg-white p-5"
-                >
-                    <label className="text-sm font-medium text-slate-700">
-                        Ask your class a question
-                    </label>
-                    <input
-                        value={ask.data.title}
-                        onChange={(e) => ask.setData('title', e.target.value)}
-                        placeholder="What are you stuck on?"
-                        className="mt-2 block w-full rounded-lg border-slate-300 text-sm"
-                    />
-                    {ask.errors.title && <p className="mt-1 text-xs text-rose-600">{ask.errors.title}</p>}
-
-                    <textarea
-                        value={ask.data.body}
-                        onChange={(e) => ask.setData('body', e.target.value)}
-                        rows={3}
-                        placeholder="Explain it in your own words. Your teacher and classmates will see this."
-                        className="mt-2 block w-full rounded-lg border-slate-300 text-sm"
-                    />
-                    {ask.errors.body && <p className="mt-1 text-xs text-rose-600">{ask.errors.body}</p>}
-
-                    <button
-                        disabled={ask.processing}
-                        className="mt-3 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:bg-slate-300"
-                    >
-                        {ask.processing ? 'Posting…' : 'Post question'}
-                    </button>
-                </form>
-            )}
-
             {posts.length === 0 ? (
                 <p className="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-10 text-center text-sm text-slate-500">
                     {isTeacher

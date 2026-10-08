@@ -103,7 +103,7 @@ export default function Show({ request, counterpart, messages, isTutor, canPost,
                     href={isTutor ? route('tutor.queue') : route('requests.index')}
                     className="text-sm text-slate-500 hover:text-slate-800"
                 >
-                    ← Back
+                    ← {isTutor ? 'My queue' : 'My questions'}
                 </Link>
 
                 <div className="mt-4 flex items-center justify-between gap-4 rounded-t-xl border border-b-0 border-slate-200 bg-white p-4">

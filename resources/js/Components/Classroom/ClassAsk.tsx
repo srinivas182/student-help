@@ -18,9 +18,10 @@ export default function ClassAsk({
     canParticipate: boolean;
 }) {
     const [open, setOpen] = useState(false);
-    const [mode, setMode] = useState<'choose' | 'teacher'>('choose');
+    const [mode, setMode] = useState<'choose' | 'teacher' | 'class'>('choose');
 
     const form = useForm({ topic: '', description: '' });
+    const classForm = useForm({ type: 'question', title: '', body: '' });
 
     useEffect(() => {
         const escape = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false);
@@ -77,10 +78,9 @@ export default function ClassAsk({
                                         </span>
                                     </button>
 
-                                    <Link
-                                        href="#class-feed"
-                                        onClick={close}
-                                        className="block w-full rounded-xl border border-slate-200 p-4 text-left transition hover:border-teal-300 hover:bg-teal-50/50"
+                                    <button
+                                        onClick={() => setMode('class')}
+                                        className="w-full rounded-xl border border-slate-200 p-4 text-left transition hover:border-teal-300 hover:bg-teal-50/50"
                                     >
                                         <span className="block text-sm font-medium text-slate-900">
                                             Ask the class
@@ -88,7 +88,7 @@ export default function ClassAsk({
                                         <span className="mt-0.5 block text-xs text-slate-500">
                                             Everyone in this class sees it and can answer.
                                         </span>
-                                    </Link>
+                                    </button>
 
                                     <Link
                                         href={route('assistant.index')}
@@ -110,6 +110,71 @@ export default function ClassAsk({
                                     </p>
                                 )}
                             </>
+                        ) : mode === 'class' ? (
+                            <form
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    classForm.post(route('classrooms.posts.store', classroomId), {
+                                        onSuccess: close,
+                                    });
+                                }}
+                                className="space-y-4"
+                            >
+                                <div>
+                                    <h2 className="text-lg font-semibold text-slate-900">Ask the class</h2>
+                                    <p className="mt-1 text-sm text-slate-600">
+                                        Your teacher and everyone in this class will see it.
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <label className="text-sm font-medium text-slate-700">
+                                        What are you stuck on?
+                                    </label>
+                                    <input
+                                        value={classForm.data.title}
+                                        onChange={(e) => classForm.setData('title', e.target.value)}
+                                        placeholder="Factorising when a is not 1"
+                                        autoFocus
+                                        className="mt-1.5 block w-full rounded-lg border-slate-300 text-sm"
+                                    />
+                                    {classForm.errors.title && (
+                                        <p className="mt-1 text-xs text-rose-600">{classForm.errors.title}</p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="text-sm font-medium text-slate-700">
+                                        Explain it in your own words
+                                    </label>
+                                    <textarea
+                                        value={classForm.data.body}
+                                        onChange={(e) => classForm.setData('body', e.target.value)}
+                                        rows={4}
+                                        placeholder="I get the first step but not what happens after that."
+                                        className="mt-1.5 block w-full rounded-lg border-slate-300 text-sm"
+                                    />
+                                    {classForm.errors.body && (
+                                        <p className="mt-1 text-xs text-rose-600">{classForm.errors.body}</p>
+                                    )}
+                                </div>
+
+                                <div className="flex gap-3 border-t border-slate-100 pt-4">
+                                    <button
+                                        disabled={classForm.processing}
+                                        className="flex-1 rounded-lg bg-teal-600 px-6 py-3 text-sm font-semibold text-white hover:bg-teal-500 disabled:bg-slate-300"
+                                    >
+                                        {classForm.processing ? 'Posting…' : 'Post to the class'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setMode('choose')}
+                                        className="rounded-lg border border-slate-300 px-5 py-3 text-sm text-slate-600"
+                                    >
+                                        Back
+                                    </button>
+                                </div>
+                            </form>
                         ) : (
                             <form
                                 onSubmit={(e) => {

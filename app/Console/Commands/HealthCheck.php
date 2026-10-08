@@ -30,6 +30,10 @@ class HealthCheck extends Command
                 return Cache::get('health:ping') === 'ok';
             }),
             'queue' => $this->attempt(fn () => Queue::connection()->size() >= 0),
+            // A worker that is not running shows up as jobs piling up, which
+            // otherwise fails silently: emails and notifications just never
+            // arrive and nothing anywhere says so
+            'queue_moving' => $this->attempt(fn () => Queue::connection()->size() < 100),
             'storage' => $this->attempt(function () {
                 Storage::disk('local')->put('health.txt', 'ok');
                 $ok = Storage::disk('local')->get('health.txt') === 'ok';

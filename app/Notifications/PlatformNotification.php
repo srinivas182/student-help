@@ -27,6 +27,19 @@ abstract class PlatformNotification extends Notification implements ShouldQueue
 
     abstract public function event(): string;
 
+    /**
+     * In-app notifications are written straight away rather than queued.
+     *
+     * They are a single database insert, so queuing buys nothing — and if the
+     * queue worker is not running, a queued in-app notification simply never
+     * arrives, silently. Email still queues, because sending it is slow and a
+     * failed send should be retried.
+     */
+    public function viaConnections(): array
+    {
+        return ['database' => 'sync'];
+    }
+
     abstract public function title(User $notifiable): string;
 
     abstract public function body(User $notifiable): string;

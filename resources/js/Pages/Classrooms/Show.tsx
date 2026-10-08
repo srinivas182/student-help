@@ -23,6 +23,7 @@ interface Post {
 }
 
 export default function Show({
+    myQuestions,
     canParticipate,
     sessions,
     classroom,
@@ -32,6 +33,7 @@ export default function Show({
     memberCount,
     voiceNotes,
 }: {
+    myQuestions: { id: number; topic: string; status: string; updatedAt: string | null }[];
     canParticipate: boolean;
     sessions: ClassSession[];
     classroom: {
@@ -240,6 +242,41 @@ export default function Show({
                                 }
                             />
                         ))}
+                    </section>
+                )}
+
+                {!isTeacher && myQuestions.length > 0 && (
+                    <section className="rounded-xl border border-slate-200 bg-white p-5">
+                        <div className="flex items-baseline justify-between">
+                            <h2 className="font-semibold text-slate-900">
+                                Your private questions to {classroom.teacher}
+                            </h2>
+                            <Link
+                                href={route('requests.index')}
+                                className="text-xs font-medium text-indigo-600"
+                            >
+                                All my questions
+                            </Link>
+                        </div>
+
+                        <ul className="mt-3 divide-y divide-slate-100">
+                            {myQuestions.map((question) => (
+                                <li key={question.id}>
+                                    <Link
+                                        href={route('conversations.show', question.id)}
+                                        className="flex items-center justify-between gap-3 py-2.5 hover:text-indigo-700"
+                                    >
+                                        <span className="min-w-0 truncate text-sm text-slate-800">
+                                            {question.topic}
+                                        </span>
+                                        <span className="shrink-0 text-xs text-slate-500">
+                                            {question.status === 'resolved' ? 'answered' : question.status} ·{' '}
+                                            {question.updatedAt}
+                                        </span>
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
                     </section>
                 )}
 

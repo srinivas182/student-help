@@ -210,6 +210,21 @@ class ClassroomController extends Controller
                 : [],
             'memberCount' => $classroom->students()->count(),
             'canParticipate' => $user->canParticipate(),
+            // A learner who asked their teacher privately then landed in a
+            // conversation had no way back to it. Their own threads with this
+            // teacher belong on the class page.
+            'myQuestions' => $isTeacher ? [] : \App\Domains\Tutoring\Models\HelpRequest::query()
+                ->where('student_id', $user->id)
+                ->where('tutor_id', $classroom->teacher_id)
+                ->latest('last_activity_at')
+                ->limit(5)
+                ->get()
+                ->map(fn ($request) => [
+                    'id' => $request->id,
+                    'topic' => $request->topic,
+                    'status' => $request->status,
+                    'updatedAt' => $request->last_activity_at?->diffForHumans(),
+                ]),
             'voiceNotes' => VoiceNote::where('attachable_type', $classroom->getMorphClass())
                 ->where('attachable_id', $classroom->id)
                 ->with('user:id,first_name,last_name')
