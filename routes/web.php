@@ -36,6 +36,7 @@ use App\Http\Controllers\BillingController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\StudyGroupController;
 use App\Http\Controllers\VoiceNoteController;
@@ -57,6 +58,9 @@ Route::post('/billing/notify', [BillingController::class, 'notify'])
     ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
     ->middleware('throttle:webhooks')
     ->name('billing.notify');
+
+Route::get('/sitemap.xml', [SitemapController::class, 'sitemap'])->name('sitemap');
+Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots');
 
 // Staff invitations — public, token-authenticated (SRS: AUTH-08)
 Route::get('/invitations/{token}', [InvitationController::class, 'show'])->name('invitations.show');

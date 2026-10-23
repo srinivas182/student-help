@@ -60,6 +60,8 @@ class HandleInertiaRequests extends Middleware
                 'studentUrl' => app(\App\Domains\Identity\Portal::class)->urlFor('student'),
                 'teacherUrl' => app(\App\Domains\Identity\Portal::class)->urlFor('teacher'),
             ],
+            // Title, description, canonical and structured data per page
+            'seo' => fn () => app(\App\Domains\Identity\Services\SeoMeta::class)->for($request),
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
                 'warning' => fn () => $request->session()->get('warning'),
