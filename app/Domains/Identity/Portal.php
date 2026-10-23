@@ -15,10 +15,10 @@ class Portal
 
     public function current(Request $request): string
     {
-        $host = $request->getHost();
+        $host = $this->normalise($request->getHost());
 
         foreach ([self::STUDENT, self::TEACHER] as $portal) {
-            if ($this->hostFor($portal) === $host) {
+            if ($this->normalise($this->hostFor($portal)) === $host) {
                 return $portal;
             }
         }
@@ -27,15 +27,28 @@ class Portal
         return self::STUDENT;
     }
 
+    /**
+     * www.example.com and example.com are the same site.
+     *
+     * Matching the host exactly meant the www address fell through to the
+     * default, so a teacher arriving at www.theirdomain saw the student
+     * portal — with nothing to indicate why.
+     */
+    private function normalise(string $host): string
+    {
+        return strtolower(preg_replace('/^www\./i', '', trim($host)) ?? $host);
+    }
+
     public function isSharedHost(Request $request): bool
     {
         if (! config('portals.allow_shared_host')) {
             return false;
         }
 
-        $host = $request->getHost();
+        $host = $this->normalise($request->getHost());
 
-        return $host !== $this->hostFor(self::STUDENT) && $host !== $this->hostFor(self::TEACHER);
+        return $host !== $this->normalise($this->hostFor(self::STUDENT))
+            && $host !== $this->normalise($this->hostFor(self::TEACHER));
     }
 
     /** Which portal this user belongs to. */

@@ -304,6 +304,10 @@ visitor sees, re-caches, and prints what the application now believes. Editing
 until it runs Laravel keeps serving the old hosts, which looks like DNS not
 having propagated.
 
+Both `www.` and the bare domain resolve to the same portal, so cPanel creating
+a `www` alias is fine and needs no redirect. Links the platform generates
+always use the bare domain.
+
 Do not test login until AutoSSL has issued certificates: the session cookie is
 secure-only, so over plain http you log in and get bounced straight back to the
 login page.
