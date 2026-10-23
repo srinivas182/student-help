@@ -287,6 +287,27 @@ consent emails do not send until this is done.
 
 ---
 
+## Changing the domains
+
+When the platform moves to new domains, add them in cPanel with the same
+document root (`/home/USER/student-help/public` for both), run AutoSSL on each,
+then:
+
+```bash
+cd ~/student-help
+bash deploy/set-domains.sh thexstudenthelp.co.za thexteacherhelp.co.za
+```
+
+It backs up `.env`, rewrites the four settings that decide which portal a
+visitor sees, re-caches, and prints what the application now believes. Editing
+`.env` by hand works too, but `config:cache` is the step people forget — and
+until it runs Laravel keeps serving the old hosts, which looks like DNS not
+having propagated.
+
+Do not test login until AutoSSL has issued certificates: the session cookie is
+secure-only, so over plain http you log in and get bounced straight back to the
+login page.
+
 ## Deploying an update
 
 ```bash
