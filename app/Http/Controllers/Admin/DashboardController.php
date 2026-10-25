@@ -65,6 +65,14 @@ class DashboardController extends Controller
                 'averageRating' => round((float) Rating::avg('stars'), 2),
                 'lowRatings' => Rating::where('stars', '<=', 2)->count(),
             ],
+            // Subjects with no verified tutor: questions there sit unanswered,
+            // which is the quietest way for a platform to lose learners
+            'uncoveredSubjects' => \App\Domains\Curriculum\Models\CurriculumItem::ofType(
+                \App\Domains\Curriculum\Models\CurriculumItem::TYPE_SUBJECT,
+            )->active()
+                ->whereDoesntHave('tutorProfiles', fn ($q) => $q
+                    ->where('verification_status', TutorProfile::STATUS_APPROVED))
+                ->count(),
             'safety' => [
                 'openReports' => Report::where('status', Report::STATUS_OPEN)->count(),
                 'highPriority' => Report::where('status', Report::STATUS_OPEN)

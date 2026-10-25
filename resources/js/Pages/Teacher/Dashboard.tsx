@@ -1,3 +1,4 @@
+import { PageHero } from '@/Components/Dashboard/Kit';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 
@@ -37,6 +38,37 @@ export default function Dashboard({ verification, impact, waiting, active, subje
             <Head title="Teacher home" />
 
             <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+                {/* A volunteer gives their time for nothing; the first thing
+                    they should see is the difference it made. */}
+                <PageHero
+                    eyebrow={subjects.length > 0 ? subjects.slice(0, 3).join(' · ') : undefined}
+                    title={
+                        waiting.length > 0
+                            ? `${waiting.length} question${waiting.length === 1 ? '' : 's'} waiting`
+                            : 'Nothing waiting right now'
+                    }
+                    subtitle={
+                        waiting.length > 0
+                            ? 'Take the ones you have time for. Nothing is assigned to you.'
+                            : 'We will tell you when a question comes up in your subjects.'
+                    }
+                    tone="teal"
+                >
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        {[
+                            ['Learners helped', impact.studentsHelped],
+                            ['Questions answered', impact.resolved],
+                            ['This month', impact.thisMonth],
+                            ['Rating', impact.rating ?? '—'],
+                        ].map(([label, value]) => (
+                            <div key={label as string} className="rounded-xl bg-white/10 px-4 py-3 backdrop-blur">
+                                <p className="text-xl font-semibold">{value as string}</p>
+                                <p className="mt-0.5 text-xs text-white/70">{label as string}</p>
+                            </div>
+                        ))}
+                    </div>
+                </PageHero>
+
                 {!verification.isVerified && (
                     <div className="rounded-xl border border-amber-200 bg-amber-50 p-5" role="status">
                         <p className="font-semibold text-amber-900">

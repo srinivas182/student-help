@@ -1,3 +1,4 @@
+import { AttentionRow, ICONS, PageHero, SectionCard, StatTile } from '@/Components/Dashboard/Kit';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 
@@ -15,6 +16,7 @@ interface Props {
         medianAcceptHours: number | null; medianResolveHours: number | null;
         resolutionRate: number | null; averageRating: number; lowRatings: number;
     };
+    uncoveredSubjects: number;
     safety: { openReports: number; highPriority: number; flaggedMessages: number };
     portals: { studentsAtTeacherDoor: number; teachersAtStudentDoor: number };
     topSubjects: { subject: string; total: number }[];
@@ -31,7 +33,7 @@ function Card({ label, value, tone = 'text-slate-900', sub }: { label: string; v
     );
 }
 
-export default function Dashboard({ days, people, requests, service, safety, portals, topSubjects, busiestTutors }: Props) {
+export default function Dashboard({ days, people, requests, service, safety, portals, topSubjects, busiestTutors, uncoveredSubjects }: Props) {
     const needsAttention = [
         people.pendingTutors > 0 && {
             label: `${people.pendingTutors} tutor${people.pendingTutors === 1 ? '' : 's'} awaiting verification`,
@@ -52,6 +54,92 @@ export default function Dashboard({ days, people, requests, service, safety, por
             <Head title="Admin overview" />
 
             <div className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
+                <PageHero
+                    eyebrow="Platform overview"
+                    title="How DX is doing"
+                    subtitle="The numbers below cover the period you choose. The panel on the right is what needs a person today."
+                    tone="slate"
+                >
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        {[
+                            ['Learners', people.students],
+                            ['Verified tutors', people.tutors],
+                            ['Questions asked', requests.total],
+                            ['Average rating', service.averageRating || '—'],
+                        ].map(([label, value]) => (
+                            <div key={label as string} className="rounded-xl bg-white/10 px-4 py-3 backdrop-blur">
+                                <p className="text-xl font-semibold">{value as number}</p>
+                                <p className="mt-0.5 text-xs text-white/70">{label as string}</p>
+                            </div>
+                        ))}
+                    </div>
+                </PageHero>
+
+                {/* What needs a person today, rather than numbers to interpret */}
+                <div className="grid gap-6 lg:grid-cols-3">
+                    <SectionCard
+                        title="Needs your attention"
+                        description="Each of these is somebody waiting."
+                        className="lg:col-span-2"
+                    >
+                        <div className="grid gap-2.5 sm:grid-cols-2">
+                            <AttentionRow
+                                label="Tutor applications waiting"
+                                count={people.pendingTutors}
+                                href={route('admin.verification.index')}
+                                tone={people.pendingTutors > 0 ? 'amber' : 'slate'}
+                                icon={ICONS.people}
+                            />
+                            <AttentionRow
+                                label="Reports open"
+                                count={safety.openReports}
+                                href={route('moderation.index')}
+                                tone={safety.highPriority > 0 ? 'rose' : safety.openReports > 0 ? 'amber' : 'slate'}
+                                icon={ICONS.shield}
+                            />
+                            <AttentionRow
+                                label="Questions with no tutor"
+                                count={requests.unassigned}
+                                href={route('admin.coverage')}
+                                tone={requests.unassigned > 0 ? 'amber' : 'slate'}
+                                icon={ICONS.question}
+                            />
+                            <AttentionRow
+                                label="Subjects with no tutor at all"
+                                count={uncoveredSubjects}
+                                href={route('admin.coverage')}
+                                tone={uncoveredSubjects > 0 ? 'rose' : 'slate'}
+                                icon={ICONS.warning}
+                            />
+                        </div>
+
+                        {people.pendingTutors === 0 &&
+                            safety.openReports === 0 &&
+                            requests.unassigned === 0 &&
+                            uncoveredSubjects === 0 && (
+                                <p className="mt-3 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-800">
+                                    Nothing is waiting. Everything is covered and every report is handled.
+                                </p>
+                            )}
+                    </SectionCard>
+
+                    <SectionCard title="How quickly we answer">
+                        <dl className="space-y-3">
+                            {[
+                                ['Median time to accept', service.medianAcceptHours ? `${service.medianAcceptHours} hrs` : '—'],
+                                ['Median time to resolve', service.medianResolveHours ? `${service.medianResolveHours} hrs` : '—'],
+                                ['Questions resolved', `${service.resolutionRate}%`],
+                                ['Low ratings', service.lowRatings],
+                            ].map(([label, value]) => (
+                                <div key={label as string} className="flex items-baseline justify-between gap-3">
+                                    <dt className="text-sm text-slate-600">{label as string}</dt>
+                                    <dd className="text-sm font-semibold text-slate-900">{value as string}</dd>
+                                </div>
+                            ))}
+                        </dl>
+                    </SectionCard>
+                </div>
+
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <p className="text-sm text-slate-500">Showing the last {days} days.</p>
                     <div className="flex gap-2">

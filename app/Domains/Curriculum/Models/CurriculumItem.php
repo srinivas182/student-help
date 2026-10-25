@@ -43,6 +43,17 @@ class CurriculumItem extends Model
         return $this->hasMany(self::class, 'parent_id')->orderBy('position');
     }
 
+    /** Verified tutors who cover this subject, via the tutor_subjects pivot. */
+    public function tutorProfiles(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(
+            \App\Domains\Tutoring\Models\TutorProfile::class,
+            'tutor_subjects',
+            'curriculum_item_id',
+            'tutor_profile_id',
+        );
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
