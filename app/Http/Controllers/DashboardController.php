@@ -53,6 +53,11 @@ class DashboardController extends Controller
             'nextActions' => $isStudent ? $this->nextActions->forStudent($user) : [],
             'streak' => $isStudent ? $this->streaks->summary($user) : null,
             'subjectProgress' => $isStudent ? $this->subjectProgress->forStudent($user) : [],
+
+            // Counts for the four feature blocks, scoped to this learner's own
+            // subjects: being told there are forty lessons and finding two is
+            // how a learner stops believing the rest of the page
+            'featureCounts' => $isStudent ? $this->featureCounts($user) : null,
             'context' => $user->academicContext()->orderBy('position')->pluck('name'),
             'subjects' => $subjects,
             'requests' => $requests,
@@ -73,5 +78,32 @@ class DashboardController extends Controller
                 'canSelfStudy' => $user->canSelfStudy(),
             ],
         ]);
+    }
+
+    /** Live numbers for the feature blocks, never decorative ones. */
+    private function featureCounts(\App\Models\User $user): array
+    {
+        $subjectIds = $user->subjects()->pluck('curriculum_items.id');
+
+        return [
+            'topics' => $subjectIds->isEmpty() ? 0 : \App\Domains\Tutor\Models\Topic::published()
+                ->whereIn('curriculum_item_id', $subjectIds)->count(),
+
+            'tutors' => \App\Domains\Tutoring\Models\TutorProfile::query()
+                ->where('verification_status', \App\Domains\Tutoring\Models\TutorProfile::STATUS_APPROVED)
+                ->when($subjectIds->isNotEmpty(), fn ($q) => $q->whereHas(
+                    'subjects',
+                    fn ($s) => $s->whereIn('curriculum_items.id', $subjectIds),
+                ))->count(),
+
+            'groups' => $subjectIds->isEmpty() ? 0 : \Illuminate\Support\Facades\DB::table('study_groups')
+                ->whereIn('curriculum_item_id', $subjectIds)
+                ->where('is_locked', false)
+                ->count(),
+
+            'sessions' => app(\App\Domains\Classroom\Services\SessionService::class)
+                ->upcomingFor($user, 20)
+                ->count(),
+        ];
     }
 }

@@ -1,3 +1,4 @@
+import FeatureBlocks, { FeatureCounts } from '@/Components/Dashboard/FeatureBlocks';
 import { EmptyState, ICONS, PageHero, SectionCard, StatTile } from '@/Components/Dashboard/Kit';
 import GlobalSearch from '@/Components/GlobalSearch';
 import NextActionCard, { NextAction } from '@/Components/NextActionCard';
@@ -19,6 +20,7 @@ interface Props {
     nextActions: NextAction[];
     streak: Streak | null;
     subjectProgress: SubjectProgress[];
+    featureCounts: FeatureCounts | null;
     context: string[];
     subjects: { id: number; name: string; code: string | null }[];
     requests: RequestRow[];
@@ -44,6 +46,7 @@ export default function Dashboard({
     nextActions,
     streak,
     subjectProgress,
+    featureCounts,
     context,
     subjects,
     requests,
@@ -100,24 +103,19 @@ export default function Dashboard({
                     <GlobalSearch compact />
                 </div>
 
+                {/* The four things the platform does, under what is waiting */}
+                {featureCounts && (
+                    <FeatureBlocks
+                        counts={featureCounts}
+                        canParticipate={participation.canParticipate}
+                    />
+                )}
+
                 {streak && <StreakCard streak={streak} />}
 
                 <SubjectProgressList subjects={subjectProgress} />
 
-                <Link
-                    href={route('explore')}
-                    className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 transition hover:border-slate-300 hover:shadow-sm"
-                >
-                    <span>
-                        <span className="block font-medium text-slate-900">
-                            What else can I do here?
-                        </span>
-                        <span className="mt-0.5 block text-sm text-slate-600">
-                            Live classes, tutors, study groups and lessons in your language.
-                        </span>
-                    </span>
-                    <span aria-hidden="true" className="shrink-0 text-slate-400">→</span>
-                </Link>
+
 
                 <div className="grid gap-6 lg:grid-cols-3">
                     <section className="rounded-xl border border-slate-200 bg-white lg:col-span-2">
