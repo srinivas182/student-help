@@ -93,7 +93,9 @@ class OnboardingController extends Controller
 
         $this->onboarding->completeWithSubjects($request->user(), $validated['subject_ids']);
 
-        return redirect()->route('dashboard')->with('success', 'Your profile is set up. Welcome to DX Student Help.');
+        // Straight to the welcome screen rather than the dashboard: this is the
+        // one moment a new learner is certain to be paying attention.
+        return redirect()->route('onboarding.welcome');
     }
 
     public function restart(Request $request): RedirectResponse
@@ -101,5 +103,24 @@ class OnboardingController extends Controller
         $this->onboarding->reset($request->user());
 
         return redirect()->route('onboarding.show');
+    }
+
+    /** Shown once, after onboarding, to say what the platform can actually do. */
+    public function welcome(Request $request): Response
+    {
+        $user = $request->user();
+
+        $subjectIds = $user->subjects()->pluck('curriculum_items.id');
+
+        return Inertia::render('Onboarding/Welcome', [
+            'firstName' => $user->first_name ?: 'there',
+            'subjects' => $user->subjects()->pluck('name'),
+            'canParticipate' => $user->canParticipate(),
+            'topicCount' => $subjectIds->isEmpty()
+                ? 0
+                : \App\Domains\Tutor\Models\Topic::published()
+                    ->whereIn('curriculum_item_id', $subjectIds)
+                    ->count(),
+        ]);
     }
 }

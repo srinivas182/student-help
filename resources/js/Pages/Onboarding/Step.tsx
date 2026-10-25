@@ -1,4 +1,5 @@
 import BuiltBy from '@/Components/BuiltBy';
+import OptionIcon from '@/Components/Onboarding/OptionIcon';
 import { Head, router, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
@@ -18,14 +19,18 @@ interface StepData {
     step: number;
 }
 
+/** Card surface, icon badge and arrow, kept together so they always agree. */
 const PALETTE = [
-    'from-sky-50 to-sky-100 border-sky-200 text-sky-700',
-    'from-emerald-50 to-emerald-100 border-emerald-200 text-emerald-700',
-    'from-violet-50 to-violet-100 border-violet-200 text-violet-700',
-    'from-amber-50 to-amber-100 border-amber-200 text-amber-700',
-    'from-rose-50 to-rose-100 border-rose-200 text-rose-700',
-    'from-teal-50 to-teal-100 border-teal-200 text-teal-700',
+    { card: 'border-sky-200 bg-sky-50/60 hover:border-sky-300', badge: 'bg-sky-100 text-sky-600', arrow: 'bg-sky-500' },
+    { card: 'border-emerald-200 bg-emerald-50/60 hover:border-emerald-300', badge: 'bg-emerald-100 text-emerald-600', arrow: 'bg-emerald-500' },
+    { card: 'border-violet-200 bg-violet-50/60 hover:border-violet-300', badge: 'bg-violet-100 text-violet-600', arrow: 'bg-violet-500' },
+    { card: 'border-amber-200 bg-amber-50/60 hover:border-amber-300', badge: 'bg-amber-100 text-amber-600', arrow: 'bg-amber-500' },
+    { card: 'border-rose-200 bg-rose-50/60 hover:border-rose-300', badge: 'bg-rose-100 text-rose-600', arrow: 'bg-rose-500' },
+    { card: 'border-teal-200 bg-teal-50/60 hover:border-teal-300', badge: 'bg-teal-100 text-teal-600', arrow: 'bg-teal-500' },
 ];
+
+/** Roughly how many steps a learner faces, so the bar means something. */
+const TYPICAL_STEPS = 5;
 
 export default function Step({ step, canGoBack }: { step: StepData; canGoBack: boolean }) {
     const { setData, post, processing } = useForm<{ curriculum_item_id: number | null }>({
@@ -63,6 +68,14 @@ export default function Step({ step, canGoBack }: { step: StepData; canGoBack: b
                     </span>
                 </div>
 
+                {/* A learner who cannot see the end of a wizard assumes it is endless */}
+                <div className="mb-6 h-1.5 overflow-hidden rounded-full bg-slate-200">
+                    <div
+                        className="h-full rounded-full bg-indigo-500 transition-all duration-500"
+                        style={{ width: `${Math.min((step.step / TYPICAL_STEPS) * 100, 95)}%` }}
+                    />
+                </div>
+
                 {step.breadcrumb.length > 0 && (
                     <nav className="mb-6 flex flex-wrap gap-2" aria-label="Your selections so far">
                         {step.breadcrumb.map((crumb) => (
@@ -81,31 +94,63 @@ export default function Step({ step, canGoBack }: { step: StepData; canGoBack: b
                     <p className="mt-2 text-sm text-slate-500">{step.subtitle}</p>
                 </header>
 
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {step.options.map((option, index) => (
-                        <button
-                            key={option.id}
-                            type="button"
-                            disabled={processing}
-                            onClick={() => choose(option.id)}
-                            className={`group flex flex-col items-start gap-3 rounded-2xl border bg-gradient-to-br p-5 text-left transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60 ${
-                                PALETTE[index % PALETTE.length]
-                            }`}
-                        >
-                            <span className="text-base font-semibold text-slate-900">{option.name}</span>
-                            {option.description && (
-                                <span className="text-sm text-slate-600">{option.description}</span>
-                            )}
-                            <span className="mt-auto inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-sm shadow-sm transition group-hover:translate-x-1">
-                                →
-                            </span>
-                        </button>
-                    ))}
+                <div
+                    className={`grid gap-4 ${
+                        step.options.length <= 2
+                            ? 'sm:grid-cols-2'
+                            : step.options.length === 3
+                              ? 'sm:grid-cols-3'
+                              : 'sm:grid-cols-2 lg:grid-cols-3'
+                    }`}
+                >
+                    {step.options.map((option, index) => {
+                        const tone = PALETTE[index % PALETTE.length];
+
+                        return (
+                            <button
+                                key={option.id}
+                                type="button"
+                                disabled={processing}
+                                onClick={() => choose(option.id)}
+                                className={`group flex flex-col items-center gap-3 rounded-2xl border-2 bg-white p-6 text-center transition hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 disabled:opacity-60 ${tone.card}`}
+                            >
+                                <span
+                                    className={`flex h-16 w-16 items-center justify-center rounded-full ${tone.badge}`}
+                                >
+                                    <OptionIcon name={option.name} className="h-8 w-8" />
+                                </span>
+
+                                <span className="text-base font-semibold text-slate-900">
+                                    {option.name}
+                                </span>
+
+                                {option.description && (
+                                    <span className="text-sm leading-snug text-slate-600">
+                                        {option.description}
+                                    </span>
+                                )}
+
+                                <span
+                                    className={`mt-auto inline-flex h-9 w-9 items-center justify-center rounded-full text-white shadow-sm transition group-hover:translate-x-0.5 ${tone.arrow}`}
+                                >
+                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5} aria-hidden="true">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+                                    </svg>
+                                </span>
+                            </button>
+                        );
+                    })}
                 </div>
 
-                <p className="mt-8 text-center text-xs text-slate-400">
-                    You can always change this later in your profile settings.
-                </p>
+                <div className="mt-8 flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4">
+                    <svg className="mt-0.5 h-5 w-5 shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+                        <circle cx="12" cy="12" r="9" />
+                        <path strokeLinecap="round" d="M12 11v5M12 8h.01" />
+                    </svg>
+                    <p className="text-sm text-slate-600">
+                        You can always change this later in your profile settings.
+                    </p>
+                </div>
             </div>
             <BuiltBy className="mt-8 pb-6" />
         </div>

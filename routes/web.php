@@ -384,6 +384,7 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::get('/', [OnboardingController::class, 'show'])->name('show');
         Route::post('/', [OnboardingController::class, 'store'])->name('store');
         Route::post('/back', [OnboardingController::class, 'back'])->name('back');
+        Route::get('/welcome', [OnboardingController::class, 'welcome'])->name('welcome');
         Route::get('/subjects', [OnboardingController::class, 'subjects'])->name('subjects');
         Route::post('/subjects', [OnboardingController::class, 'storeSubjects'])->name('subjects.store');
         Route::post('/restart', [OnboardingController::class, 'restart'])->name('restart');

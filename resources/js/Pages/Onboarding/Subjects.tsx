@@ -1,4 +1,5 @@
 import BuiltBy from '@/Components/BuiltBy';
+import OptionIcon from '@/Components/Onboarding/OptionIcon';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
@@ -81,21 +82,34 @@ export default function Subjects({
                                 type="button"
                                 aria-pressed={active}
                                 onClick={() => toggle(subject.id)}
-                                className={`flex items-center justify-between gap-3 rounded-xl border p-4 text-left transition ${
+                                className={`flex items-center gap-3 rounded-xl border-2 p-4 text-left transition ${
                                     active
-                                        ? 'border-indigo-400 bg-indigo-50 shadow-sm'
+                                        ? 'border-violet-400 bg-violet-50/70 shadow-sm'
                                         : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
                                 }`}
                             >
-                                <span className="text-sm font-medium text-slate-800">{subject.name}</span>
                                 <span
-                                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border text-xs ${
+                                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${
+                                        active ? 'bg-violet-100 text-violet-600' : 'bg-slate-100 text-slate-500'
+                                    }`}
+                                >
+                                    <OptionIcon name={subject.name} className="h-6 w-6" />
+                                </span>
+
+                                <span className="flex-1 text-sm font-medium leading-snug text-slate-800">
+                                    {subject.name}
+                                </span>
+
+                                <span
+                                    className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 ${
                                         active
-                                            ? 'border-indigo-500 bg-indigo-500 text-white'
+                                            ? 'border-violet-500 bg-violet-500 text-white'
                                             : 'border-slate-300 bg-white text-transparent'
                                     }`}
                                 >
-                                    ✓
+                                    <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5} aria-hidden="true">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" />
+                                    </svg>
                                 </span>
                             </button>
                         );
