@@ -95,26 +95,28 @@ export default function Dashboard({
                     a learner reads top to bottom without the page changing
                     container around them. */}
                 <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7">
-                    <h2 className="font-semibold text-slate-900">
-                        {nextActions.length > 0
-                            ? 'Here is what is waiting for you'
-                            : 'Nothing waiting — here is what you can do'}
-                    </h2>
-
-                    {nextActions.length > 0 && (
-                        <div className="mt-4 space-y-3">
-                            {nextActions.map((action) => (
-                                <NextActionCard key={action.kind + action.url} action={action} />
-                            ))}
-                        </div>
-                    )}
+                    <h2 className="font-semibold text-slate-900">What you can do</h2>
 
                     {featureCounts && (
-                        <div className={nextActions.length > 0 ? 'mt-6 border-t border-slate-100 pt-6' : 'mt-4'}>
+                        <div className="mt-4">
                             <FeatureBlocks
                                 counts={featureCounts}
                                 canParticipate={participation.canParticipate}
                             />
+                        </div>
+                    )}
+
+                    {nextActions.length > 0 && (
+                        <div className="mt-7 border-t border-slate-100 pt-6">
+                            <h3 className="font-semibold text-slate-900">
+                                Here is what is waiting for you
+                            </h3>
+
+                            <div className="mt-4 space-y-3">
+                                {nextActions.map((action) => (
+                                    <NextActionCard key={action.kind + action.url} action={action} />
+                                ))}
+                            </div>
                         </div>
                     )}
                 </section>
