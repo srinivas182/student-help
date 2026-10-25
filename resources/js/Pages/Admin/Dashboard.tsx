@@ -57,23 +57,14 @@ export default function Dashboard({ days, people, requests, service, safety, por
                 <PageHero
                     eyebrow="Platform overview"
                     title="How DX is doing"
-                    subtitle="The numbers below cover the period you choose. The panel on the right is what needs a person today."
-                    tone="slate"
-                >
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        {[
-                            ['Learners', people.students],
-                            ['Verified tutors', people.tutors],
-                            ['Questions asked', requests.total],
-                            ['Average rating', service.averageRating || '—'],
-                        ].map(([label, value]) => (
-                            <div key={label as string} className="rounded-xl bg-white/10 px-4 py-3 backdrop-blur">
-                                <p className="text-xl font-semibold">{value as number}</p>
-                                <p className="mt-0.5 text-xs text-white/70">{label as string}</p>
-                            </div>
-                        ))}
-                    </div>
-                </PageHero>
+                    subtitle="The panel below is what needs a person today. Everything else is for context."
+                    stats={[
+                        { label: 'Learners', value: people.students, icon: ICONS.people, tone: 'indigo' },
+                        { label: 'Verified tutors', value: people.tutors, icon: ICONS.check, tone: 'emerald' },
+                        { label: 'Questions asked', value: requests.total, icon: ICONS.question, tone: 'violet' },
+                        { label: 'Average rating', value: service.averageRating || '—', icon: ICONS.star, tone: 'amber' },
+                    ]}
+                />
 
                 {/* What needs a person today, rather than numbers to interpret */}
                 <div className="grid gap-6 lg:grid-cols-3">

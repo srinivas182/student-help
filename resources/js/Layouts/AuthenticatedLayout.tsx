@@ -112,7 +112,7 @@ export default function Authenticated({
                                             href={route('requests.index')}
                                             active={route().current('requests.*')}
                                         >
-                                            My questions
+                                            Ask
                                         </NavLink>
                                         <NavLink
                                             href={route('learn.index')}
@@ -124,6 +124,12 @@ export default function Authenticated({
                                         <NavGroup
                                             label="Study"
                                             items={[
+                                                {
+                                                    label: 'My questions',
+                                                    href: route('requests.index'),
+                                                    pattern: 'requests.*',
+                                                    description: 'Questions you asked a tutor',
+                                                },
                                                 {
                                                     label: 'Study material',
                                                     href: route('resources.index'),
@@ -170,7 +176,7 @@ export default function Authenticated({
                                         />
 
                                         <NavGroup
-                                            label="Me"
+                                            label="Progress"
                                             items={[
                                                 {
                                                     label: 'My progress',

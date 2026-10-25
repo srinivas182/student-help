@@ -14,15 +14,9 @@ const TABS = [
         icon: 'M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5',
     },
     {
-        label: 'Ask',
-        route: 'requests.index',
-        match: ['requests.*'],
-        icon: 'M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12Z',
-    },
-    {
-        label: 'Learn',
+        label: 'Study',
         route: 'learn.index',
-        match: ['learn.*', 'assessment.*'],
+        match: ['learn.*', 'assessment.*', 'resources.*', 'requests.*', 'assistant.*'],
         icon: 'M12 6.5 4 4v14l8 2.5 8-2.5V4l-8 2.5Zm0 0V21',
     },
     {
@@ -32,9 +26,15 @@ const TABS = [
         icon: 'M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm13 12v-1a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8',
     },
     {
-        label: 'Me',
+        label: 'Progress',
         route: 'progress',
-        match: ['progress', 'profile.*', 'billing.*', 'notifications.*'],
+        match: ['progress'],
+        icon: 'M4 20V10M10 20V4M16 20v-7M22 20H2',
+    },
+    {
+        label: 'Profile',
+        route: 'profile.edit',
+        match: ['profile.*', 'billing.*', 'notifications.*', 'twoFactor.*'],
         icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z',
     },
 ];
@@ -76,7 +76,7 @@ export default function MobileTabBar() {
                                     >
                                         <path d={tab.icon} />
                                     </svg>
-                                    {tab.label === 'Me' && unread > 0 && (
+                                    {tab.label === 'Profile' && unread > 0 && (
                                         <span className="absolute -right-1.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-semibold text-white">
                                             {unread > 9 ? '9+' : unread}
                                         </span>

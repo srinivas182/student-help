@@ -1,4 +1,4 @@
-import { PageHero } from '@/Components/Dashboard/Kit';
+import { ICONS, PageHero } from '@/Components/Dashboard/Kit';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 
@@ -53,21 +53,13 @@ export default function Dashboard({ verification, impact, waiting, active, subje
                             : 'We will tell you when a question comes up in your subjects.'
                     }
                     tone="teal"
-                >
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        {[
-                            ['Learners helped', impact.studentsHelped],
-                            ['Questions answered', impact.resolved],
-                            ['This month', impact.thisMonth],
-                            ['Rating', impact.rating ?? '—'],
-                        ].map(([label, value]) => (
-                            <div key={label as string} className="rounded-xl bg-white/10 px-4 py-3 backdrop-blur">
-                                <p className="text-xl font-semibold">{value as string}</p>
-                                <p className="mt-0.5 text-xs text-white/70">{label as string}</p>
-                            </div>
-                        ))}
-                    </div>
-                </PageHero>
+                    stats={[
+                        { label: 'Learners helped', value: impact.studentsHelped, icon: ICONS.people, tone: 'teal' },
+                        { label: 'Questions answered', value: impact.resolved, icon: ICONS.check, tone: 'emerald' },
+                        { label: 'This month', value: impact.thisMonth, icon: ICONS.calendar, tone: 'indigo' },
+                        { label: 'Rating', value: impact.rating ?? '—', icon: ICONS.star, tone: 'amber' },
+                    ]}
+                />
 
                 {!verification.isVerified && (
                     <div className="rounded-xl border border-amber-200 bg-amber-50 p-5" role="status">
@@ -89,12 +81,14 @@ export default function Dashboard({ verification, impact, waiting, active, subje
                     </div>
                 )}
 
-                <section className="rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 p-6 text-white">
-                    <h1 className="text-2xl font-semibold">
-                        You have helped {impact.studentsHelped} student
+                {/* The impact line, in their own light palette rather than a
+                    second dark aesthetic sitting beside it */}
+                <section className="rounded-2xl border border-teal-200 bg-teal-50/60 p-6">
+                    <h2 className="text-xl font-semibold text-slate-900">
+                        You have helped {impact.studentsHelped} learner
                         {impact.studentsHelped === 1 ? '' : 's'}
-                    </h1>
-                    <p className="mt-1 text-sm text-teal-50">
+                    </h2>
+                    <p className="mt-1.5 text-sm text-slate-600">
                         {impact.resolved} questions answered
                         {impact.rating ? ` · ★ ${impact.rating} from ${impact.ratingsCount} ratings` : ''}
                         {impact.materialShared

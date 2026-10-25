@@ -68,21 +68,13 @@ export default function Dashboard({
                             ? 'Here is what is waiting for you.'
                             : 'Nothing waiting. A good moment to get ahead.'
                     }
-                >
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        {[
-                            ['Open questions', stats.open],
-                            ['Answered', stats.resolved],
-                            ['Subjects', stats.subjects],
-                            ['Day streak', streak?.days ?? 0],
-                        ].map(([label, value]) => (
-                            <div key={label as string} className="rounded-xl bg-white/10 px-4 py-3 backdrop-blur">
-                                <p className="text-xl font-semibold">{value as number}</p>
-                                <p className="mt-0.5 text-xs text-white/70">{label as string}</p>
-                            </div>
-                        ))}
-                    </div>
-                </PageHero>
+                    stats={[
+                        { label: 'Open questions', value: stats.open, icon: ICONS.question, tone: 'indigo' },
+                        { label: 'Answered', value: stats.resolved, icon: ICONS.check, tone: 'emerald' },
+                        { label: 'Subjects', value: stats.subjects, icon: ICONS.book, tone: 'violet' },
+                        { label: 'Day streak', value: streak?.days ?? 0, icon: ICONS.flame, tone: 'amber' },
+                    ]}
+                />
                 {/* CON-03: a minor without guardian consent can browse but not participate */}
                 {!participation.canParticipate && (
                     <div className="rounded-xl border border-amber-200 bg-amber-50 p-5" role="status">
@@ -94,8 +86,6 @@ export default function Dashboard({
                         </p>
                     </div>
                 )}
-
-                <section className="rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 p-6 text-white">
 
                 {/* One answer to "what now?", before anything else on the page */}
                 {nextActions.length > 0 && (
@@ -113,10 +103,6 @@ export default function Dashboard({
                 {streak && <StreakCard streak={streak} />}
 
                 <SubjectProgressList subjects={subjectProgress} />
-                    <p className="mt-1 text-sm text-indigo-100">
-                        {context.length > 0 ? context.join(' · ') : 'Your learning space'}
-                    </p>
-                </section>
 
                 <div className="grid gap-6 lg:grid-cols-3">
                     <section className="rounded-xl border border-slate-200 bg-white lg:col-span-2">

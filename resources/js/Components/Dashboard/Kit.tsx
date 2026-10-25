@@ -54,44 +54,69 @@ export function Icon({ path, className = 'h-5 w-5' }: { path: string; className?
     );
 }
 
-/** The band at the top of a dashboard: who you are and what matters today. */
+/**
+ * The band at the top of a dashboard: who you are and what matters today.
+ *
+ * Light, not a dark gradient. Every app screen in the client's designs is
+ * white with navy headings and pastel accents; the only dark artwork they sent
+ * is a marketing poster. A dark hero here would be a second aesthetic sitting
+ * next to theirs rather than part of it.
+ */
 export function PageHero({
     eyebrow,
     title,
     subtitle,
     tone = 'indigo',
+    stats,
     children,
 }: PropsWithChildren<{
     eyebrow?: string;
     title: string;
     subtitle?: ReactNode;
     tone?: Tone;
+    stats?: { label: string; value: number | string; icon?: string; tone?: Tone }[];
 }>) {
-    const gradients: Record<Tone, string> = {
-        indigo: 'from-indigo-600 to-indigo-800',
-        emerald: 'from-emerald-600 to-emerald-800',
-        amber: 'from-amber-500 to-amber-700',
-        rose: 'from-rose-600 to-rose-800',
-        violet: 'from-violet-600 to-violet-800',
-        teal: 'from-teal-600 to-teal-800',
-        slate: 'from-slate-700 to-slate-900',
-    };
+    const t = TONES[tone];
 
     return (
-        <section
-            className={`rounded-2xl bg-gradient-to-br px-6 py-7 text-white sm:px-8 ${gradients[tone]}`}
-        >
+        <section className="rounded-2xl border border-slate-200 bg-white px-6 py-8 sm:px-8 sm:py-10">
             {eyebrow && (
-                <p className="text-xs font-semibold uppercase tracking-widest text-white/70">
-                    {eyebrow}
-                </p>
+                <p className={`text-xs font-semibold uppercase tracking-widest ${t.text}`}>{eyebrow}</p>
             )}
 
-            <h1 className="mt-1.5 text-2xl font-semibold sm:text-3xl">{title}</h1>
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                {title}
+            </h1>
 
-            {subtitle && <p className="mt-2 max-w-2xl text-sm text-white/80">{subtitle}</p>}
+            {subtitle && <p className="mt-2.5 max-w-2xl text-slate-600">{subtitle}</p>}
 
-            {children && <div className="mt-5">{children}</div>}
+            {stats && stats.length > 0 && (
+                <div className="mt-7 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+                    {stats.map((stat) => {
+                        const st = TONES[stat.tone ?? tone];
+
+                        return (
+                            <div
+                                key={stat.label}
+                                className={`rounded-xl border p-4 ${st.border} ${st.surface}`}
+                            >
+                                {stat.icon && (
+                                    <span
+                                        className={`mb-3 flex h-11 w-11 items-center justify-center rounded-full ${st.badge}`}
+                                    >
+                                        <Icon path={stat.icon} className="h-5 w-5" />
+                                    </span>
+                                )}
+
+                                <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+                                <p className="mt-0.5 text-xs font-medium text-slate-600">{stat.label}</p>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {children && <div className="mt-7">{children}</div>}
         </section>
     );
 }
@@ -116,13 +141,13 @@ export function StatTile({
 
     const inner = (
         <div
-            className={`flex h-full items-start gap-3 rounded-xl border p-4 transition ${t.border} ${t.surface} ${
+            className={`flex h-full items-start gap-4 rounded-xl border p-5 transition ${t.border} ${t.surface} ${
                 href ? 'hover:shadow-md' : ''
             }`}
         >
             {icon && (
-                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${t.badge}`}>
-                    <Icon path={icon} />
+                <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${t.badge}`}>
+                    <Icon path={icon} className="h-6 w-6" />
                 </span>
             )}
 
@@ -157,7 +182,7 @@ export function SectionCard({
     className?: string;
 }>) {
     return (
-        <section className={`rounded-xl border border-slate-200 bg-white p-5 sm:p-6 ${className}`}>
+        <section className={`rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 ${className}`}>
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                     <h2 className="font-semibold text-slate-900">{title}</h2>
@@ -231,11 +256,11 @@ export function AttentionRow({
     return (
         <Link
             href={href}
-            className={`flex items-center justify-between gap-3 rounded-lg border p-3.5 transition hover:shadow-sm ${t.border} ${t.surface}`}
+            className={`flex items-center justify-between gap-3 rounded-xl border p-4 transition hover:shadow-sm ${t.border} ${t.surface}`}
         >
             <span className="flex min-w-0 items-center gap-3">
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${t.badge}`}>
-                    <Icon path={icon} className="h-4 w-4" />
+                <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${t.badge}`}>
+                    <Icon path={icon} className="h-5 w-5" />
                 </span>
                 <span className="truncate text-sm font-medium text-slate-800">{label}</span>
             </span>
