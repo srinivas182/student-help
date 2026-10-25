@@ -66,11 +66,8 @@ export default function Dashboard({
                 <PageHero
                     eyebrow={context.length > 0 ? context.join(' · ') : undefined}
                     title={`Hello ${firstName}`}
-                    subtitle={
-                        nextActions.length > 0
-                            ? 'Here is what is waiting for you.'
-                            : 'Nothing waiting. A good moment to get ahead.'
-                    }
+                    subtitle="Study smarter. Learn deeper. Achieve more."
+
                     stats={[
                         { label: 'Open questions', value: stats.open, icon: ICONS.question, tone: 'indigo' },
                         { label: 'Answered', value: stats.resolved, icon: ICONS.check, tone: 'emerald' },
@@ -90,26 +87,37 @@ export default function Dashboard({
                     </div>
                 )}
 
-                {/* One answer to "what now?", before anything else on the page */}
-                {nextActions.length > 0 && (
-                    <section className="space-y-3">
-                        {nextActions.map((action) => (
-                            <NextActionCard key={action.kind + action.url} action={action} />
-                        ))}
-                    </section>
-                )}
-
                 <div className="lg:hidden">
                     <GlobalSearch compact />
                 </div>
 
-                {/* The four things the platform does, under what is waiting */}
-                {featureCounts && (
-                    <FeatureBlocks
-                        counts={featureCounts}
-                        canParticipate={participation.canParticipate}
-                    />
-                )}
+                {/* What is waiting and what the platform does, in one block:
+                    a learner reads top to bottom without the page changing
+                    container around them. */}
+                <section className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7">
+                    <h2 className="font-semibold text-slate-900">
+                        {nextActions.length > 0
+                            ? 'Here is what is waiting for you'
+                            : 'Nothing waiting — here is what you can do'}
+                    </h2>
+
+                    {nextActions.length > 0 && (
+                        <div className="mt-4 space-y-3">
+                            {nextActions.map((action) => (
+                                <NextActionCard key={action.kind + action.url} action={action} />
+                            ))}
+                        </div>
+                    )}
+
+                    {featureCounts && (
+                        <div className={nextActions.length > 0 ? 'mt-6 border-t border-slate-100 pt-6' : 'mt-4'}>
+                            <FeatureBlocks
+                                counts={featureCounts}
+                                canParticipate={participation.canParticipate}
+                            />
+                        </div>
+                    )}
+                </section>
 
                 {streak && <StreakCard streak={streak} />}
 
