@@ -168,6 +168,13 @@ export default function Welcome({
                     >
                         Take me to my dashboard
                     </button>
+
+                    <Link
+                        href={route('explore')}
+                        className="rounded-lg border border-slate-300 bg-white px-8 py-3 text-center text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                        Show me everything first
+                    </Link>
                 </div>
             </div>
 

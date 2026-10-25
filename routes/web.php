@@ -35,6 +35,7 @@ use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\ExploreController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\TwoFactorController;
@@ -204,6 +205,9 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::delete('/', [TwoFactorController::class, 'disable'])->name('disable');
         Route::delete('/devices', [TwoFactorController::class, 'forgetDevices'])->name('devices');
     });
+
+    // What the platform can do, in one screen
+    Route::get('/explore', ExploreController::class)->name('explore');
 
     // One search box across lessons, material, community and your own questions
     Route::middleware('throttle:search')->group(function () {

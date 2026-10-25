@@ -125,6 +125,12 @@ export default function Authenticated({
                                             label="Study"
                                             items={[
                                                 {
+                                                    label: 'What you can do',
+                                                    href: route('explore'),
+                                                    pattern: 'explore',
+                                                    description: 'Everything the platform offers',
+                                                },
+                                                {
                                                     label: 'My questions',
                                                     href: route('requests.index'),
                                                     pattern: 'requests.*',

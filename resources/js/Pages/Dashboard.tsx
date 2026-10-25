@@ -104,6 +104,21 @@ export default function Dashboard({
 
                 <SubjectProgressList subjects={subjectProgress} />
 
+                <Link
+                    href={route('explore')}
+                    className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 transition hover:border-slate-300 hover:shadow-sm"
+                >
+                    <span>
+                        <span className="block font-medium text-slate-900">
+                            What else can I do here?
+                        </span>
+                        <span className="mt-0.5 block text-sm text-slate-600">
+                            Live classes, tutors, study groups and lessons in your language.
+                        </span>
+                    </span>
+                    <span aria-hidden="true" className="shrink-0 text-slate-400">→</span>
+                </Link>
+
                 <div className="grid gap-6 lg:grid-cols-3">
                     <section className="rounded-xl border border-slate-200 bg-white lg:col-span-2">
                         <header className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
