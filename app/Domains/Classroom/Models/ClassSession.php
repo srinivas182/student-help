@@ -21,6 +21,8 @@ class ClassSession extends Model
         'classroom_id', 'title', 'description', 'mode', 'meeting_url', 'location',
         'starts_at', 'duration_minutes', 'status', 'cancel_reason',
         'repeats', 'repeats_until', 'parent_session_id',
+        'recording_url', 'recording_path', 'recording_note', 'recording_added_at',
+        'reminded_at', 'started_at',
     ];
 
     /**
@@ -39,6 +41,9 @@ class ClassSession extends Model
         return [
             'starts_at' => 'datetime',
             'repeats_until' => 'date',
+            'recording_added_at' => 'datetime',
+            'reminded_at' => 'datetime',
+            'started_at' => 'datetime',
         ];
     }
 
@@ -89,5 +94,33 @@ class ClassSession extends Model
         }
 
         return $this->starts_at->format('D j M, H:i');
+    }
+
+    public function materials(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ClassSessionMaterial::class);
+    }
+
+    public function hasRecording(): bool
+    {
+        return filled($this->recording_url) || filled($this->recording_path);
+    }
+
+    /** Shown as happening right now, so the page can say so. */
+    public function isLive(): bool
+    {
+        return $this->status === self::STATUS_SCHEDULED
+            && now()->between($this->starts_at, $this->endsAt());
+    }
+
+    /**
+     * Sessions needing a reminder: starting within the window, not yet
+     * reminded, and not cancelled.
+     */
+    public function scopeNeedingReminder(Builder $query, int $minutes = 60): Builder
+    {
+        return $query->where('status', self::STATUS_SCHEDULED)
+            ->whereNull('reminded_at')
+            ->whereBetween('starts_at', [now(), now()->addMinutes($minutes)]);
     }
 }

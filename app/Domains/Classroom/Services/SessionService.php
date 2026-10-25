@@ -160,6 +160,179 @@ class SessionService
         return ClassSession::where(fn ($q) => $q->where('id', $rootId)->orWhere('parent_session_id', $rootId));
     }
 
+    /**
+     * A recording, as a link or an uploaded file.
+     *
+     * Link is the default and the recommendation: an hour of video is several
+     * hundred megabytes, which fills the server and costs a learner on mobile
+     * data more than the lesson is worth. Cloud hosts stream it adaptively.
+     */
+    public function attachRecording(
+        ClassSession $session,
+        User $teacher,
+        ?string $url,
+        ?\Illuminate\Http\UploadedFile $file,
+        ?string $note = null,
+    ): void {
+        $this->assertTeacher($session->classroom, $teacher);
+
+        if (blank($url) && $file === null) {
+            throw ValidationException::withMessages([
+                'recording' => 'Paste a link to the recording, or upload the file.',
+            ]);
+        }
+
+        $path = $session->recording_path;
+
+        if ($file !== null) {
+            // Replace rather than accumulate: a re-upload should not leave the
+            // previous file sitting on disk forever
+            if ($path) {
+                \Illuminate\Support\Facades\Storage::disk('local')->delete($path);
+            }
+
+            $path = $file->store("recordings/{$session->classroom_id}/{$session->id}", 'local');
+        }
+
+        $session->update([
+            'recording_url' => $file !== null ? null : $url,
+            'recording_path' => $file !== null ? $path : null,
+            'recording_note' => $note,
+            'recording_added_at' => now(),
+        ]);
+
+        $this->notifyMembers(
+            $session->classroom,
+            $session,
+            'Recording available',
+            $note ?: 'The recording of this session is ready to watch.',
+        );
+
+        audit('class_session.recording_added', $session, [
+            'kind' => $file !== null ? 'upload' : 'link',
+        ]);
+    }
+
+    public function removeRecording(ClassSession $session, User $teacher): void
+    {
+        $this->assertTeacher($session->classroom, $teacher);
+
+        if ($session->recording_path) {
+            \Illuminate\Support\Facades\Storage::disk('local')->delete($session->recording_path);
+        }
+
+        $session->update([
+            'recording_url' => null,
+            'recording_path' => null,
+            'recording_note' => null,
+            'recording_added_at' => null,
+        ]);
+
+        audit('class_session.recording_removed', $session);
+    }
+
+    /** Slides, notes or a worksheet, attached to the session they belong to. */
+    public function addMaterial(
+        ClassSession $session,
+        User $teacher,
+        string $title,
+        ?string $url,
+        ?\Illuminate\Http\UploadedFile $file,
+    ): \App\Domains\Classroom\Models\ClassSessionMaterial {
+        $this->assertTeacher($session->classroom, $teacher);
+
+        $path = null;
+        $mime = null;
+        $size = 0;
+
+        if ($file !== null) {
+            $path = $file->store("session-materials/{$session->id}", 'local');
+            $mime = $file->getClientMimeType();
+            $size = $file->getSize() ?: 0;
+        }
+
+        return $session->materials()->create([
+            'uploaded_by' => $teacher->id,
+            'title' => $title,
+            'path' => $path,
+            'external_url' => $file === null ? $url : null,
+            'mime_type' => $mime,
+            'size' => $size,
+        ]);
+    }
+
+    /**
+     * Who turned up, who said they would and did not, and who watched it
+     * afterwards. The last column is the one that makes a recording worth
+     * uploading.
+     */
+    public function register(ClassSession $session, User $teacher): \Illuminate\Support\Collection
+    {
+        $this->assertTeacher($session->classroom, $teacher);
+
+        $responses = $session->attendees()->get()->keyBy('id');
+
+        return $session->classroom->students()->get()->map(function (User $student) use ($responses) {
+            $record = $responses->get($student->id);
+            $pivot = $record?->pivot;
+
+            return [
+                'id' => $student->id,
+                'name' => $student->name,
+                'response' => $pivot?->response,
+                'attended' => $pivot?->attended_at !== null,
+                'attendedAt' => $pivot?->attended_at
+                    ? Carbon::parse($pivot->attended_at)->format('H:i')
+                    : null,
+                'watchedRecording' => (bool) ($pivot?->watched_recording ?? false),
+            ];
+        })->sortBy('name')->values();
+    }
+
+    public function markWatchedRecording(ClassSession $session, User $student): void
+    {
+        $session->attendees()->syncWithoutDetaching([
+            $student->id => ['watched_recording' => true],
+        ]);
+    }
+
+    /**
+     * Reminds people shortly before a session starts.
+     *
+     * Being told three weeks ahead that something is scheduled is not a
+     * reminder. This is what actually gets a learner to turn up.
+     */
+    public function sendDueReminders(int $minutes = 60): int
+    {
+        $sent = 0;
+
+        foreach (ClassSession::needingReminder($minutes)->with('classroom')->get() as $session) {
+            if (! $session->classroom) {
+                continue;
+            }
+
+            $students = $session->classroom->students()->get();
+
+            if ($students->isNotEmpty()) {
+                \Illuminate\Support\Facades\Notification::send(
+                    $students,
+                    new ClassSessionChanged(
+                        $session,
+                        'Starting soon: '.$session->title,
+                        $session->mode === ClassSession::MODE_ONLINE
+                            ? 'The join button appears on the class page shortly before it starts.'
+                            : null,
+                    ),
+                );
+            }
+
+            $session->update(['reminded_at' => now()]);
+            $sent++;
+        }
+
+        return $sent;
+    }
+
     private function assertTeacher(Classroom $classroom, User $user): void
     {
         if ($classroom->teacher_id !== $user->id) {

@@ -121,6 +121,18 @@ Route::middleware(['auth', 'verified', 'portal'])->group(function () {
         Route::post('/sessions/{session}/cancel', [ClassSessionController::class, 'cancel'])->name('sessions.cancel');
         Route::post('/sessions/{session}/respond', [ClassSessionController::class, 'respond'])->name('sessions.respond');
         Route::get('/sessions/{session}/join', [ClassSessionController::class, 'join'])->name('sessions.join');
+
+        // Recordings, materials and the attendance register
+        Route::post('/sessions/{session}/recording', [ClassSessionController::class, 'recording'])
+            ->middleware('throttle:uploads')->name('sessions.recording');
+        Route::delete('/sessions/{session}/recording', [ClassSessionController::class, 'removeRecording'])
+            ->name('sessions.recording.remove');
+        Route::get('/sessions/{session}/watch', [ClassSessionController::class, 'watchRecording'])
+            ->name('sessions.watch');
+        Route::post('/sessions/{session}/materials', [ClassSessionController::class, 'addMaterial'])
+            ->middleware('throttle:uploads')->name('sessions.materials');
+        Route::get('/sessions/{session}/register', [ClassSessionController::class, 'register'])
+            ->name('sessions.register');
         Route::post('/{classroom}/discoverable', [ClassroomController::class, 'setDiscoverable'])->name('discoverable');
         Route::post('/{classroom}/request-join', [ClassroomController::class, 'requestJoin'])->name('requestJoin');
     });

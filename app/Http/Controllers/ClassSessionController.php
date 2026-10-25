@@ -110,4 +110,109 @@ class ClassSessionController extends Controller
 
         return back()->with('success', 'Marked as attending. See you there.');
     }
+
+    /** Attach the recording after a session, by link or by upload. */
+    public function recording(Request $request, ClassSession $session): RedirectResponse
+    {
+        $validated = $request->validate([
+            'recording_url' => ['nullable', 'url', 'max:500', new \App\Rules\SafeUrl],
+            // 500 MB ceiling: beyond that a link is the only sensible option
+            'recording_file' => ['nullable', 'file', 'mimetypes:video/mp4,video/webm,video/quicktime', 'max:512000'],
+            'recording_note' => ['nullable', 'string', 'max:300'],
+        ], [
+            'recording_file.max' => 'That file is too large. Upload it to Drive or Zoom Cloud and paste the link instead.',
+            'recording_file.mimetypes' => 'Upload an MP4, WebM or MOV file.',
+        ]);
+
+        $this->sessions->attachRecording(
+            $session,
+            $request->user(),
+            $validated['recording_url'] ?? null,
+            $request->file('recording_file'),
+            $validated['recording_note'] ?? null,
+        );
+
+        return back()->with('success', 'Recording added. Everyone in the class has been told.');
+    }
+
+    public function removeRecording(Request $request, ClassSession $session): RedirectResponse
+    {
+        $this->sessions->removeRecording($session, $request->user());
+
+        return back()->with('success', 'Recording removed.');
+    }
+
+    /** Streams an uploaded recording, and records that they watched it. */
+    public function watchRecording(Request $request, ClassSession $session)
+    {
+        $user = $request->user();
+
+        abort_unless(
+            $session->classroom->students()->whereKey($user->id)->exists()
+                || $session->classroom->teacher_id === $user->id,
+            403,
+        );
+
+        abort_unless($session->hasRecording(), 404);
+
+        $this->sessions->markWatchedRecording($session, $user);
+
+        if ($session->recording_url) {
+            return redirect()->away($session->recording_url);
+        }
+
+        abort_unless(\Illuminate\Support\Facades\Storage::disk('local')->exists($session->recording_path), 404);
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->response($session->recording_path);
+    }
+
+    public function addMaterial(Request $request, ClassSession $session): RedirectResponse
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:120'],
+            'external_url' => ['nullable', 'url', 'max:500', new \App\Rules\SafeUrl],
+            'file' => ['nullable', 'file', 'mimes:pdf,doc,docx,ppt,pptx,png,jpg,jpeg', 'max:20480'],
+        ]);
+
+        abort_if(
+            blank($validated['external_url'] ?? null) && ! $request->hasFile('file'),
+            422,
+            'Add a file or a link.',
+        );
+
+        $this->sessions->addMaterial(
+            $session,
+            $request->user(),
+            $validated['title'],
+            $validated['external_url'] ?? null,
+            $request->file('file'),
+        );
+
+        return back()->with('success', 'Material added to this session.');
+    }
+
+    /** Who turned up, who did not, and who watched the recording. */
+    public function register(Request $request, ClassSession $session): \Inertia\Response
+    {
+        $register = $this->sessions->register($session, $request->user());
+
+        return \Inertia\Inertia::render('Classrooms/Register', [
+            'session' => [
+                'id' => $session->id,
+                'title' => $session->title,
+                'whenLabel' => $session->whenLabel(),
+                'mode' => $session->mode,
+                'hasRecording' => $session->hasRecording(),
+                'classroomId' => $session->classroom_id,
+                'classroomName' => $session->classroom?->name,
+            ],
+            'register' => $register,
+            'summary' => [
+                'members' => $register->count(),
+                'attended' => $register->where('attended', true)->count(),
+                'saidGoing' => $register->where('response', 'going')->count(),
+                'watchedRecording' => $register->where('watchedRecording', true)->count(),
+            ],
+        ]);
+    }
 }

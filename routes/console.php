@@ -25,3 +25,8 @@ Schedule::command('horizon:snapshot')->everyFiveMinutes();
 Schedule::call(fn () => \Illuminate\Support\Facades\Cache::put(
     'health:scheduler_last_run', now(), now()->addDay(),
 ))->everyFiveMinutes()->name('scheduler-heartbeat');
+
+// Session reminders: being told three weeks ahead is not a reminder
+Schedule::call(fn () => app(\App\Domains\Classroom\Services\SessionService::class)->sendDueReminders(60))
+    ->everyFifteenMinutes()
+    ->name('class-session-reminders');

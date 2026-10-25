@@ -66,6 +66,13 @@ read is written to the audit log.
 **Tutor documents are visible to administrators.** Necessary for verification.
 Access is logged with the administrator's identity and timestamp.
 
+**Session recordings default to a link, not an upload.** An hour of video is
+several hundred megabytes. Uploading fills the server within a term, and a
+learner on mobile data cannot afford to stream it from us. Zoom Cloud, Google
+Drive and unlisted YouTube host it free and adapt quality to the connection.
+Upload stays available, capped at 500 MB, for a tutor with no cloud option.
+Either way the recording is reachable only by members of that class.
+
 **Class posts cannot be deleted by their author or by the teacher.** Only
 moderators can remove content, and every removal is audit logged. This is a
 deliberate decision, confirmed with DX: allowing deletion would also allow

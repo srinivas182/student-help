@@ -138,7 +138,7 @@ class ClassroomController extends Controller
             'sessions' => $classroom->sessions()
                 ->where('starts_at', '>=', now()->subWeek())
                 ->orderBy('starts_at')
-                ->with('attendees:id')
+                ->with(['attendees:id', 'materials'])
                 ->get()
                 ->map(fn (\App\Domains\Classroom\Models\ClassSession $session) => [
                     'id' => $session->id,
@@ -153,7 +153,17 @@ class ClassroomController extends Controller
                     'status' => $session->status,
                     'cancelReason' => $session->cancel_reason,
                     'isJoinable' => $session->isJoinable(),
+                    'isLive' => $session->isLive(),
                     'isPast' => $session->isPast(),
+                    'hasRecording' => $session->hasRecording(),
+                    'recordingNote' => $session->recording_note,
+                    'materials' => $session->materials->map(fn ($material) => [
+                        'id' => $material->id,
+                        'title' => $material->title,
+                        'isLink' => $material->isLink(),
+                        'url' => $material->external_url,
+                        'size' => $material->sizeLabel(),
+                    ]),
                     'repeats' => $session->repeats ?? ($session->parent_session_id ? 'weekly' : null),
                     'goingCount' => $session->attendees->count(),
                     'myResponse' => $session->attendees->firstWhere('id', $user->id)?->pivot?->response,

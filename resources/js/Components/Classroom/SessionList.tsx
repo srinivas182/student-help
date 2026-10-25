@@ -1,3 +1,4 @@
+import SessionExtras, { SessionMaterial } from '@/Components/Classroom/SessionExtras';
 import { router, useForm } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -14,7 +15,11 @@ export interface ClassSession {
     status: string;
     cancelReason: string | null;
     isJoinable: boolean;
+    isLive: boolean;
     isPast: boolean;
+    hasRecording: boolean;
+    recordingNote: string | null;
+    materials: SessionMaterial[];
     repeats: string | null;
     goingCount: number;
     myResponse: string | null;
@@ -61,10 +66,24 @@ export default function SessionList({
         >
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                    <p className="font-medium text-slate-900">
+                    <p className="flex flex-wrap items-center gap-2 font-medium text-slate-900">
                         {session.title}
+
+                        {session.isLive && session.status !== 'cancelled' && (
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-100 px-2.5 py-0.5 text-[11px] font-semibold text-rose-700">
+                                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-500" />
+                                Live now
+                            </span>
+                        )}
+
                         {session.repeats === 'weekly' && (
-                            <span className="ml-2 text-[11px] font-normal text-slate-400">weekly</span>
+                            <span className="text-[11px] font-normal text-slate-400">weekly</span>
+                        )}
+
+                        {session.hasRecording && !session.isLive && (
+                            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-medium text-slate-600">
+                                recording
+                            </span>
                         )}
                     </p>
 
@@ -137,6 +156,15 @@ export default function SessionList({
                     )}
                 </div>
             </div>
+
+            <SessionExtras
+                sessionId={session.id}
+                isTeacher={isTeacher}
+                isPast={session.isPast}
+                hasRecording={session.hasRecording}
+                recordingNote={session.recordingNote}
+                materials={session.materials ?? []}
+            />
 
             {cancelling === session.id && (
                 <div className="mt-4 space-y-2 rounded-lg bg-slate-50 p-4">
